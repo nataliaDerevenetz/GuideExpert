@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    private val userInfoRepository: UserInfoRepository
+    private val userInfoRepository: DataSourceRepository
 ) : ViewModel() {
 
     var count by mutableStateOf(0)

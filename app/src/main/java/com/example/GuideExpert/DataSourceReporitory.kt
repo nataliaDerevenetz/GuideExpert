@@ -1,7 +1,8 @@
 package com.example.GuideExpert
 
 import android.util.Log
-import com.example.GuideExpert.R
+import com.example.GuideExpert.data.DataProvider
+import com.example.GuideExpert.data.Excursion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +28,14 @@ class ExcursionData(
 )
 
 
-class UserInfoRepository {
+class DataSourceRepository {
+
+
+    fun getAllExcursionFlow(): Flow<List<Excursion>> {
+        val excursions = DataProvider.excursionList
+        return flow{emit(excursions)}
+    }
+
      fun getUserInfo(userId:String): Flow<UserInfo> {
         return flow{
             withContext(Dispatchers.IO) {

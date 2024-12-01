@@ -1,6 +1,6 @@
 package com.example.GuideExpert.di
 
-import com.example.GuideExpert.UserInfoRepository
+import com.example.GuideExpert.DataSourceRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +15,7 @@ object DomainModule {
     @Singleton
     fun provideUserInfoRepository(
         // Potential dependencies of this type
-    ): UserInfoRepository {
-        return UserInfoRepository()
+    ): DataSourceRepository {
+        return DataSourceRepository()
     }
 }

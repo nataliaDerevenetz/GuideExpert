@@ -20,7 +20,6 @@ import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.data.Excursion
 
 
-
 @Composable
 fun ExcursionsScreen(
     count :Int,
@@ -39,7 +38,7 @@ fun ExcursionsScreen(
 fun ExcursionDetailScreen(
     count :Int,
     onIcr :()->Unit,
-    viewModel: ExcursionsViewModel = hiltViewModel()
+    viewModel: ExcursionDetailViewModel = hiltViewModel()
 ) {
     val excursion by viewModel.excursion.collectAsStateWithLifecycle()
     val excursionData by viewModel.excursionData.observeAsState()
@@ -62,8 +61,13 @@ fun ExcursionDetailScreen(
 
 
 @Composable
-fun ExcursionSearchScreen(navigateToExcursion: (Excursion) -> Unit) {
-    val excursions = remember { DataProvider.excursionList }
+fun ExcursionSearchScreen(
+    navigateToExcursion: (Excursion) -> Unit,
+    viewModel: ExcursionsViewModel = hiltViewModel()
+    ) {
+
+    val excursions by viewModel.allExcursion.collectAsStateWithLifecycle(listOf())
+
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {

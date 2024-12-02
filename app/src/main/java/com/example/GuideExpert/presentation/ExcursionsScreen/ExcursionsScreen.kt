@@ -15,8 +15,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.GuideExpert.ExcursionDetailViewModel
-import com.example.GuideExpert.ExcursionsViewModel
 import com.example.GuideExpert.domain.models.Excursion
 
 

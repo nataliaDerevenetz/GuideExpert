@@ -1,11 +1,11 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.GuideExpert.data.repository.DataSourceRepository
+import com.example.GuideExpert.domain.repository.DataSourceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

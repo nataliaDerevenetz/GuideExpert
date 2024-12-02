@@ -1,4 +1,4 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation.ExcursionsScreen
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

@@ -1,7 +1,6 @@
 package com.example.GuideExpert.domain.models
 
 import com.example.GuideExpert.R
-import kotlinx.serialization.Serializable
 
 class ExcursionData(
     val excursionId: String = "8886",

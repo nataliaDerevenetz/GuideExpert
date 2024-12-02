@@ -2,14 +2,17 @@ package com.example.GuideExpert.data.repository
 
 import android.util.Log
 import com.example.GuideExpert.data.DataProvider
+import com.example.GuideExpert.data.storage.DBStorage
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.repository.DataSourceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import javax.inject.Inject
 
 @Serializable
 class UserInfo(
@@ -18,27 +21,17 @@ class UserInfo(
     val age: Int = 10,
     val sex:String = "men"
 )
-/*
-@Serializable
-class ExcursionData(
-    val excursionId: String = "8886",
-    val title: String ="Супер экскурсия!!",
-    val company: String = "Лучшая компания",
-    val photo: Int = R.drawable.excurs1
 
-)
-*/
+class DataSourceRepositoryImpl @Inject constructor(
+    private val dbStorage : DBStorage
+): DataSourceRepository {
 
-class DataSourceRepository {
+    override fun getAllExcursionFlow(): List<Excursion>{
+        return dbStorage.getAllExcursionFlow()
 
-
-    fun getAllExcursionFlow(): List<Excursion>{
-        // return flow!!!
-        val excursions = DataProvider.excursionList
-        return excursions
     }
 
-     fun getUserInfo(userId:String): Flow<UserInfo> {
+    override fun getUserInfo(userId:String): Flow<UserInfo> {
         return flow{
             withContext(Dispatchers.IO) {
                 delay(5000)
@@ -48,15 +41,8 @@ class DataSourceRepository {
     }
 
 
-    fun getExcursionInfo(excursionId:Int): Flow<ExcursionData> {
-        Log.d("TAG","excursionId::   ${excursionId.toString()}")
-        return flow{
-         /*   withContext(Dispatchers.IO) {
-                delay(5000)
-            }
+    override fun getExcursionInfo(excursionId:Int): Flow<ExcursionData> {
+        return dbStorage.getExcursionInfo(excursionId)
 
-          */
-            emit(ExcursionData(excursionId = excursionId.toString()))
-        }
     }
 }

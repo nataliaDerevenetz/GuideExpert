@@ -1,4 +1,4 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation.ExcursionsScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,15 +9,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.GuideExpert.data.DataProvider
-import com.example.GuideExpert.data.Excursion
+import com.example.GuideExpert.ExcursionDetailViewModel
+import com.example.GuideExpert.ExcursionsViewModel
+import com.example.GuideExpert.domain.models.Excursion
 
 
 @Composable
@@ -66,7 +66,8 @@ fun ExcursionSearchScreen(
     viewModel: ExcursionsViewModel = hiltViewModel()
     ) {
 
-    val excursions by viewModel.allExcursion.collectAsStateWithLifecycle(listOf())
+   // val excursions by viewModel.allExcursion.collectAsStateWithLifecycle(listOf())
+    val excursions by viewModel.allExcursionState.collectAsStateWithLifecycle(listOf())
 
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)

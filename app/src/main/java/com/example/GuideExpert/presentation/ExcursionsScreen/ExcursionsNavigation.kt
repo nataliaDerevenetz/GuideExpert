@@ -1,11 +1,12 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation.ExcursionsScreen
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.GuideExpert.data.Excursion
+import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.serializableType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 

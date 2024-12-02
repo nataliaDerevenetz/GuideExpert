@@ -1,4 +1,4 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation.ProfileScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -6,7 +6,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 @Composable

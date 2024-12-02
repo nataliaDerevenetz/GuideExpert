@@ -1,4 +1,4 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation.ExcursionsScreen
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -27,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
-import com.example.GuideExpert.data.Excursion
+import com.example.GuideExpert.domain.models.Excursion
 
 @Composable
 fun ExcursionListItem(excursion: Excursion, navigateToProfile: (Excursion) -> Unit) {

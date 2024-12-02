@@ -1,4 +1,4 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.padding
@@ -23,6 +23,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.GuideExpert.UserViewModel
+import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionsScreen
+import com.example.GuideExpert.presentation.ProfileScreen.ProfileScreen
 import kotlinx.serialization.Serializable
 
 

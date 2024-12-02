@@ -1,9 +1,8 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.presentation.ProfileScreen
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.GuideExpert.data.Excursion
 import kotlinx.serialization.Serializable
 
 @Serializable

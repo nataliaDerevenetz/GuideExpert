@@ -1,4 +1,4 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.data.repository
 
 import android.util.Log
 import com.example.GuideExpert.data.DataProvider

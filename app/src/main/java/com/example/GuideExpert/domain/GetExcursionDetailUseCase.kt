@@ -1,7 +1,7 @@
 package com.example.GuideExpert.domain
 
-import com.example.GuideExpert.ExcursionData
-import com.example.GuideExpert.data.Excursion
+//import com.example.GuideExpert.ExcursionData
+import com.example.GuideExpert.domain.models.ExcursionData
 import kotlinx.coroutines.flow.Flow
 
 interface GetExcursionDetailUseCase {

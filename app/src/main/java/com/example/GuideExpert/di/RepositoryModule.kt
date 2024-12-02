@@ -1,6 +1,6 @@
 package com.example.GuideExpert.di
 
-import com.example.GuideExpert.DataSourceRepository
+import com.example.GuideExpert.data.repository.DataSourceRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

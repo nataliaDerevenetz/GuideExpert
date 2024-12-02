@@ -1,6 +1,7 @@
 package com.example.GuideExpert.data
 
 import com.example.GuideExpert.R
+import com.example.GuideExpert.domain.models.Excursion
 
 object DataProvider {
     val excursionList = listOf(

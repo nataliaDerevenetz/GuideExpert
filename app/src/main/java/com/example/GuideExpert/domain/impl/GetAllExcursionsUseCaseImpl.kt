@@ -1,12 +1,12 @@
 package com.example.GuideExpert.domain.impl
 
-import com.example.GuideExpert.domain.GetExcursionAllUseCase
+import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import javax.inject.Inject
 
 
-class GetExcursionAllUseCaseImpl @Inject constructor(
+class GetAllExcursionsUseCaseImpl @Inject constructor(
     private val dataSourceRepository: DataSourceRepository
-):GetExcursionAllUseCase{
+):GetAllExcursionsUseCase{
     override operator fun invoke() = dataSourceRepository.getAllExcursionFlow()
 }

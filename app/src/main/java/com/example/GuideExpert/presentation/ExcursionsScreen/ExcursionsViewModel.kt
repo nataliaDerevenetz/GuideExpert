@@ -2,7 +2,7 @@ package com.example.GuideExpert.presentation.ExcursionsScreen
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.GuideExpert.domain.GetExcursionAllUseCase
+import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExcursionsViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    getExcursionAllUseCase: GetExcursionAllUseCase
+    getExcursionAllUseCase: GetAllExcursionsUseCase
 ) : ViewModel() {
 
     private val _allExcursion = MutableStateFlow(emptyList<Excursion>())

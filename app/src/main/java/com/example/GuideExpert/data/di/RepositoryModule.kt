@@ -1,4 +1,4 @@
-package com.example.GuideExpert.di
+package com.example.GuideExpert.data.di
 
 import com.example.GuideExpert.data.repository.DataSourceRepositoryImpl
 import com.example.GuideExpert.data.storage.DBStorage

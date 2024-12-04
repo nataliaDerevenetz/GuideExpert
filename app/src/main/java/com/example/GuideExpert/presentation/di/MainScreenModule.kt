@@ -1,8 +1,8 @@
-package com.example.GuideExpert.di
+package com.example.GuideExpert.presentation.di
 
-import com.example.GuideExpert.domain.GetExcursionAllUseCase
+import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
-import com.example.GuideExpert.domain.impl.GetExcursionAllUseCaseImpl
+import com.example.GuideExpert.domain.impl.GetAllExcursionsUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionDetailUseCaseImpl
 import dagger.Binds
 import dagger.Module
@@ -20,6 +20,6 @@ abstract class MainScreenModule {
 
     @Binds
     abstract fun bindGetExcursionAllUseCase(
-        getAllNotesUseCaseImpl: GetExcursionAllUseCaseImpl
-    ) : GetExcursionAllUseCase
+        getAllNotesUseCaseImpl: GetAllExcursionsUseCaseImpl
+    ) : GetAllExcursionsUseCase
 }

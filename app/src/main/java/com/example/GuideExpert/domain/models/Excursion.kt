@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 data class Excursion (
     val id: Int,
-    val name: String,
+    val title: String,
     val description: String,
     val photo: Int
 ): Parcelable

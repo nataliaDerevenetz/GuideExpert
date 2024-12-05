@@ -60,7 +60,7 @@ fun ExcursionListItem(excursion: Excursion, navigateToProfile: (Excursion) -> Un
                             .clickable { Log.d("CLICK","featured") }
                     )
                 }
-                Text(text = excursion.name, style = typography.headlineSmall)
+                Text(text = excursion.title, style = typography.headlineSmall)
                 Text(text = "VIEW DETAIL", style = typography.bodyMedium)
             }
         }

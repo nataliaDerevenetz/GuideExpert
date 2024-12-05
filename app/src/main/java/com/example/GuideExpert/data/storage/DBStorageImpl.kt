@@ -20,6 +20,12 @@ class DBStorageImpl @Inject constructor(
     private val excursionDao: ExcursionDao
 ): DBStorage{
     override fun getAllExcursionFlow(): Flow<List<Excursion>> {
+     /*   val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            excursionDao.insertAllExcursionTest(DataProvider.excursionList.map { it -> it.toExcursionEntity() })
+
+        }*/
+
         return excursionDao.getAllExcursion().map { excursionEntityList ->
             excursionEntityList.map { excursionEntity ->
                 excursionEntity.toExcursion()
@@ -31,8 +37,7 @@ class DBStorageImpl @Inject constructor(
     //    return excursions
     }
 
-    // excursionDao.insertAllExcursionTest(DataProvider.excursionList.map { it -> it.toExcursionEntity() })
-
+    //
 
     override fun getExcursionInfo(excursionId: Int): Flow<ExcursionData> {
         Log.d("TAG","excursionId::   ${excursionId.toString()}")

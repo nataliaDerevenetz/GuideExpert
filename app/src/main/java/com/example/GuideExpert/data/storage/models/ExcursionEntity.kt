@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class ExcursionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    @ColumnInfo val name: String,
+    @ColumnInfo val title: String,
     @ColumnInfo val description: String,
     @ColumnInfo val photo: Int
 )

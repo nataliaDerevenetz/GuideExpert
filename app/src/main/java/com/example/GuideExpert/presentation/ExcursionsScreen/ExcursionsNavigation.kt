@@ -26,7 +26,7 @@ class ExcursionDetail(val excursion : Excursion) {
 
 fun NavGraphBuilder.excursionsDestination(onNavigateToExcursion: (Excursion) -> Unit, count: Int, onIcr:() -> Unit) {
     composable<ExcursionSearchScreen> {
-        ExcursionSearchScreen(onNavigateToExcursion)
+        ExcursionHomeScreen(onNavigateToExcursion)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         ExcursionDetailScreen(count, onIcr)

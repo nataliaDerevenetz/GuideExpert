@@ -20,7 +20,7 @@ import javax.inject.Singleton
 class LocalSourceModuleProvider {
 
     @Provides
-    fun provideNoteDao(database: ExcursionsRoomDatabase) = database.excursionDao()
+    fun provideExcursionDao(database: ExcursionsRoomDatabase) = database.excursionDao()
 
     @Provides
     @Singleton
@@ -33,28 +33,6 @@ class LocalSourceModuleProvider {
     ).build()
 }
 
-
-/*
-@Module
-@InstallIn(SingletonComponent::class)
-object RepositoryModule {
-
-    @Provides
-    @Singleton
-    fun provideDataSourceRepository(
-       dbStorage: DBStorage
-    ): DataSourceRepository {
-        return DataSourceRepositoryImpl(dbStorage)
-    }
-
-    @Provides
-    @Singleton
-    fun provideDBStorage(
-    ): DBStorage {
-        return DBStorageImpl()
-    }
-}
-*/
 
 @Module
 @InstallIn(SingletonComponent::class)

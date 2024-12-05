@@ -26,7 +26,7 @@ class DataSourceRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage
 ): DataSourceRepository {
 
-    override fun getAllExcursionFlow(): List<Excursion>{
+    override fun getAllExcursionFlow(): Flow<List<Excursion>>{
         return dbStorage.getAllExcursionFlow()
 
     }

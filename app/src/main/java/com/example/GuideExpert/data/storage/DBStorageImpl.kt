@@ -19,16 +19,16 @@ import javax.inject.Inject
 class DBStorageImpl @Inject constructor(
     private val excursionDao: ExcursionDao
 ): DBStorage{
-    override fun getAllExcursionFlow(): List<Excursion> {
-        val listFlow = excursionDao.getAllExcursion().map { excursionEntityList ->
+    override fun getAllExcursionFlow(): Flow<List<Excursion>> {
+        return excursionDao.getAllExcursion().map { excursionEntityList ->
             excursionEntityList.map { excursionEntity ->
                 excursionEntity.toExcursion()
             }
         }
 
 
-        val excursions = DataProvider.excursionList
-        return excursions
+    //    val excursions = DataProvider.excursionList
+    //    return excursions
     }
 
     // excursionDao.insertAllExcursionTest(DataProvider.excursionList.map { it -> it.toExcursionEntity() })

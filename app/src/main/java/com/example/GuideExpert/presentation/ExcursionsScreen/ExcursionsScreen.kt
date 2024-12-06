@@ -20,10 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailViewModel
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionListItem
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeScreenUiState
 
 
 @Composable
@@ -32,82 +34,4 @@ fun ExcursionsScreen(
     onIcr :()->Unit
 ) {
     NavigationHomeScreen(count,onIcr)
-}
-
-
-@Composable
-fun ExcursionDetailScreen(
-    count :Int,
-    onIcr :()->Unit,
-    viewModel: ExcursionDetailViewModel = hiltViewModel()
-) {
-    val excursion by viewModel.excursion.collectAsStateWithLifecycle()
-    val excursionData by viewModel.excursionData.observeAsState()
-    Column {
-        Text("ExcursionDetailScreen")
-        Text("id ${excursion.id}")
-        Text("Excursion ${excursionData?.title}")
-        Text("Excursion ${excursionData?.company}")
-        Text("Excursion ${excursionData?.excursionId}")
-
-        Column {
-            Text("Incr :: $count")
-            Button(onClick = {onIcr()}) {
-                Text(text = "Increase", fontSize = 25.sp)
-            }
-        }
-    }
-    // TODO("Not yet implemented")
-}
-
-
-@Composable
-fun ExcursionHomeScreen(
-    navigateToExcursion: (Excursion) -> Unit,
-    viewModel: ExcursionsViewModel = hiltViewModel()
-    ) {
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    when(uiState) {
-
-        is HomeScreenUiState.Empty -> HomeScreenEmpty()
-
-        is HomeScreenUiState.Content ->
-            HomeScreenContent(
-                excursions = (uiState as HomeScreenUiState.Content).excursions,
-          //  onSetFavoriteExcursionButtonClick = onSetFavoriteExcursionButtonClick,
-                navigateToExcursion = navigateToExcursion
-            )
-    }
-
-}
-
-@Composable
-private fun HomeScreenEmpty(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = stringResource(R.string.no_excursions_found),
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 27.sp,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@Composable
-private fun HomeScreenContent(
-    modifier: Modifier = Modifier,
-    excursions: List<Excursion>,
-  //  onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
-    navigateToExcursion: (Excursion) -> Unit,
-) {
-    LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        items(excursions, key = { it.id }) {
-            ExcursionListItem(it,navigateToExcursion)
-        }
-    }
 }

@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScreen
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionHomeScreen
 import com.example.GuideExpert.serializableType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf

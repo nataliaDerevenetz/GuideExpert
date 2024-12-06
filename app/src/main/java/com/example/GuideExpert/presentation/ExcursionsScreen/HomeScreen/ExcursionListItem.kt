@@ -1,4 +1,4 @@
-package com.example.GuideExpert.presentation.ExcursionsScreen
+package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -30,7 +30,11 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 
 @Composable
-fun ExcursionListItem(excursion: Excursion, navigateToProfile: (Excursion) -> Unit) {
+fun ExcursionListItem(
+    excursion: Excursion,
+    onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
+    navigateToProfile: (Excursion) -> Unit,
+    ) {
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
         /* colors = CardDefaults.cardColors(
@@ -57,7 +61,9 @@ fun ExcursionListItem(excursion: Excursion, navigateToProfile: (Excursion) -> Un
                         contentDescription = "featured",
                         colorFilter = ColorFilter.tint(Color.White),
                         modifier = Modifier.align(Alignment.TopEnd)
-                            .clickable { Log.d("CLICK","featured") }
+                            .clickable {
+                                onSetFavoriteExcursionButtonClick(excursion)
+                                Log.d("CLICK","featured") }
                     )
                 }
                 Text(text = excursion.title, style = typography.headlineSmall)

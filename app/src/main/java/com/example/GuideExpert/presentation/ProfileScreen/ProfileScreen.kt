@@ -11,12 +11,14 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun ProfileScreen(count :Int, onIcr :()->Unit) {
 
+    NavigationProfileScreen(count,onIcr)
+    /*
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Screen1) {
         val onNavigateToScreen2 = { navController.navigateToScreen2("Ok it Screen2")}
         profileDestination(onNavigateToScreen2,count,onIcr)
-    }
+    }*/
 
 }
 

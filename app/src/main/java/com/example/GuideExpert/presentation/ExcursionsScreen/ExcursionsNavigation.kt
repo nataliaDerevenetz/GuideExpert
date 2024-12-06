@@ -1,9 +1,12 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen
 
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.serializableType
@@ -23,6 +26,17 @@ class ExcursionDetail(val excursion : Excursion) {
     }
 }
 
+@Composable
+fun NavigationHomeScreen(
+    count :Int,
+    onIcr :()->Unit
+) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = ExcursionSearchScreen) {
+        val onNavigateToExcursion = { it: Excursion -> navController.navigateToExcursionDetail(excursion = it) }
+        excursionsDestination(onNavigateToExcursion,count,onIcr)
+    }
+}
 
 fun NavGraphBuilder.excursionsDestination(onNavigateToExcursion: (Excursion) -> Unit, count: Int, onIcr:() -> Unit) {
     composable<ExcursionSearchScreen> {

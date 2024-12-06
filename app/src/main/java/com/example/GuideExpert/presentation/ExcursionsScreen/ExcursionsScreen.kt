@@ -31,12 +31,7 @@ fun ExcursionsScreen(
     count :Int,
     onIcr :()->Unit
 ) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = ExcursionSearchScreen) {
-        val onNavigateToExcursion = { it: Excursion -> navController.navigateToExcursionDetail(excursion = it) }
-        excursionsDestination(onNavigateToExcursion,count,onIcr)
-    }
-
+    NavigationHomeScreen(count,onIcr)
 }
 
 

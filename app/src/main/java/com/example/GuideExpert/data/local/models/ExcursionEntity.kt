@@ -1,4 +1,4 @@
-package com.example.GuideExpert.data.storage.models
+package com.example.GuideExpert.data.local.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

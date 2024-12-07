@@ -3,9 +3,9 @@ package com.example.GuideExpert.data.di
 import android.content.Context
 import androidx.room.Room
 import com.example.GuideExpert.data.repository.DataSourceRepositoryImpl
-import com.example.GuideExpert.data.storage.DBStorage
-import com.example.GuideExpert.data.storage.DBStorageImpl
-import com.example.GuideExpert.data.storage.db.ExcursionsRoomDatabase
+import com.example.GuideExpert.data.local.DBStorage
+import com.example.GuideExpert.data.local.DBStorageImpl
+import com.example.GuideExpert.data.local.db.ExcursionsRoomDatabase
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import dagger.Binds
 import dagger.Module
@@ -38,12 +38,13 @@ class LocalSourceModuleProvider {
 @InstallIn(SingletonComponent::class)
 abstract class StorageModuleBinder {
 
-
+    @Singleton
     @Binds
     abstract fun bindDataSourceRepository(
         dataSourceRepositoryImpl: DataSourceRepositoryImpl
     ) : DataSourceRepository
 
+    @Singleton
     @Binds
     abstract fun bindDBStorageImpl(
         roomLocalDataSource: DBStorageImpl

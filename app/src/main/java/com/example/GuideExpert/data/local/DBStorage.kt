@@ -1,6 +1,5 @@
-package com.example.GuideExpert.data.storage
+package com.example.GuideExpert.data.local
 
-import com.example.GuideExpert.data.repository.UserInfo
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import kotlinx.coroutines.flow.Flow

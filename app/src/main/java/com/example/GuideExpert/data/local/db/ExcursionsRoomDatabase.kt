@@ -1,9 +1,9 @@
-package com.example.GuideExpert.data.storage.db
+package com.example.GuideExpert.data.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.GuideExpert.data.storage.dao.ExcursionDao
-import com.example.GuideExpert.data.storage.models.ExcursionEntity
+import com.example.GuideExpert.data.local.dao.ExcursionDao
+import com.example.GuideExpert.data.local.models.ExcursionEntity
 
 
 @Database(entities = [ExcursionEntity::class], version = 1)

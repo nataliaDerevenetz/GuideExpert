@@ -1,19 +1,13 @@
-package com.example.GuideExpert.data.storage
+package com.example.GuideExpert.data.local
 
 import android.util.Log
-import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.data.mappers.toExcursion
-import com.example.GuideExpert.data.mappers.toExcursionEntity
-import com.example.GuideExpert.data.storage.dao.ExcursionDao
+import com.example.GuideExpert.data.local.dao.ExcursionDao
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DBStorageImpl @Inject constructor(

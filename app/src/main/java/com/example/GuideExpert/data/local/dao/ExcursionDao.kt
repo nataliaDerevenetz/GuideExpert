@@ -1,9 +1,9 @@
-package com.example.GuideExpert.data.storage.dao
+package com.example.GuideExpert.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.GuideExpert.data.storage.models.ExcursionEntity
+import com.example.GuideExpert.data.local.models.ExcursionEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,8 +1,6 @@
 package com.example.GuideExpert.data.repository
 
-import android.util.Log
-import com.example.GuideExpert.data.DataProvider
-import com.example.GuideExpert.data.storage.DBStorage
+import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.repository.DataSourceRepository

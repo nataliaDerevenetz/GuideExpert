@@ -26,18 +26,30 @@ fun ExcursionHomeScreen(
     viewModel: ExcursionsViewModel = hiltViewModel()
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.viewState.collectAsStateWithLifecycle()
+    val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
 
-    when(uiState) {
+
+    effectFlow?.let {
+        //(effectFlow as SnackbarEffect.ShowSnackbar).message
+        // send to snackbar  --> message
+    }
+
+
+    when(uiState.content) {
 
         is HomeScreenUiState.Empty -> HomeScreenEmpty()
 
         is HomeScreenUiState.Content ->
             HomeScreenContent(
-                excursions = (uiState as HomeScreenUiState.Content).excursions,
-                onSetFavoriteExcursionButtonClick = { viewModel.handleEvent(HomeScreenUiEvent.OnFavoriteExcursionClick(it))},
+                excursions = (uiState.content as HomeScreenUiState.Content).excursions,
+                onSetFavoriteExcursionButtonClick = { viewModel.handleEvent(ExcursionsUiEvent.OnFavoriteExcursionClick(it))},
                 navigateToExcursion = navigateToExcursion
             )
+
+        is HomeScreenUiState.Loading -> {}
+
+        is HomeScreenUiState.Error -> {}
     }
 
 }

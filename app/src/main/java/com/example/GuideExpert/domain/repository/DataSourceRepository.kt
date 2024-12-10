@@ -1,12 +1,13 @@
 package com.example.GuideExpert.domain.repository
 
+import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.data.repository.UserInfo
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import kotlinx.coroutines.flow.Flow
 
 interface DataSourceRepository {
-    fun getAllExcursionFlow(): Flow<List<Excursion>>
+    fun getAllExcursionFlow(): Flow<UIResources<List<Excursion>>>
 
     fun getUserInfo(userId:String): Flow<UserInfo>
 

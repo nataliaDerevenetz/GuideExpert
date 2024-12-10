@@ -7,6 +7,7 @@ import com.example.GuideExpert.domain.repository.DataSourceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -20,14 +21,31 @@ class UserInfo(
     val sex:String = "men"
 )
 
+sealed class UIResources<out T> {
+    data class Success<out T>(val data: T) : UIResources<T>()
+    data class Error(val message: String) : UIResources<Nothing>()
+    data object Loading : UIResources<Nothing>()
+}
+
 class DataSourceRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage
 ): DataSourceRepository {
 
+    /*
     override fun getAllExcursionFlow(): Flow<List<Excursion>>{
         return dbStorage.getAllExcursionFlow()
 
+    }*/
+
+    override fun getAllExcursionFlow(): Flow<UIResources<List<Excursion>>> = flow {
+        emit(UIResources.Loading)
+        dbStorage.getAllExcursionFlow().collect { excursions ->
+            emit(UIResources.Success(excursions))
+        }
+    }.catch { e ->
+        emit(UIResources.Error(e.localizedMessage ?: "Unknown error occurred"))
     }
+
 
     override fun getUserInfo(userId:String): Flow<UserInfo> {
         return flow{

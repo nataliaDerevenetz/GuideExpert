@@ -4,65 +4,95 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+
+sealed interface ExcursionsUiEvent {
+    data class OnFavoriteExcursionClick(val excursion: Excursion) : ExcursionsUiEvent
+    data object OnLoadExcursions : ExcursionsUiEvent
+
+}
+
 sealed interface HomeScreenUiState {
+    data object Error: HomeScreenUiState
+    data object Loading: HomeScreenUiState
     data object Empty: HomeScreenUiState
     data class Content(val excursions: List<Excursion>): HomeScreenUiState
 }
 
-sealed interface HomeScreenUiEvent {
-    data class OnFavoriteExcursionClick(val excursion: Excursion) : HomeScreenUiEvent
-}
+data class ExcursionsUIState(
+    val content: HomeScreenUiState = HomeScreenUiState.Empty
+)
 
+sealed class SnackbarEffect {
+    data class ShowSnackbar(val message: String, val actionLabel: String? = null) : SnackbarEffect()
+}
 
 @HiltViewModel
 class ExcursionsViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getAllExcursionsUseCase: GetAllExcursionsUseCase
 ) : ViewModel() {
-/*
-    private val _allExcursion = MutableStateFlow(emptyList<Excursion>())
-    val allExcursionState: StateFlow<List<Excursion>> = _allExcursion.asStateFlow()
+
+    private val _viewState = MutableStateFlow(ExcursionsUIState())
+    val viewState: StateFlow<ExcursionsUIState> = _viewState
+
+    private val _effectChannel = Channel<SnackbarEffect>()
+    val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
+
 
     init {
-        _allExcursion.update { getAllExcursionsUseCase() }
+        handleEvent(ExcursionsUiEvent.OnLoadExcursions)
     }
 
-    //val allExcursion = getExcursionAllUseCase()
-*/
-    fun handleEvent(event: HomeScreenUiEvent) {
+    fun handleEvent(event: ExcursionsUiEvent) {
         when (event) {
-            is HomeScreenUiEvent.OnFavoriteExcursionClick -> setFavoriteExcursion(event.excursion)
+            is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
+            is ExcursionsUiEvent.OnFavoriteExcursionClick -> setFavoriteExcursion(event.excursion)
         }
     }
 
-    private val _allExcursion = getAllExcursionsUseCase()
-
-    val uiState: StateFlow<HomeScreenUiState> = _allExcursion.map { excursionsList ->
-        if (excursionsList.isNotEmpty())
-            HomeScreenUiState.Content(excursionsList)
-        else HomeScreenUiState.Empty
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = HomeScreenUiState.Empty
-    )
+    private fun loadExcursions() {
+        viewModelScope.launch(Dispatchers.IO) {  // Perform loading on the IO thread
+            getAllExcursionsUseCase().collectLatest { resource ->
+                when (resource) {
+                    is UIResources.Loading -> withContext(Dispatchers.Main) {
+                        _viewState.update { it.copy(content = HomeScreenUiState.Loading)  }
+                    }
+                    is UIResources.Success -> withContext(Dispatchers.Main) {
+                        _viewState.update {
+                            it.copy(content = HomeScreenUiState.Content(resource.data) )
+                        }
+                    }
+                    is UIResources.Error -> withContext(Dispatchers.Main) {
+                        _viewState.update {  it.copy(content = HomeScreenUiState.Error) }
+                        _effectChannel.send(SnackbarEffect.ShowSnackbar("Error loading excursions: ${resource.message}"))
+                    }
+                }
+            }
+        }
+    }
 
 
     private fun setFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("CLICK","setFavoriteExcursionUseCase")
            // setFavoriteExcursionUseCase(note)
+
         }
     }
 

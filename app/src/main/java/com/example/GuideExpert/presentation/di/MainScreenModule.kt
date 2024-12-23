@@ -1,8 +1,10 @@
 package com.example.GuideExpert.presentation.di
 
 import com.example.GuideExpert.domain.GetAllExcursionsUseCase
+import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
 import com.example.GuideExpert.domain.impl.GetAllExcursionsUseCaseImpl
+import com.example.GuideExpert.domain.impl.GetExcursionByQueryUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionDetailUseCaseImpl
 import dagger.Binds
 import dagger.Module
@@ -23,4 +25,9 @@ abstract class MainScreenModule {
     abstract fun bindGetExcursionAllUseCase(
         getAllNotesUseCaseImpl: GetAllExcursionsUseCaseImpl
     ) : GetAllExcursionsUseCase
+
+    @Binds
+    abstract fun bindGetExcursionByQueryUseCase(
+        getAllNotesUseCaseImpl: GetExcursionByQueryUseCaseImpl
+    ) : GetExcursionByQueryUseCase
 }

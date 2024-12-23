@@ -65,10 +65,24 @@ kapt {
 
 
 dependencies {
-
-   // ksp(libs.hilt.compiler)
-
     val room_version = "2.6.1"
+
+    implementation("androidx.room:room-paging:$room_version")
+
+    val paging_version = "3.3.2"
+    implementation("androidx.paging:paging-runtime:$paging_version")
+    implementation("androidx.paging:paging-compose:3.3.2")
+
+
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.2")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation("androidx.compose.material3:material3:1.3.1")
+
+    // ksp(libs.hilt.compiler)
+
 
     implementation("androidx.room:room-runtime:$room_version")
 

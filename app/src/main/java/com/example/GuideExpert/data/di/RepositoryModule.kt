@@ -23,6 +23,9 @@ class LocalSourceModuleProvider {
     fun provideExcursionDao(database: ExcursionsRoomDatabase) = database.excursionDao()
 
     @Provides
+    fun provideRemoteKeyDao(database: ExcursionsRoomDatabase) = database.remoteKeyDao()
+
+    @Provides
     @Singleton
     fun providesLocalDatabase(
         @ApplicationContext context: Context

@@ -9,9 +9,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -45,8 +48,10 @@ val topLevelRoutes = listOf(
 @Composable
 fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BottomNavigation(
                 backgroundColor = Color.White,
@@ -79,7 +84,7 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
         }
     ) { innerPadding ->
         NavHost(navController, startDestination = Home, Modifier.padding(innerPadding)) {
-            composable<Home> { ExcursionsScreen(viewModel.count, onIcr = {viewModel.increase()}) }
+            composable<Home> { ExcursionsScreen(snackbarHostState = snackbarHostState, count = viewModel.count, onIcr = {viewModel.increase()}) }
             composable<Profile> { ProfileScreen(viewModel.count,onIcr = {viewModel.increase()}) }
         }
     }

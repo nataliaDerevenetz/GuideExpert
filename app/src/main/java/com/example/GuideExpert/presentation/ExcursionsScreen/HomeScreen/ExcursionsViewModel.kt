@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 
 sealed interface ExcursionsUiEvent {
-    data class OnFavoriteExcursionClick(val excursion: Excursion) : ExcursionsUiEvent
+    data class OnClickFavoriteExcursion(val excursion: Excursion) : ExcursionsUiEvent
     data object OnLoadExcursions : ExcursionsUiEvent
 
 }
@@ -62,7 +62,7 @@ class ExcursionsViewModel @Inject constructor(
     fun handleEvent(event: ExcursionsUiEvent) {
         when (event) {
             is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
-            is ExcursionsUiEvent.OnFavoriteExcursionClick -> setFavoriteExcursion(event.excursion)
+            is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
         }
     }
 
@@ -79,6 +79,8 @@ class ExcursionsViewModel @Inject constructor(
                         }
                     }
                     is UIResources.Error -> withContext(Dispatchers.Main) {
+
+                        Log.d("TAG","Error loading excursions: ${resource.message}")
                         _viewState.update {  it.copy(content = HomeScreenUiState.Error) }
                         _effectChannel.send(SnackbarEffect.ShowSnackbar("Error loading excursions: ${resource.message}"))
                     }

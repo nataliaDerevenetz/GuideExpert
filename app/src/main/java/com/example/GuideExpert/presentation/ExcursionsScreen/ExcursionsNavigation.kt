@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
@@ -11,7 +12,7 @@ import androidx.navigation.toRoute
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionHomeScreen
-import com.example.GuideExpert.serializableType
+import com.example.GuideExpert.utils.serializableType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
@@ -30,19 +31,20 @@ class ExcursionDetail(val excursion : Excursion) {
 
 @Composable
 fun NavigationHomeScreen(
+    snackbarHostState : SnackbarHostState,
     count :Int,
     onIcr :()->Unit
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = ExcursionSearchScreen) {
         val onNavigateToExcursion = { it: Excursion -> navController.navigateToExcursionDetail(excursion = it) }
-        excursionsDestination(onNavigateToExcursion,count,onIcr)
+        excursionsDestination(snackbarHostState,onNavigateToExcursion,count,onIcr)
     }
 }
 
-fun NavGraphBuilder.excursionsDestination(onNavigateToExcursion: (Excursion) -> Unit, count: Int, onIcr:() -> Unit) {
+fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,onNavigateToExcursion: (Excursion) -> Unit, count: Int, onIcr:() -> Unit) {
     composable<ExcursionSearchScreen> {
-        ExcursionHomeScreen(onNavigateToExcursion)
+        ExcursionHomeScreen(snackbarHostState,onNavigateToExcursion)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         ExcursionDetailScreen(count, onIcr)

@@ -76,7 +76,8 @@ fun ExcursionListItem(
 @Composable
 private fun ExcursionImage(excursion: Excursion) {
     Image(
-        painter = painterResource(id = excursion.photo),
+       // painter = painterResource(id = excursion.photo),
+        painter = painterResource(id = R.drawable.excurs2),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier

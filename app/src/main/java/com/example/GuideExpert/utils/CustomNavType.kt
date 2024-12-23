@@ -1,10 +1,7 @@
-package com.example.GuideExpert
+package com.example.GuideExpert.utils
 
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.navigation.NavType
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

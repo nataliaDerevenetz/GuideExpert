@@ -1,4 +1,4 @@
-package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
+package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -28,6 +28,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 
 @Composable
 fun ExcursionListSearchItem(
@@ -55,7 +56,7 @@ fun ExcursionListSearchItem(
                 .align(Alignment.CenterVertically))
             {
                 Box {
-                    ExcursionImage(excursion)
+                    ExcursionImageSearch(excursion)
                     Image(
                         imageVector = ImageVector.vectorResource(R.drawable.favorite_border) ,
                         contentDescription = "featured",
@@ -75,7 +76,7 @@ fun ExcursionListSearchItem(
 }
 
 @Composable
-private fun ExcursionImage(excursion: Excursion) {
+private fun ExcursionImageSearch(excursion: Excursion) {
     Image(
        // painter = painterResource(id = excursion.photo),
         painter = painterResource(id = R.drawable.excurs2),

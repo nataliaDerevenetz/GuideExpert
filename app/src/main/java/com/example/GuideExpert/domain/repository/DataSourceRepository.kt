@@ -11,9 +11,6 @@ import kotlinx.coroutines.flow.Flow
 interface DataSourceRepository {
     fun getAllExcursionFlow(): Flow<UIResources<List<Excursion>>>
 
-    fun getGetExcursionByQueryFlow(filterQuery: FilterQuery): Flow<PagingData<Excursion>>
-
-
     fun getUserInfo(userId:String): Flow<UserInfo>
 
     fun getExcursionInfo(excursionId:Int): Flow<ExcursionData>

@@ -43,8 +43,6 @@ sealed class UIResources<out T> {
 
 class DataSourceRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,
-    private val excursionService: ExcursionService,
-    private val excursionsRoomDatabase: ExcursionsRoomDatabase,
 ): DataSourceRepository {
 
     override fun getAllExcursionFlow(): Flow<UIResources<List<Excursion>>> = flow {
@@ -55,24 +53,6 @@ class DataSourceRepositoryImpl @Inject constructor(
     }.catch { e ->
         emit(UIResources.Error(e.localizedMessage ?: "Unknown error occurred"))
     }
-
-    @OptIn(ExperimentalPagingApi::class)
-    override fun getGetExcursionByQueryFlow(filterQuery:FilterQuery): Flow<PagingData<Excursion>> {
-        return Pager(
-            config = PagingConfig(pageSize = PAGE_SIZE, maxSize = 30),
-            remoteMediator = ExcursionSearchRemoteMediator(
-                excursionsRoomDatabase = excursionsRoomDatabase,
-                excursionService = excursionService,
-                filterQuery = filterQuery
-            ),
-            pagingSourceFactory = {
-                excursionsRoomDatabase.excursionDao().pagingSource()
-            },
-        ).flow.map { pagingData -> pagingData.map { it.toExcursion() } }
-            .flowOn(Dispatchers.IO)
-
-    }
-
 
     override fun getUserInfo(userId:String): Flow<UserInfo> {
         return flow{

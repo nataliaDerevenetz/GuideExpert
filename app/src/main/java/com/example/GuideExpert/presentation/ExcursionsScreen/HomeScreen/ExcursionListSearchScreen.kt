@@ -175,11 +175,7 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                     SearchScreenEmpty()
                 }
                 is ExcursionListSearchUIState.Data -> {
-                    SearchResult(excursions,state.snackbarHostState,
-                        state.sendEffectFlow,
-                        state.onEvent,
-                        state.navigateToExcursion,
-                        )
+                    SearchResult(excursions, state)
                 }
                 is ExcursionListSearchUIState.Error -> {
 
@@ -194,43 +190,23 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
 
 
 
-
-@Composable
-fun ExcursionItem(excursion: Excursion,modifier: Modifier) {
-    Column {
-        Box(modifier = Modifier.size(300.dp, 250.dp).background(Color.Blue)) {  }
-        Text(text = excursion.title)
-        Text(text = excursion.description)
-    }
-}
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>,
-                 snackbarHostState: SnackbarHostState,
-                 sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
-                 onEvent: (SearchEvent) -> Unit,
-                 navigateToExcursion:(Excursion) -> Unit
-) {
-
+fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>, state: SearchScreenState) {
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-
     if (excursionPagingItems.loadState.refresh is LoadState.Error) {
-        LaunchedEffect(key1 = snackbarHostState) {
-            sendEffectFlow((excursionPagingItems.loadState.refresh as LoadState.Error).error.message ?: "",null)
+        LaunchedEffect(key1 = state.snackbarHostState) {
+            state.sendEffectFlow((excursionPagingItems.loadState.refresh as LoadState.Error).error.message ?: "",null)
             Log.d("TAG", excursionPagingItems.loadState.refresh.toString())
         }
     }
 
-
     if (excursionPagingItems.loadState.append is LoadState.Error) {
-        LaunchedEffect(key1 = snackbarHostState) {
-            sendEffectFlow((excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",null)
+        LaunchedEffect(key1 = state.snackbarHostState) {
+            state.sendEffectFlow((excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",null)
             Log.d("TAG", excursionPagingItems.loadState.append.toString())
-
         }
     }
 
@@ -261,17 +237,7 @@ fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>,
                     ) { index ->
                         val excursion = excursionPagingItems[index]
                         if (excursion != null) {
-                         /*   ExcursionItem(
-                                excursion,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-*/
-
-                            //state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
-
-                          //  (SearchEvent.SetSearchText(text))
-                            ExcursionListSearchItem(excursion,onEvent,navigateToExcursion)
-
+                           ExcursionListSearchItem(excursion,state.onEvent,state.navigateToExcursion)
                         }
                     }
                     item {

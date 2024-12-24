@@ -111,7 +111,6 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
         }
     }
 
-
     Column {
         SearchBar(
             inputField = {

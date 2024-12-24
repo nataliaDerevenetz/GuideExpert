@@ -50,7 +50,9 @@ fun ExcursionHomeScreen(
 
         ExcursionListSearchScreen(
             modifier = Modifier.fillMaxSize(),
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
+           // onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
+            navigateToExcursion = navigateToExcursion,
         )
 
         Spacer(modifier = Modifier.width(8.dp))

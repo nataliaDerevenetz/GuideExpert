@@ -62,7 +62,9 @@ class SearchScreenState(
     val effectFlow: Flow<SnackbarEffect>,
     val snackbarHostState: SnackbarHostState,
     val onEvent : (SearchEvent) -> Unit,
-    val sendEffectFlow : KSuspendFunction2<String, String?, Unit>
+    val sendEffectFlow : KSuspendFunction2<String, String?, Unit>,
+    val navigateToExcursion : (Excursion) -> Unit,
+    val onSetFavoriteExcursionButtonClick : (Excursion) -> Unit,
 )
 
 @Composable
@@ -72,9 +74,11 @@ fun rememberSearchScreenState(
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
     onEvent: (SearchEvent) -> Unit,
-    sendEffectFlow: KSuspendFunction2<String, String?, Unit>
-): SearchScreenState = remember(searchListState,snackbarHostState,onEvent,sendEffectFlow) {
-    SearchScreenState(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow)
+    sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
+    navigateToExcursion : (Excursion) -> Unit,
+    onSetFavoriteExcursionButtonClick : (Excursion) -> Unit,
+): SearchScreenState = remember(searchListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,onSetFavoriteExcursionButtonClick) {
+    SearchScreenState(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,onSetFavoriteExcursionButtonClick)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,13 +86,16 @@ fun rememberSearchScreenState(
 fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                         snackbarHostState: SnackbarHostState,
                         viewModel: ExcursionSearchViewModel = hiltViewModel(),
+                        navigateToExcursion: (Excursion) -> Unit,
                         state: SearchScreenState = rememberSearchScreenState(
                             searchListState = viewModel.uiPagingState,
                             stateView = viewModel.stateView,
                             effectFlow = viewModel.effectFlow,
                             snackbarHostState = snackbarHostState,
                             onEvent = viewModel::onEvent,
-                            sendEffectFlow = viewModel::sendEffectFlow
+                            sendEffectFlow = viewModel::sendEffectFlow,
+                            navigateToExcursion = navigateToExcursion,
+                            onSetFavoriteExcursionButtonClick = viewModel::setFavoriteExcursion
                         )
 ){
 
@@ -170,7 +177,11 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                     SearchScreenEmpty()
                 }
                 is ExcursionListSearchUIState.Data -> {
-                    SearchResult(excursions,state.snackbarHostState,state.sendEffectFlow)
+                    SearchResult(excursions,state.snackbarHostState,
+                        state.sendEffectFlow,
+                        state.onSetFavoriteExcursionButtonClick,
+                        state.navigateToExcursion,
+                        )
                 }
                 is ExcursionListSearchUIState.Error -> {
 
@@ -201,6 +212,8 @@ fun ExcursionItem(excursion: Excursion,modifier: Modifier) {
 fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>,
                  snackbarHostState: SnackbarHostState,
                  sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
+                 onSetFavoriteExcursionButtonClick:(Excursion) -> Unit,
+                 navigateToExcursion:(Excursion) -> Unit
 ) {
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -250,10 +263,13 @@ fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>,
                     ) { index ->
                         val excursion = excursionPagingItems[index]
                         if (excursion != null) {
-                            ExcursionItem(
+                         /*   ExcursionItem(
                                 excursion,
                                 modifier = Modifier.fillMaxWidth(),
                             )
+*/
+                            ExcursionListItem(excursion,onSetFavoriteExcursionButtonClick,navigateToExcursion)
+
                         }
                     }
                     item {

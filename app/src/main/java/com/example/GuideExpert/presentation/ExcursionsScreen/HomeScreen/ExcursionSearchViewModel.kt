@@ -60,10 +60,11 @@ data class ExcursionsSearchUIState(
 )
 
 
-sealed class SearchEvent {
-    object GetSearchExcursions : SearchEvent()
-    data class SetSearchText(val text:String) : SearchEvent()
-    data class SetStateListSearch(val state:ExcursionListSearchUIState) : SearchEvent()
+sealed interface SearchEvent {
+    object GetSearchExcursions : SearchEvent
+    data class SetSearchText(val text:String) : SearchEvent
+    data class SetStateListSearch(val state:ExcursionListSearchUIState) : SearchEvent
+    data class OnClickFavoriteExcursion(val excursion: Excursion) : SearchEvent
 }
 /*
 sealed class SnackbarEffect {
@@ -122,6 +123,8 @@ class ExcursionSearchViewModel @Inject constructor(
                 is SearchEvent.SetStateListSearch -> {
                     updateExcursionListSearchUIState(event.state)
                 }
+
+                is SearchEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
             }
         }
     }
@@ -171,6 +174,13 @@ class ExcursionSearchViewModel @Inject constructor(
     }
 
 
+     fun setFavoriteExcursion(excursion: Excursion) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.d("CLICK","setFavoriteExcursionUseCase")
+            // setFavoriteExcursionUseCase(note)
+
+        }
+    }
 
 
 

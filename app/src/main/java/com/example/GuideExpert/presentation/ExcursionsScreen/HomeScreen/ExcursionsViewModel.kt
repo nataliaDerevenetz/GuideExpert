@@ -37,10 +37,10 @@ sealed interface HomeScreenUiState {
 data class ExcursionsUIState(
     val content: HomeScreenUiState = HomeScreenUiState.Empty
 )
-
+/*
 sealed class SnackbarEffect {
     data class ShowSnackbar(val message: String, val actionLabel: String? = null) : SnackbarEffect()
-}
+}*/
 
 @HiltViewModel
 class ExcursionsViewModel @Inject constructor(

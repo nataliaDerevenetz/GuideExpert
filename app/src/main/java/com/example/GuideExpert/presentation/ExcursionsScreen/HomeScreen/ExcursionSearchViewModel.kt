@@ -174,7 +174,7 @@ class ExcursionSearchViewModel @Inject constructor(
     }
 
 
-     fun setFavoriteExcursion(excursion: Excursion) {
+     private fun setFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("CLICK","setFavoriteExcursionUseCase")
             // setFavoriteExcursionUseCase(note)

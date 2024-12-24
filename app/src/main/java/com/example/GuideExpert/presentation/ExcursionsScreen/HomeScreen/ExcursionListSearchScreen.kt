@@ -64,7 +64,6 @@ class SearchScreenState(
     val onEvent : (SearchEvent) -> Unit,
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>,
     val navigateToExcursion : (Excursion) -> Unit,
-    val onSetFavoriteExcursionButtonClick : (Excursion) -> Unit,
 )
 
 @Composable
@@ -76,9 +75,8 @@ fun rememberSearchScreenState(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-    onSetFavoriteExcursionButtonClick : (Excursion) -> Unit,
-): SearchScreenState = remember(searchListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,onSetFavoriteExcursionButtonClick) {
-    SearchScreenState(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,onSetFavoriteExcursionButtonClick)
+): SearchScreenState = remember(searchListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion) {
+    SearchScreenState(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +93,6 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                             onEvent = viewModel::onEvent,
                             sendEffectFlow = viewModel::sendEffectFlow,
                             navigateToExcursion = navigateToExcursion,
-                            onSetFavoriteExcursionButtonClick = viewModel::setFavoriteExcursion
                         )
 ){
 
@@ -179,7 +176,7 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                 is ExcursionListSearchUIState.Data -> {
                     SearchResult(excursions,state.snackbarHostState,
                         state.sendEffectFlow,
-                        state.onSetFavoriteExcursionButtonClick,
+                        state.onEvent,
                         state.navigateToExcursion,
                         )
                 }
@@ -212,7 +209,7 @@ fun ExcursionItem(excursion: Excursion,modifier: Modifier) {
 fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>,
                  snackbarHostState: SnackbarHostState,
                  sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
-                 onSetFavoriteExcursionButtonClick:(Excursion) -> Unit,
+                 onEvent: (SearchEvent) -> Unit,
                  navigateToExcursion:(Excursion) -> Unit
 ) {
 
@@ -268,7 +265,11 @@ fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>,
                                 modifier = Modifier.fillMaxWidth(),
                             )
 */
-                            ExcursionListItem(excursion,onSetFavoriteExcursionButtonClick,navigateToExcursion)
+
+                            //state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+
+                          //  (SearchEvent.SetSearchText(text))
+                            ExcursionListSearchItem(excursion,onEvent,navigateToExcursion)
 
                         }
                     }

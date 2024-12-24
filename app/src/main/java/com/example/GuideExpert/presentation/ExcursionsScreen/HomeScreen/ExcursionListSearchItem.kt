@@ -30,9 +30,9 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 
 @Composable
-fun ExcursionListItem(
+fun ExcursionListSearchItem(
     excursion: Excursion,
-    onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
+    onEvent: (SearchEvent) -> Unit,
     navigateToProfile: (Excursion) -> Unit,
     ) {
     Card(
@@ -62,7 +62,8 @@ fun ExcursionListItem(
                         colorFilter = ColorFilter.tint(Color.White),
                         modifier = Modifier.align(Alignment.TopEnd)
                             .clickable {
-                                onSetFavoriteExcursionButtonClick(excursion)
+                                onEvent(SearchEvent.OnClickFavoriteExcursion(excursion))
+                             //   onSetFavoriteExcursionButtonClick(excursion)
                                 Log.d("CLICK","featured") }
                     )
                 }

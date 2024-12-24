@@ -51,7 +51,6 @@ fun ExcursionHomeScreen(
         ExcursionListSearchScreen(
             modifier = Modifier.fillMaxSize(),
             snackbarHostState = snackbarHostState,
-           // onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
             navigateToExcursion = navigateToExcursion,
         )
 
@@ -106,7 +105,7 @@ private fun HomeScreenContent(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {
         items(excursions, key = { it.id }) {
-            ExcursionListItem(it,onSetFavoriteExcursionButtonClick,navigateToExcursion)
+            ExcursionListFilterItem(it,onSetFavoriteExcursionButtonClick,navigateToExcursion)
         }
     }
 }

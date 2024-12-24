@@ -11,6 +11,7 @@ import com.example.GuideExpert.data.local.models.ExcursionEntity
 import com.example.GuideExpert.data.local.models.RemoteKeyEntity
 import com.example.GuideExpert.data.mappers.toExcursionEntity
 import com.example.GuideExpert.data.remote.services.ExcursionService
+import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.utils.Constant.REMOTE_KEY_ID
 import retrofit2.HttpException
 import java.io.IOException
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class ExcursionSearchRemoteMediator @Inject constructor(
     private val excursionService: ExcursionService,
     private val excursionsRoomDatabase: ExcursionsRoomDatabase,
+    private val filterQuery: FilterQuery
 ) : RemoteMediator<Int, ExcursionEntity>() {
     override suspend fun load(
         loadType: LoadType,
@@ -38,6 +40,8 @@ class ExcursionSearchRemoteMediator @Inject constructor(
                 }
             }
 
+
+            Log.d("TAG","${filterQuery.query}  ${filterQuery.sort}")
             // MAKE API CALL
             val apiResponse = excursionService.getExcursionsPaging(
                 offset = offset,

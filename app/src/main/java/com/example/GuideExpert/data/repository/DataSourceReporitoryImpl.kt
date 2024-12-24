@@ -13,6 +13,7 @@ import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import com.example.GuideExpert.utils.Constant.PAGE_SIZE
 import kotlinx.coroutines.Dispatchers
@@ -56,12 +57,13 @@ class DataSourceRepositoryImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalPagingApi::class)
-    override fun getGetExcursionByQueryFlow(): Flow<PagingData<Excursion>> {
+    override fun getGetExcursionByQueryFlow(filterQuery:FilterQuery): Flow<PagingData<Excursion>> {
         return Pager(
             config = PagingConfig(pageSize = PAGE_SIZE, maxSize = 30),
             remoteMediator = ExcursionSearchRemoteMediator(
                 excursionsRoomDatabase = excursionsRoomDatabase,
                 excursionService = excursionService,
+                filterQuery = filterQuery
             ),
             pagingSourceFactory = {
                 excursionsRoomDatabase.excursionDao().pagingSource()

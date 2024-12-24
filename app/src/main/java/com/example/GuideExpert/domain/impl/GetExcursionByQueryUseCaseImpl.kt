@@ -10,5 +10,5 @@ import javax.inject.Inject
 class GetExcursionByQueryUseCaseImpl @Inject constructor(
     private val dataSourceRepository: DataSourceRepository
 ): GetExcursionByQueryUseCase {
-    override operator fun invoke(filter: FilterQuery) = dataSourceRepository.getGetExcursionByQueryFlow()
+    override operator fun invoke(filter: FilterQuery) = dataSourceRepository.getGetExcursionByQueryFlow(filter)
 }

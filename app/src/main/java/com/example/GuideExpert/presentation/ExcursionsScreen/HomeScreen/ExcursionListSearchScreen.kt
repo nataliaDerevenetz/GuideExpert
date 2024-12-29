@@ -163,7 +163,7 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
             onExpandedChange = { expanded = it
                 text = ""
                 state.onEvent(SearchEvent.SetSearchText(text)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
         ) {
 
             when(uiState.contentState){

@@ -17,8 +17,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,23 +49,34 @@ fun ExcursionHomeScreen(
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
     val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
 
-    val scrollState = rememberScrollState()
-
     effectFlow?.let {
         //(effectFlow as SnackbarEffect.ShowSnackbar).message
         // send to snackbar  --> message
     }
-   // Modifier.verticalScroll(scrollState)
-    Column() {
 
-        ExcursionListSearchScreen(
-            modifier = Modifier.fillMaxSize(),
-            snackbarHostState = snackbarHostState,
-            navigateToExcursion = navigateToExcursion,
-        )
+    val toolbarHeight = 80
+    var toolbarHeightDp by rememberSaveable { mutableStateOf(toolbarHeight) }
 
-        HorizontalDivider()
-      
+    val screenHeightDp =   LocalConfiguration.current.screenHeightDp
+    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.dp.roundToPx().toFloat() }
+
+    var scrolling by rememberSaveable { mutableStateOf(true) }
+    var toolbarOffsetHeightPx by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+                val newOffset = toolbarOffsetHeightPx + delta
+                if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                return Offset.Zero
+            }
+        }
+    }
+
+    Box(
+        Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
+    ) {
+
         when (uiState.content) {
 
             is HomeScreenUiState.Empty -> HomeScreenEmpty()
@@ -70,7 +91,8 @@ fun ExcursionHomeScreen(
                             )
                         )
                     },
-                    navigateToExcursion = navigateToExcursion
+                    navigateToExcursion = navigateToExcursion,
+                    toolbarHeightDp = toolbarHeightDp
                 )
 
             is HomeScreenUiState.Loading -> {}
@@ -78,7 +100,29 @@ fun ExcursionHomeScreen(
             is HomeScreenUiState.Error -> {}
         }
 
+
+
+        ExcursionListSearchScreen(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHostState = snackbarHostState,
+            navigateToExcursion = navigateToExcursion,
+            toolbarHeightDp = toolbarHeightDp,
+            toolbarOffsetHeightPx = toolbarOffsetHeightPx,
+            scrollingOn = {scrolling = false
+                toolbarHeightDp = screenHeightDp},
+            scrollingOff = {
+                scrolling = true
+                toolbarHeightDp = toolbarHeight
+            }
+        )
     }
+
+
+
+
+
+
+
 }
 
 @Composable
@@ -100,9 +144,12 @@ private fun HomeScreenContent(
     excursions: List<Excursion>,
     onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
     navigateToExcursion: (Excursion) -> Unit,
+    toolbarHeightDp: Int
 ) {
+
+
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        contentPadding = PaddingValues(top = toolbarHeightDp.dp)
     ) {
         items(excursions, key = { it.id }) {
             ExcursionListFilterItem(it,onSetFavoriteExcursionButtonClick,navigateToExcursion)

@@ -57,9 +57,6 @@ fun MainTopBar(modifier: Modifier = Modifier,
 
     var boxVisible by rememberSaveable { mutableStateOf(true) }
 
-
-
-
     Box(
         modifier =
         Modifier.height(toolbarHeightDp.dp).offset {
@@ -68,48 +65,7 @@ fun MainTopBar(modifier: Modifier = Modifier,
     ){
         Column {
 
-            val gradient45 = Brush.linearGradient(
-                colors = listOf(Color.Blue, Color.Magenta),
-                start = Offset(0f, Float.POSITIVE_INFINITY),
-                end = Offset(Float.POSITIVE_INFINITY, 0f)
-            )
-            AnimatedVisibility(visible = boxVisible) {
-                Box {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 3.dp, vertical = 2.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween) {
-                        Row (verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { Log.d("CLICK","Entre") }){
-                            Icon(
-                                Icons.Filled.AccountCircle, modifier = Modifier.size(48.dp)
-                                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                                    .drawWithCache {
-                                        onDrawWithContent {
-                                            drawContent()
-                                            drawRect(gradient45, blendMode = BlendMode.SrcAtop)
-                                        }
-                                    },
-                                contentDescription = null,tint = Color.Gray
-                            )
-                            Spacer(modifier = Modifier.width(5.dp))
-                            Text(
-                                "Войти",
-                                fontSize = 16.sp,
-                                color = Color.Blue,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        }
-                            Icon( Icons.Filled.Notifications, modifier = Modifier.size(38.dp)
-                                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                                    .drawWithCache {
-                                        onDrawWithContent {
-                                            drawContent()
-                                            drawRect(gradient45, blendMode = BlendMode.SrcAtop)
-                                        }
-                                    },
-                            contentDescription = null)
-                    }
-                }
-
-            }
+            ProfileBox(boxVisible = boxVisible)
 
             ExcursionListSearchScreen(
                 modifier = Modifier.fillMaxSize(),

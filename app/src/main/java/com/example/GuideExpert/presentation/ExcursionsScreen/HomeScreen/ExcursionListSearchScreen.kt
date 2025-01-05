@@ -92,10 +92,9 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                         snackbarHostState: SnackbarHostState,
                         viewModel: ExcursionSearchViewModel = hiltViewModel(),
                         navigateToExcursion: (Excursion) -> Unit,
-                        toolbarHeightDp: Int,
-                        toolbarOffsetHeightPx: Float,
                         scrollingOn:()->Unit,
                         scrollingOff:()->Unit,
+                        onActiveChanged: (Boolean) -> Unit,
                         state: SearchScreenState = rememberSearchScreenState(
                             searchListState = viewModel.uiPagingState,
                             stateView = viewModel.stateView,
@@ -123,98 +122,96 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
         }
     }
 
-    Box(
-        modifier =
-        Modifier.height(toolbarHeightDp.dp).offset {
-            IntOffset(x = 0, y = toolbarOffsetHeightPx.roundToInt())
-        }.background(color = Color.Transparent).fillMaxWidth()
-    ){
-        Column {
-            SearchBar(
-                inputField = {
-                    SearchBarDefaults.InputField(
-                        query = text,
-                        onQueryChange = {
-                            text = it
-                            state.onEvent(SearchEvent.SetSearchText(text))
-                        },
-                        onSearch = { expanded = true
-                            coroutineScope.launch { keyboardController?.hide() } },
-                        expanded = expanded,
-                        onExpandedChange = {
-                            if(expanded != it)   state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
-                            expanded = it
-
-                            if (expanded) {
-                                scrollingOn()
-                            } else {
-                                scrollingOff()
-                            }
-                        },
-                        placeholder = { Text(text = stringResource(R.string.search_str)) },
-                        leadingIcon = {
-                            if (expanded){
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = null,
-                                    Modifier.clickable {
-                                        expanded = false
-                                        text = ""
-                                        state.onEvent(SearchEvent.SetSearchText(text))
-                                        state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
-                                        scrollingOff()
-                                    })
-                            } else {
-                                Icon(Icons.Default.Search, contentDescription = null)
-                            } },
-                        trailingIcon = {
-                            if (expanded){
-                                Icon(
-                                    Icons.Default.Clear,
-                                    contentDescription = null,
-                                    Modifier.clickable {
-                                        state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
-                                        if (text.isNotEmpty()) {
-                                            text = ""
-                                            state.onEvent(SearchEvent.SetSearchText(text))
-                                        } else {
-                                            expanded = false
-                                            scrollingOff()
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    )},
-                expanded = expanded,
-                onExpandedChange = { expanded = it
-                    text = ""
+    SearchBar(
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = text,
+                onQueryChange = {
+                    text = it
                     state.onEvent(SearchEvent.SetSearchText(text))
+                },
+                onSearch = { expanded = true
+                    coroutineScope.launch { keyboardController?.hide() } },
+                expanded = expanded,
+                onExpandedChange = {
+                    onActiveChanged(it)
+                    if(expanded != it)   state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                    expanded = it
+
                     if (expanded) {
                         scrollingOn()
                     } else {
                         scrollingOff()
-                    }},
-                modifier = Modifier.padding(bottom = 0.dp).fillMaxWidth()
-            ) {
-
-                when(uiState.contentState){
-                    is ExcursionListSearchUIState.Idle -> {
-                        SearchScreenEmpty()
                     }
-                    is ExcursionListSearchUIState.Loading -> {
-                        SearchScreenEmpty()
-                    }
-                    is ExcursionListSearchUIState.Data -> {
-                        SearchResult(excursions, state)
-                    }
-                    is ExcursionListSearchUIState.Error -> {
-
+                },
+                placeholder = { Text(text = stringResource(R.string.search_str)) },
+                leadingIcon = {
+                    if (expanded){
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            Modifier.clickable {
+                                expanded = false
+                                onActiveChanged(expanded)
+                                text = ""
+                                state.onEvent(SearchEvent.SetSearchText(text))
+                                state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                                scrollingOff()
+                            })
+                    } else {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                    } },
+                trailingIcon = {
+                    if (expanded){
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = null,
+                            Modifier.clickable {
+                                state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                                if (text.isNotEmpty()) {
+                                    text = ""
+                                    state.onEvent(SearchEvent.SetSearchText(text))
+                                } else {
+                                    expanded = false
+                                    onActiveChanged(expanded)
+                                    scrollingOff()
+                                }
+                            }
+                        )
                     }
                 }
+            )},
+        expanded = expanded,
+        onExpandedChange = {
+            onActiveChanged(it)
+            expanded = it
+            text = ""
+            state.onEvent(SearchEvent.SetSearchText(text))
+            if (expanded) {
+                scrollingOn()
+            } else {
+                scrollingOff()
+            }},
+        modifier = if(expanded){
+            Modifier.fillMaxWidth()
+        } else{ Modifier.padding(bottom = 8.dp, start = 8.dp, end = 8.dp).fillMaxWidth()}
+    ) {
+
+        when(uiState.contentState){
+            is ExcursionListSearchUIState.Idle -> {
+                SearchScreenEmpty()
+            }
+            is ExcursionListSearchUIState.Loading -> {
+                SearchScreenEmpty()
+            }
+            is ExcursionListSearchUIState.Data -> {
+                SearchResult(excursions, state)
+            }
+            is ExcursionListSearchUIState.Error -> {
 
             }
         }
+
     }
 
 }
@@ -243,7 +240,7 @@ fun SearchResult(excursionPagingItems: LazyPagingItems<Excursion>, state: Search
 
     Log.d("TAG", "itemCount  = ${excursionPagingItems.itemCount.toString()}")
 
-    Box(modifier = Modifier.padding(top = 8.dp).fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         if (excursionPagingItems.loadState.refresh is LoadState.Loading) {
             LoadingExcursionListShimmer()
         } else {

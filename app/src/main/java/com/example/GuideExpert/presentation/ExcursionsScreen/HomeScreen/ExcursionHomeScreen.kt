@@ -1,17 +1,10 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -38,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
+import com.example.GuideExpert.utils.Constant.TOOLBAR_HEIGHT
 
 @Composable
 fun ExcursionHomeScreen(
@@ -54,14 +48,16 @@ fun ExcursionHomeScreen(
         // send to snackbar  --> message
     }
 
-    val toolbarHeight = 80
+
+    val toolbarHeight = TOOLBAR_HEIGHT
     var toolbarHeightDp by rememberSaveable { mutableStateOf(toolbarHeight) }
 
+
     val screenHeightDp =   LocalConfiguration.current.screenHeightDp
-    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.dp.roundToPx().toFloat() }
+    var toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.dp.roundToPx().toFloat() }
 
     var scrolling by rememberSaveable { mutableStateOf(true) }
-    var toolbarOffsetHeightPx by remember { mutableStateOf(0f) }
+    var toolbarOffsetHeightPx by rememberSaveable { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -101,14 +97,14 @@ fun ExcursionHomeScreen(
         }
 
 
-
-        ExcursionListSearchScreen(
-            modifier = Modifier.fillMaxSize(),
+        MainTopBar(modifier = Modifier.fillMaxSize(),
             snackbarHostState = snackbarHostState,
             navigateToExcursion = navigateToExcursion,
             toolbarHeightDp = toolbarHeightDp,
             toolbarOffsetHeightPx = toolbarOffsetHeightPx,
-            scrollingOn = {scrolling = false
+            scrollingOn = {
+                toolbarOffsetHeightPx = 0f
+                scrolling = false
                 toolbarHeightDp = screenHeightDp},
             scrollingOff = {
                 scrolling = true
@@ -116,12 +112,6 @@ fun ExcursionHomeScreen(
             }
         )
     }
-
-
-
-
-
-
 
 }
 

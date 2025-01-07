@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -60,15 +61,16 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 topLevelRoutes.forEach { topLevelRoute ->
-                    var selected = currentDestination?.hierarchy?.any { it.hasRoute(topLevelRoute.route::class) } == true
+                    val selected = currentDestination?.hierarchy?.any { it.hasRoute(topLevelRoute.route::class) } == true
                     Log.d("TAG",selected.toString())
-                    BottomNavigationItem(
+                    NavigationBarItem(
+                        selected = selected,
                         label = { Text(topLevelRoute.name) },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute(topLevelRoute.route::class) } == true,
                         icon = {
                             Icon(topLevelRoute.icon,
                                 contentDescription = topLevelRoute.name,
                                 tint = if (selected) Color.Black else Color.Gray) },
+                        alwaysShowLabel = false,
                         onClick = {
                             navController.navigate(topLevelRoute.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {

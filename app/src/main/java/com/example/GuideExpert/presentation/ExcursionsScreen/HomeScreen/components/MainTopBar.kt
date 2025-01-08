@@ -1,4 +1,4 @@
-package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
+package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionListSearchScreen
 import kotlin.math.roundToInt
 
 @Composable

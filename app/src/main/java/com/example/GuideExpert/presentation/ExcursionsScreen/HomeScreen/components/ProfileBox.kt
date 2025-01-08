@@ -1,4 +1,4 @@
-package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
+package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility

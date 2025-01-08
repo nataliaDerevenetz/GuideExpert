@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
-import com.example.GuideExpert.utils.Constant.TOOLBAR_HEIGHT
+import kotlin.math.roundToInt
 
 @Composable
 fun ExcursionHomeScreen(
@@ -48,12 +48,10 @@ fun ExcursionHomeScreen(
         // send to snackbar  --> message
     }
 
+    val screenHeightDp =  LocalConfiguration.current.screenHeightDp
 
-    val toolbarHeight = TOOLBAR_HEIGHT
+    var toolbarHeight by rememberSaveable { mutableStateOf(screenHeightDp) }
     var toolbarHeightDp by rememberSaveable { mutableStateOf(toolbarHeight) }
-
-
-    val screenHeightDp =   LocalConfiguration.current.screenHeightDp
     var toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.dp.roundToPx().toFloat() }
 
     var scrolling by rememberSaveable { mutableStateOf(true) }
@@ -68,6 +66,8 @@ fun ExcursionHomeScreen(
             }
         }
     }
+    val localDensity = LocalDensity.current
+
 
     Box(
         Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
@@ -105,10 +105,14 @@ fun ExcursionHomeScreen(
             scrollingOn = {
                 toolbarOffsetHeightPx = 0f
                 scrolling = false
-                toolbarHeightDp = screenHeightDp},
+                toolbarHeightDp = screenHeightDp },
             scrollingOff = {
                 scrolling = true
+                toolbarHeightDp = toolbarHeight },
+            onToolbarHeightChange = {
+                toolbarHeight = with(localDensity) {it.toDp() }.value.roundToInt()
                 toolbarHeightDp = toolbarHeight
+                toolbarHeightPx = with(localDensity) { toolbarHeight.dp.roundToPx().toFloat() }
             }
         )
     }

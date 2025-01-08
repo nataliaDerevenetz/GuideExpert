@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.MainTopBar
 import kotlin.math.roundToInt
 
@@ -146,6 +147,9 @@ private fun HomeScreenContent(
     LazyColumn(
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)
     ) {
+        item{
+            ImageSlider()
+        }
         items(excursions, key = { it.id }) {
             ExcursionListFilterItem(it,onSetFavoriteExcursionButtonClick,navigateToExcursion)
         }

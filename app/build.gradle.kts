@@ -57,6 +57,9 @@ android {
     }
 }
 
+composeCompiler {
+    enableStrongSkippingMode = true
+}
 
 kapt {
     correctErrorTypes = true
@@ -65,6 +68,10 @@ kapt {
 
 
 dependencies {
+
+    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-paging:$room_version")

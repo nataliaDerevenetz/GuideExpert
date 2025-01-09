@@ -142,8 +142,6 @@ private fun HomeScreenContent(
     navigateToExcursion: (Excursion) -> Unit,
     toolbarHeightDp: Int
 ) {
-
-
     LazyColumn(
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)
     ) {

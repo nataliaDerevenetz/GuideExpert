@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Notifications
@@ -50,7 +51,10 @@ fun ProfileBox(modifier: Modifier = Modifier,
         Box {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 3.dp, vertical = 2.dp),
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                Row (verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { Log.d("CLICK","Entre") }){
+                Row (verticalAlignment = Alignment.CenterVertically, modifier = Modifier.graphicsLayer {
+                    clip = true
+                    shape = RoundedCornerShape(50.dp)
+                }.clickable { Log.d("CLICK","Entre") }.padding(start = 4.dp, end = 4.dp)){
                     Icon(
                         Icons.Filled.AccountCircle, modifier = Modifier.size(48.dp)
                             .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }

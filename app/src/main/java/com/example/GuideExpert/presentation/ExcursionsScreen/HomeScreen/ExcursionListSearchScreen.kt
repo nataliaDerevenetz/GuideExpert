@@ -20,6 +20,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -147,37 +148,39 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                 placeholder = { Text(text = stringResource(R.string.search_str)) },
                 leadingIcon = {
                     if (expanded){
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            Modifier.clickable {
-                                expanded = false
-                                onActiveChanged(expanded)
-                                text = ""
-                                state.onEvent(SearchEvent.SetSearchText(text))
-                                state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
-                                scrollingOff()
-                            })
+                        IconButton(onClick = {
+                            expanded = false
+                            onActiveChanged(expanded)
+                            text = ""
+                            state.onEvent(SearchEvent.SetSearchText(text))
+                            state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                            scrollingOff()
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Go Back"
+                            )
+                        }
                     } else {
-                        Icon(Icons.Default.Search, contentDescription = null)
+                        IconButton(onClick = {}){
+                            Icon(Icons.Default.Search, contentDescription = null)
+                        }
                     } },
                 trailingIcon = {
                     if (expanded){
-                        Icon(
-                            Icons.Default.Clear,
-                            contentDescription = null,
-                            Modifier.clickable {
-                                state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
-                                if (text.isNotEmpty()) {
-                                    text = ""
-                                    state.onEvent(SearchEvent.SetSearchText(text))
-                                } else {
-                                    expanded = false
-                                    onActiveChanged(expanded)
-                                    scrollingOff()
-                                }
+                        IconButton(onClick = {
+                            state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                            if (text.isNotEmpty()) {
+                                text = ""
+                                state.onEvent(SearchEvent.SetSearchText(text))
+                            } else {
+                                expanded = false
+                                onActiveChanged(expanded)
+                                scrollingOff()
                             }
-                        )
+                        }) {
+                            Icon(Icons.Default.Clear, contentDescription = null,)
+                        }
                     }
                 }
             )},

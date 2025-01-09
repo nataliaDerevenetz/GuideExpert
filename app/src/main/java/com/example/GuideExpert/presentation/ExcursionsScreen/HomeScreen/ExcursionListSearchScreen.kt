@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -182,7 +183,7 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                             Icon(Icons.Default.Clear, contentDescription = null,)
                         }
                     }
-                }
+                },
             )},
         expanded = expanded,
         onExpandedChange = {
@@ -197,7 +198,8 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
             }},
         modifier = if(expanded){
             Modifier.fillMaxWidth()
-        } else{ Modifier.padding(bottom = 8.dp, start = 8.dp, end = 8.dp).fillMaxWidth()}
+        } else{ Modifier.padding(bottom = 8.dp, start = 8.dp, end = 8.dp).fillMaxWidth()},
+        windowInsets = WindowInsets(0)
     ) {
 
         when(uiState.contentState){
@@ -216,6 +218,8 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
         }
 
     }
+
+
 
 }
 

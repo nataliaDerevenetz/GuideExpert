@@ -33,6 +33,9 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.MainTopBar
+import com.example.GuideExpert.utils.Constant.STATUSBAR_HEIGHT
+import com.example.GuideExpert.utils.dpToPx
+import com.example.GuideExpert.utils.pxToDp
 import kotlin.math.roundToInt
 
 @Composable
@@ -56,6 +59,8 @@ fun ExcursionHomeScreen(
     var toolbarHeightDp by rememberSaveable { mutableStateOf(toolbarHeight) }
     var toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.dp.roundToPx().toFloat() }
 
+
+    val localDensity = LocalDensity.current
     var scrolling by rememberSaveable { mutableStateOf(true) }
     var toolbarOffsetHeightPx by rememberSaveable { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
@@ -63,12 +68,13 @@ fun ExcursionHomeScreen(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 val newOffset = toolbarOffsetHeightPx + delta
-                if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx +
+                        with(localDensity) { STATUSBAR_HEIGHT.dp.roundToPx().toFloat() }), 0f)
                 return Offset.Zero
             }
         }
     }
-    val localDensity = LocalDensity.current
+
 
 
     Box(
@@ -84,9 +90,7 @@ fun ExcursionHomeScreen(
                     excursions = (uiState.content as HomeScreenUiState.Content).excursions,
                     onSetFavoriteExcursionButtonClick = {
                         viewModel.handleEvent(
-                            ExcursionsUiEvent.OnClickFavoriteExcursion(
-                                it
-                            )
+                            ExcursionsUiEvent.OnClickFavoriteExcursion(it)
                         )
                     },
                     navigateToExcursion = navigateToExcursion,

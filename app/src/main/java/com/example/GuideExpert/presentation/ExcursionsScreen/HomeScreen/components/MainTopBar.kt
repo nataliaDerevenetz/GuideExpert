@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +43,7 @@ fun MainTopBar(modifier: Modifier = Modifier,
     Box(
         modifier =Modifier.height(toolbarHeightDp.dp).offset {
             IntOffset(x = 0, y = toolbarOffsetHeightPx.roundToInt())
-        }.background(color = Color.White).fillMaxWidth()
+        }.background(color = MaterialTheme.colorScheme.background).fillMaxWidth()
     ){
         Column(modifier = Modifier
             .onGloballyPositioned { coordinates ->
@@ -50,18 +52,19 @@ fun MainTopBar(modifier: Modifier = Modifier,
                     onToolbarHeightChange(coordinates.size.height.toFloat())
                     isLoadSizeTopAppBar = true
                 }
-            }) {
+            }
+        ) {
 
             ProfileBox(boxVisible = boxVisible)
 
-            ExcursionListSearchScreen(
-                modifier = Modifier.fillMaxSize(),
-                snackbarHostState = snackbarHostState,
-                navigateToExcursion = navigateToExcursion,
-                scrollingOn = scrollingOn,
-                scrollingOff = scrollingOff,
-                onActiveChanged = { boxVisible = !it }
-            )
+              ExcursionListSearchScreen(
+                  modifier = Modifier,
+                  snackbarHostState = snackbarHostState,
+                  navigateToExcursion = navigateToExcursion,
+                  scrollingOn = scrollingOn,
+                  scrollingOff = scrollingOff,
+                  onActiveChanged = { boxVisible = !it }
+              )
 
             HorizontalDivider(thickness=0.7.dp, modifier =  Modifier.shadow(3.dp))
         }

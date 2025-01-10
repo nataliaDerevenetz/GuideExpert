@@ -63,13 +63,13 @@ fun ExcursionHomeScreen(
     val localDensity = LocalDensity.current
     var scrolling by rememberSaveable { mutableStateOf(true) }
     var toolbarOffsetHeightPx by rememberSaveable { mutableStateOf(0f) }
+    val statusbarHeight =  with(localDensity) { STATUSBAR_HEIGHT.dp.roundToPx().toFloat() }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 val newOffset = toolbarOffsetHeightPx + delta
-                if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx +
-                        with(localDensity) { STATUSBAR_HEIGHT.dp.roundToPx().toFloat() }), 0f)
+                if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx+statusbarHeight), 0f)
                 return Offset.Zero
             }
         }

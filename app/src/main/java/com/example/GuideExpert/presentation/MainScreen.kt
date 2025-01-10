@@ -6,6 +6,8 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -38,11 +40,15 @@ object Home
 object Profile
 
 
-data class TopLevelRoute<T : Any>(val name: String, val route: T, val icon: ImageVector)
+data class TopLevelRoute<T : Any>(
+    val title: String,
+    val route: T,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector)
 
 val topLevelRoutes = listOf(
-    TopLevelRoute("Home", Home, Icons.Filled.Home),
-    TopLevelRoute("Person", Profile, Icons.Filled.Person)
+    TopLevelRoute("Home", Home, Icons.Filled.Home,Icons.Outlined.Home),
+    TopLevelRoute("Person", Profile, Icons.Filled.Person,Icons.Outlined.Person)
 )
 
 @Composable
@@ -61,11 +67,15 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
                     Log.d("TAG",selected.toString())
                     NavigationBarItem(
                         selected = selected,
-                        label = { Text(topLevelRoute.name) },
-                        icon = {
-                            Icon(topLevelRoute.icon,
-                                contentDescription = topLevelRoute.name,
-                                tint = if (selected) Color.Black else Color.Gray) },
+                        label = { Text(topLevelRoute.title) },
+
+                        icon = {Icon(
+                                imageVector = if (selected) {
+                                    topLevelRoute.selectedIcon
+                                } else topLevelRoute.unselectedIcon,
+                                contentDescription = topLevelRoute.title,
+                                tint = Color.Black
+                            )},
                         alwaysShowLabel = false,
                         onClick = {
                             navController.navigate(topLevelRoute.route) {

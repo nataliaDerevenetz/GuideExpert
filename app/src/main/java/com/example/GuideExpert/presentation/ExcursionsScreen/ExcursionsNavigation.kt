@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScreen
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionHomeScreen
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeScreen
 import com.example.GuideExpert.utils.serializableType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
@@ -44,7 +44,7 @@ fun NavigationHomeScreen(
 
 fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,onNavigateToExcursion: (Excursion) -> Unit, count: Int, onIcr:() -> Unit) {
     composable<ExcursionSearchScreen> {
-        ExcursionHomeScreen(snackbarHostState,onNavigateToExcursion)
+        HomeScreen(snackbarHostState,onNavigateToExcursion)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         ExcursionDetailScreen(count, onIcr)

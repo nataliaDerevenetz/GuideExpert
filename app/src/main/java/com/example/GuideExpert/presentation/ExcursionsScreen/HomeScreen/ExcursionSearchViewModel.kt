@@ -157,15 +157,14 @@ class ExcursionSearchViewModel @Inject constructor(
     }
 
     init {
-        searchText = state.getLiveData("query", "").value.toString()
+        searchText = state.getStateFlow("query", "").value
         onEvent(SearchEvent.GetSearchExcursions)
     }
-
-
+    
 
     fun setCurrentText(query: String) {
         state["query"] = query
-        searchText = state.getLiveData("query", "").value.toString()
+        searchText = state.getStateFlow("query", "").value
     }
 
 

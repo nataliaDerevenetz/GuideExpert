@@ -1,5 +1,7 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,12 +36,11 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.componen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.MainTopBar
 import com.example.GuideExpert.utils.Constant.STATUSBAR_HEIGHT
-import com.example.GuideExpert.utils.dpToPx
-import com.example.GuideExpert.utils.pxToDp
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun ExcursionHomeScreen(
+fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     navigateToExcursion: (Excursion) -> Unit,
     viewModel: ExcursionsViewModel = hiltViewModel()
@@ -75,52 +76,58 @@ fun ExcursionHomeScreen(
         }
     }
 
+    var filtersVisible by remember {
+        mutableStateOf(false)
+    }
 
+    SharedTransitionLayout {
+        Box(
+            Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
+        ) {
 
-    Box(
-        Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
-    ) {
+            when (uiState.content) {
 
-        when (uiState.content) {
+                is HomeScreenUiState.Empty -> HomeScreenEmpty()
 
-            is HomeScreenUiState.Empty -> HomeScreenEmpty()
+                is HomeScreenUiState.Content ->
+                    HomeScreenContent(
+                        excursions = (uiState.content as HomeScreenUiState.Content).excursions,
+                        onSetFavoriteExcursionButtonClick = {
+                            viewModel.handleEvent(
+                                ExcursionsUiEvent.OnClickFavoriteExcursion(it)
+                            )
+                        },
+                        navigateToExcursion = navigateToExcursion,
+                        toolbarHeightDp = toolbarHeightDp
+                    )
 
-            is HomeScreenUiState.Content ->
-                HomeScreenContent(
-                    excursions = (uiState.content as HomeScreenUiState.Content).excursions,
-                    onSetFavoriteExcursionButtonClick = {
-                        viewModel.handleEvent(
-                            ExcursionsUiEvent.OnClickFavoriteExcursion(it)
-                        )
-                    },
-                    navigateToExcursion = navigateToExcursion,
-                    toolbarHeightDp = toolbarHeightDp
-                )
+                is HomeScreenUiState.Loading -> {}
 
-            is HomeScreenUiState.Loading -> {}
-
-            is HomeScreenUiState.Error -> {}
-        }
-
-
-        MainTopBar(modifier = Modifier.fillMaxSize(),
-            snackbarHostState = snackbarHostState,
-            navigateToExcursion = navigateToExcursion,
-            toolbarHeightDp = toolbarHeightDp,
-            toolbarOffsetHeightPx = toolbarOffsetHeightPx,
-            scrollingOn = {
-                toolbarOffsetHeightPx = 0f
-                scrolling = false
-                toolbarHeightDp = screenHeightDp },
-            scrollingOff = {
-                scrolling = true
-                toolbarHeightDp = toolbarHeight },
-            onToolbarHeightChange = {
-                toolbarHeight = with(localDensity) {it.toDp() }.value.roundToInt()
-                toolbarHeightDp = toolbarHeight
-                toolbarHeightPx = with(localDensity) { toolbarHeight.dp.roundToPx().toFloat() }
+                is HomeScreenUiState.Error -> {}
             }
-        )
+
+
+            MainTopBar(modifier = Modifier.fillMaxSize(),
+                snackbarHostState = snackbarHostState,
+                navigateToExcursion = navigateToExcursion,
+                toolbarHeightDp = toolbarHeightDp,
+                toolbarOffsetHeightPx = toolbarOffsetHeightPx,
+                scrollingOn = {
+                    toolbarOffsetHeightPx = 0f
+                    scrolling = false
+                    toolbarHeightDp = screenHeightDp
+                },
+                scrollingOff = {
+                    scrolling = true
+                    toolbarHeightDp = toolbarHeight
+                },
+                onToolbarHeightChange = {
+                    toolbarHeight = with(localDensity) { it.toDp() }.value.roundToInt()
+                    toolbarHeightDp = toolbarHeight
+                    toolbarHeightPx = with(localDensity) { toolbarHeight.dp.roundToPx().toFloat() }
+                }
+            )
+        }
     }
 
 }

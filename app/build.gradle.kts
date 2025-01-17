@@ -69,6 +69,8 @@ kapt {
 
 dependencies {
 
+    implementation("androidx.compose.animation:animation:1.7.6")
+
     implementation("com.google.accompanist:accompanist-pager:0.28.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
     implementation("io.coil-kt:coil-compose:2.7.0")

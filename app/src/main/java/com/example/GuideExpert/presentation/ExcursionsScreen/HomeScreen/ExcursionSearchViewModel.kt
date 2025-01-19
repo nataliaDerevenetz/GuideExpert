@@ -1,16 +1,11 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.FilterQuery
@@ -79,9 +74,6 @@ class ExcursionSearchViewModel @Inject constructor(
 ) : ViewModel() {
     //  val excursions: Flow<List<Excursion>> = excursionRepository.getExcursions()
 
-    private var searchText by mutableStateOf("")
-
-
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
@@ -97,14 +89,14 @@ class ExcursionSearchViewModel @Inject constructor(
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
+    private val savedSearchText: StateFlow<String> = state.getStateFlow(key = "QUERY", initialValue = "")
 
     @OptIn(FlowPreview::class)
-    private val currentQueryFlow = snapshotFlow { searchText }
+    private val currentQueryFlow = savedSearchText
         .debounce(500L)
         .filter { it.isNotEmpty() }
         .distinctUntilChanged()
         .onEach {
-            //  _uiPagingState.update { PagingData.empty()}
             onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Loading))
         }
         .flowOn(Dispatchers.IO)
@@ -157,15 +149,13 @@ class ExcursionSearchViewModel @Inject constructor(
     }
 
     init {
-        searchText = state.getStateFlow("query", "").value
         onEvent(SearchEvent.GetSearchExcursions)
     }
-    
 
-    fun setCurrentText(query: String) {
-        state["query"] = query
-        searchText = state.getStateFlow("query", "").value
-    }
+
+    private fun setCurrentText(query: String) {
+        state["QUERY"] = query
+     }
 
 
     suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {

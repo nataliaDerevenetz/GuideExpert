@@ -1,10 +1,21 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +44,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.MainTopBar
 import com.example.GuideExpert.utils.Constant.STATUSBAR_HEIGHT
@@ -70,6 +83,8 @@ fun HomeScreen(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 val newOffset = toolbarOffsetHeightPx + delta
+                if (scrolling) Log.d("TAG", "SCROLL YES") else Log.d("TAG", "SCROLL NOT")
+
                 if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx+statusbarHeight), 0f)
                 return Offset.Zero
             }
@@ -98,7 +113,11 @@ fun HomeScreen(
                             )
                         },
                         navigateToExcursion = navigateToExcursion,
-                        toolbarHeightDp = toolbarHeightDp
+                        toolbarHeightDp = toolbarHeightDp,
+                        filterScreenVisible = filtersVisible,
+                        onFiltersSelected = {
+                            filtersVisible = true
+                        },
                     )
 
                 is HomeScreenUiState.Loading -> {}
@@ -127,6 +146,15 @@ fun HomeScreen(
                     toolbarHeightPx = with(localDensity) { toolbarHeight.dp.roundToPx().toFloat() }
                 }
             )
+
+            if (filtersVisible) { scrolling = false}
+
+            AnimatedVisibility(filtersVisible, enter = fadeIn(), exit = fadeOut()) {
+                FilterScreen {
+                    filtersVisible = false
+                    scrolling = true
+                }
+            }
         }
     }
 
@@ -145,19 +173,39 @@ private fun HomeScreenEmpty(modifier: Modifier = Modifier) {
     }
 }
 
+context(SharedTransitionScope)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun HomeScreenContent(
     modifier: Modifier = Modifier,
     excursions: List<Excursion>,
     onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
     navigateToExcursion: (Excursion) -> Unit,
-    toolbarHeightDp: Int
+    toolbarHeightDp: Int,
+    filterScreenVisible: Boolean,
+    onFiltersSelected: () -> Unit,
 ) {
+
+    val filters = listOf("Высокий рейтинг","Популярные","Новые")
+
     LazyColumn(
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)
     ) {
         item{
             ImageSlider()
+        }
+        item {
+           /* Spacer(
+                Modifier.windowInsetsTopHeight(
+                    WindowInsets.statusBars.add(WindowInsets(top = 56.dp))
+                )
+            )*/
+            FilterBar(
+                filters,
+             //   sharedTransitionScope = sharedTransitionScope,
+                filterScreenVisible = filterScreenVisible,
+                onShowFilters = onFiltersSelected,
+            )
         }
         items(excursions, key = { it.id }) {
             ExcursionListFilterItem(it,onSetFavoriteExcursionButtonClick,navigateToExcursion)

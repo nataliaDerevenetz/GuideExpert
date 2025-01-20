@@ -43,6 +43,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
     }
     buildFeatures {
         compose = true
@@ -68,6 +69,8 @@ kapt {
 
 
 dependencies {
+
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 
     implementation("androidx.compose.animation:animation:1.7.6")
 

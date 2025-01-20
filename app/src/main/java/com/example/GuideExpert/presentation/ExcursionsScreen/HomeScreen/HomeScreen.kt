@@ -187,7 +187,7 @@ private fun HomeScreenContent(
     onFiltersSelected: () -> Unit,
 ) {
 
-    val filters = DataProvider.filtersBar//listOf("Высокий рейтинг","Популярные","Новые")
+    val filters = DataProvider.filtersBar
 
     LazyColumn(
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)
@@ -196,14 +196,8 @@ private fun HomeScreenContent(
             ImageSlider()
         }
         item {
-           /* Spacer(
-                Modifier.windowInsetsTopHeight(
-                    WindowInsets.statusBars.add(WindowInsets(top = 56.dp))
-                )
-            )*/
             FilterBar(
                 filters,
-             //   sharedTransitionScope = sharedTransitionScope,
                 filterScreenVisible = filterScreenVisible,
                 onShowFilters = onFiltersSelected,
             )

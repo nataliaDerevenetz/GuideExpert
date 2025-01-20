@@ -7,7 +7,6 @@ import com.example.GuideExpert.domain.models.FilterTypes
 
 object DataProvider {
 
-
     val filtersBar = listOf(
         Filter(id = 1, name = "Топ",type = FilterTypes.Sort),
         Filter(id = 2, name = "Новые",type = FilterTypes.Sort),
@@ -37,6 +36,7 @@ object DataProvider {
         Filter(id = 2, name = "Индивидуальные",type = FilterTypes.Groups),
     )
 
+    var sortDefault = filtersSort.get(0).id
   /*
     val excursionList = listOf(
         Excursion(

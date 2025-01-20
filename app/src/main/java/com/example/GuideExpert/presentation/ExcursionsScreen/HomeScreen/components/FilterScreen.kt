@@ -9,6 +9,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,26 +22,35 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
+import com.example.GuideExpert.data.DataProvider
+import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.ui.theme.Shadow1
+import com.example.GuideExpert.ui.theme.Shadow2
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -47,7 +58,7 @@ context(SharedTransitionScope, AnimatedVisibilityScope)
 fun FilterScreen(
     onDismiss: () -> Unit
 ) {
-   // var sortState by remember { mutableStateOf(SnackRepo.getSortDefault()) }
+    var sortState by remember { mutableStateOf(DataProvider.sortDefault) }
 
     Box(
         modifier = Modifier
@@ -125,31 +136,123 @@ fun FilterScreen(
 
             }
 
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
-            Text("1")
+            SortFiltersSection(
+                sortState = sortState,
+                onFilterChange = { filter ->
+                    sortState = filter.id
+                }
+            )
 
+            FilterChipSection(
+                title = stringResource(id = R.string.categories),
+                filters = DataProvider.filtersCategories
+            )
+
+            FilterChipSection(
+                title = stringResource(id = R.string.groups),
+                filters = DataProvider.filtersGroups
+            )
+
+            FilterChipSection(
+                title = stringResource(id = R.string.duration),
+                filters = DataProvider.filtersDuration
+            )
 
 
         }
 
     }
 
+}
+
+@Composable
+fun SortFiltersSection(sortState: Int, onFilterChange: (Filter) -> Unit) {
+    FilterTitle(text = stringResource(id = R.string.sort))
+    Column(Modifier.padding(bottom = 24.dp)) {
+        SortFilters(
+            sortState = sortState,
+            onChanged = onFilterChange
+        )
+    }
+}
+
+@Composable
+fun FilterTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleLarge,
+        color = Shadow1,//JetsnackTheme.colors.brand,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+}
+
+@Composable
+fun SortFilters(
+    sortFilters: List<Filter> = DataProvider.filtersSort,
+    sortState: Int,
+    onChanged: (Filter) -> Unit
+) {
+
+    sortFilters.forEach { filter ->
+        SortOption(
+            text = filter.name,
+            icon = filter.icon,
+            selected = sortState == filter.id,
+            onClickOption = {
+                onChanged(filter)
+            }
+        )
+    }
+}
+
+@Composable
+fun SortOption(
+    text: String,
+    icon: ImageVector?,
+    onClickOption: () -> Unit,
+    selected: Boolean
+) {
+    Row(
+        modifier = Modifier
+            .padding(top = 14.dp)
+            .selectable(selected) { onClickOption() }
+    ) {
+        if (icon != null) {
+            Icon(imageVector = icon, contentDescription = null)
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .weight(1f)
+        )
+        if (selected) {
+            Icon(
+                imageVector = Icons.Filled.Done,
+                contentDescription = null,
+                tint = Shadow1//JetsnackTheme.colors.brand
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FilterChipSection(title: String, filters: List<Filter>) {
+    FilterTitle(text = title)
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 12.dp, bottom = 16.dp)
+            .padding(horizontal = 4.dp)
+    ) {
+        filters.forEach { filter ->
+            FilterChip(
+                filter = filter,
+                modifier = Modifier.padding(end = 4.dp, bottom = 8.dp),
+                shape = CircleShape
+            )
+        }
+    }
 }

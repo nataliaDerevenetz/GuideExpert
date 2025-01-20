@@ -4,4 +4,8 @@
     <string name="search_str">Поиск...</string>
     <string name="label_filters">Фильтры</string>
     <string name="reset">Сбросить</string>
+    <string name="sort">Сортировать</string>
+    <string name="categories">Категории</string>
+    <string name="groups">Размер</string>
+    <string name="duration">Продолжительность</string>
 </resources>

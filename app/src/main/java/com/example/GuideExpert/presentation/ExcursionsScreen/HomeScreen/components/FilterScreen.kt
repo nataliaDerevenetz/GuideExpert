@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
+import com.example.GuideExpert.ui.theme.Shadow1
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -45,6 +47,8 @@ context(SharedTransitionScope, AnimatedVisibilityScope)
 fun FilterScreen(
     onDismiss: () -> Unit
 ) {
+   // var sortState by remember { mutableStateOf(SnackRepo.getSortDefault()) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -114,7 +118,7 @@ fun FilterScreen(
                     Icon(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = "",
-                        tint = Color.Blue.copy(alpha = if (!resetEnabled) 0.38f else 1f)
+                        tint = Shadow1.copy(alpha = if (!resetEnabled) 0.38f else 1f)
                     )
 
                 }

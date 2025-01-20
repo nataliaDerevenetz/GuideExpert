@@ -3,36 +3,64 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.compone
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.content.MediaType.Companion.Text
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.List
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.icons.rounded.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
 
+fun Modifier.fadeInDiagonalGradientBorder(
+    showBorder: Boolean,
+    colors: List<Color>,
+    borderSize: Dp = 2.dp,
+    shape: Shape
+) = composed {
+    val animatedColors = List(colors.size) { i ->
+        animateColorAsState(
+            if (showBorder) colors[i] else colors[i].copy(alpha = 0f),
+            label = "animated color"
+        ).value
+    }
+    diagonalGradientBorder(
+        colors = animatedColors,
+        borderSize = borderSize,
+        shape = shape
+    )
+}
 
 fun Modifier.diagonalGradientBorder(
     colors: List<Color>,
@@ -44,16 +72,28 @@ fun Modifier.diagonalGradientBorder(
     shape = shape
 )
 
+fun Modifier.offsetGradientBackground(
+    colors: List<Color>,
+    width: Float,
+    offset: Float = 0f
+) = background(
+    Brush.horizontalGradient(
+        colors = colors,
+        startX = -offset,
+        endX = width - offset,
+        tileMode = TileMode.Mirror
+    )
+)
+
 object FilterSharedElementKey
 
 context(SharedTransitionScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterBar(
-    filters: List<String>,
+    filters: List<Filter>,
     onShowFilters: () -> Unit,
     filterScreenVisible: Boolean,
-   // sharedTransitionScope: SharedTransitionScope
 ) {
 
     LazyRow(
@@ -86,9 +126,74 @@ fun FilterBar(
             }
         }
         items(filters) { filter ->
-            Text(filter)
-         //   FilterChip(filter = filter, shape = MaterialTheme.shapes.small)
+            FilterChip(filter = filter, shape = CircleShape)
         }
     }
+}
 
+@Composable
+fun FilterChip(
+    filter: Filter,
+    modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.small
+) {
+    val (selected, setSelected) = filter.enabled
+    val backgroundColor by animateColorAsState(
+        if (selected) Shadow1 else MaterialTheme.colorScheme.background,
+        label = "background color"
+    )
+    val border = Modifier.fadeInDiagonalGradientBorder(
+        showBorder = !selected,
+        colors = listOf(Shadow1, Shadow2),
+        shape = shape
+    )
+    val textColor by animateColorAsState(
+        if (selected) Color.Black else Color.White,
+        label = "text color"
+    )
+
+    Surface(
+        modifier = modifier,
+        color = backgroundColor,
+        contentColor = textColor,
+        shape = shape,
+        elevation = 2.dp
+    ) {
+        val interactionSource = remember { MutableInteractionSource() }
+
+        val pressed by interactionSource.collectIsPressedAsState()
+        val backgroundPressed =
+            if (pressed) {
+                Modifier.offsetGradientBackground(
+                    listOf(Shadow1, Shadow2),
+                    200f,
+                    0f
+                )
+            } else {
+                Modifier.background(Color.Transparent)
+            }
+        Box(
+            modifier = Modifier
+                .toggleable(
+                    value = selected,
+                    onValueChange = setSelected,
+                    interactionSource = interactionSource,
+                    indication = null
+                )
+                .then(backgroundPressed)
+                .then(border),
+        ) {
+            Text(
+                text = filter.name,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                modifier = Modifier.padding(
+                    horizontal = 20.dp,
+                    vertical = 6.dp
+                ),
+                fontWeight = FontWeight.Bold,
+                color = if (selected) Color.White else MaterialTheme.typography.labelMedium.color
+            )
+        }
+    }
 }

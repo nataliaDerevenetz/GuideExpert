@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
+import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
@@ -186,7 +187,7 @@ private fun HomeScreenContent(
     onFiltersSelected: () -> Unit,
 ) {
 
-    val filters = listOf("Высокий рейтинг","Популярные","Новые")
+    val filters = DataProvider.filtersBar//listOf("Высокий рейтинг","Популярные","Новые")
 
     LazyColumn(
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)

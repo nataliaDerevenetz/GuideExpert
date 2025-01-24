@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -202,51 +203,45 @@ fun FilterChip(
 }
 
 fun setFilterScreen(filter: Filter, enabled: Boolean) {
-    Log.d("TAG", "${filter.name}  SET enable :: ${enabled.toString()}")
     val filters = DataProvider.filtersBar
     filters.filter { it.type == filter.type &&  it.id == filter.id }
         .map {
             val (selected, setSelected) = it.enabled
             setSelected(enabled)
-            Log.d("TAG", "name  :: ${it.name}")
         }
 
     when (filter.type) {
 
-        is FilterType.Duration -> {Log.d("TAG", "Duration")
+        is FilterType.Duration -> {
             val filtersDuration = DataProvider.filtersDuration
             filtersDuration.filter { it.type == filter.type &&  it.id == filter.id }
                 .map {
                     val (selected, setSelected) = it.enabled
                     setSelected(enabled)
-                    Log.d("TAG", "name  :: ${it.name}")
                 }
         }
-        is FilterType.Sort -> {Log.d("TAG", "Sort")
+        is FilterType.Sort -> {
             val filtersSort = DataProvider.filtersSort
             filtersSort.filter { it.type == filter.type &&  it.id == filter.id }
                 .map {
                     val (selected, setSelected) = it.enabled
                     setSelected(enabled)
-                    Log.d("TAG", "name  :: ${it.name}")
                 }
         }
-        is FilterType.Groups -> {Log.d("TAG", "Groups")
+        is FilterType.Groups -> {
             val filtersGroups = DataProvider.filtersGroups
             filtersGroups.filter { it.type == filter.type &&  it.id == filter.id }
                 .map {
                     val (selected, setSelected) = it.enabled
                     setSelected(enabled)
-                    Log.d("TAG", "name  :: ${it.name}")
                 }
         }
-        is FilterType.Categories -> {Log.d("TAG", "Categories")
+        is FilterType.Categories -> {
             val filtersCategories = DataProvider.filtersCategories
             filtersCategories.filter { it.type == filter.type &&  it.id == filter.id }
                 .map {
                     val (selected, setSelected) = it.enabled
                     setSelected(enabled)
-                    Log.d("TAG", "name  :: ${it.name}")
                 }
         }
     }

@@ -1,39 +1,37 @@
 package com.example.GuideExpert.data
 
-import com.example.GuideExpert.R
-import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
-import com.example.GuideExpert.domain.models.FilterTypes
+import com.example.GuideExpert.domain.models.FilterType
 
 object DataProvider {
 
     val filtersBar = listOf(
-        Filter(id = 1, name = "Топ",type = FilterTypes.Sort),
-        Filter(id = 2, name = "Новые",type = FilterTypes.Sort),
-        Filter(id = 1, name = "Обзорные",type = FilterTypes.Categories),
-        Filter(id = 1, name = "Групповые",type = FilterTypes.Groups),
+        Filter(id = 1, name = "Топ",type = FilterType.Sort),
+        Filter(id = 2, name = "Вечерние",type = FilterType.Duration),
+        Filter(id = 1, name = "Обзорные",type = FilterType.Categories),
+        Filter(id = 1, name = "Групповые",type = FilterType.Groups),
     )
 
     val filtersSort = listOf(
-        Filter(id = 1, name = "Топ",type = FilterTypes.Sort),
-        Filter(id = 2, name = "Новые",type = FilterTypes.Sort),
-        Filter(id = 3, name = "Рейтинг",type = FilterTypes.Sort),)
+        Filter(id = 1, name = "Топ",type = FilterType.Sort),
+        Filter(id = 2, name = "Новые",type = FilterType.Sort),
+        Filter(id = 3, name = "Рейтинг",type = FilterType.Sort),)
 
     val filtersCategories = listOf(
-        Filter(id = 1, name = "Обзорные",type = FilterTypes.Categories),
-        Filter(id = 2, name = "Детские",type = FilterTypes.Categories),
-        Filter(id = 3, name = "Водные",type = FilterTypes.Categories)
+        Filter(id = 1, name = "Обзорные",type = FilterType.Categories),
+        Filter(id = 2, name = "Детские",type = FilterType.Categories),
+        Filter(id = 3, name = "Водные",type = FilterType.Categories)
     )
 
     val filtersDuration = listOf(
-        Filter(id = 1, name = "Короткие",type = FilterTypes.Duration),
-        Filter(id = 2, name = "Вечерние",type = FilterTypes.Duration),
-        Filter(id = 3, name = "Весь день",type = FilterTypes.Duration)
+        Filter(id = 1, name = "Короткие",type = FilterType.Duration),
+        Filter(id = 2, name = "Вечерние",type = FilterType.Duration),
+        Filter(id = 3, name = "Весь день",type = FilterType.Duration)
     )
 
     val filtersGroups = listOf(
-        Filter(id = 1, name = "Групповые",type = FilterTypes.Groups),
-        Filter(id = 2, name = "Индивидуальные",type = FilterTypes.Groups),
+        Filter(id = 1, name = "Групповые",type = FilterType.Groups),
+        Filter(id = 2, name = "Индивидуальные",type = FilterType.Groups),
     )
 
     var sortDefault = filtersSort.get(0).id

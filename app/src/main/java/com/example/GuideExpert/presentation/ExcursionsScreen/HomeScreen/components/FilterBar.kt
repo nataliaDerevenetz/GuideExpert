@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope

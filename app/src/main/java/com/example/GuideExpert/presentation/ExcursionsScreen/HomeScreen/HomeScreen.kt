@@ -84,8 +84,6 @@ fun HomeScreen(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 val newOffset = toolbarOffsetHeightPx + delta
-                if (scrolling) Log.d("TAG", "SCROLL YES") else Log.d("TAG", "SCROLL NOT")
-
                 if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx+statusbarHeight), 0f)
                 return Offset.Zero
             }

@@ -181,7 +181,7 @@ fun FilterTitle(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
-        color = Shadow1,//JetsnackTheme.colors.brand,
+        color = Shadow1,
         modifier = Modifier.padding(bottom = 8.dp)
     )
 }
@@ -231,7 +231,7 @@ fun SortOption(
             Icon(
                 imageVector = Icons.Filled.Done,
                 contentDescription = null,
-                tint = Shadow1//JetsnackTheme.colors.brand
+                tint = Shadow1
             )
         }
     }

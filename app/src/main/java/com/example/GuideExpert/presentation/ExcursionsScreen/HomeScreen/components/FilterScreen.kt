@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -59,6 +60,8 @@ fun FilterScreen(
     onDismiss: () -> Unit
 ) {
     var sortState by remember { mutableStateOf(DataProvider.sortDefault) }
+
+    Log.d("TAG","SORT ID :: ${sortState.toString()}")
 
     Box(
         modifier = Modifier
@@ -140,6 +143,9 @@ fun FilterScreen(
                 sortState = sortState,
                 onFilterChange = { filter ->
                     sortState = filter.id
+                   // val (selected, setSelected) = filter.enabled
+                   // setSelected(true)
+
                 }
             )
 

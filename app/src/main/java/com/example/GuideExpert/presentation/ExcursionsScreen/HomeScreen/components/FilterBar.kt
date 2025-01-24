@@ -40,7 +40,9 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
+import com.example.GuideExpert.domain.models.FilterType
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
 
@@ -177,7 +179,7 @@ fun FilterChip(
             modifier = Modifier
                 .toggleable(
                     value = selected,
-                    onValueChange = setSelected,
+                    onValueChange = {setFilterScreen(filter,it)},
                     interactionSource = interactionSource,
                     indication = null
                 )
@@ -195,6 +197,57 @@ fun FilterChip(
                 fontWeight = FontWeight.Bold,
                 color = if (selected) Color.White else MaterialTheme.typography.labelMedium.color
             )
+        }
+    }
+}
+
+fun setFilterScreen(filter: Filter, enabled: Boolean) {
+    Log.d("TAG", "${filter.name}  SET enable :: ${enabled.toString()}")
+    val filters = DataProvider.filtersBar
+    filters.filter { it.type == filter.type &&  it.id == filter.id }
+        .map {
+            val (selected, setSelected) = it.enabled
+            setSelected(enabled)
+            Log.d("TAG", "name  :: ${it.name}")
+        }
+
+    when (filter.type) {
+
+        is FilterType.Duration -> {Log.d("TAG", "Duration")
+            val filtersDuration = DataProvider.filtersDuration
+            filtersDuration.filter { it.type == filter.type &&  it.id == filter.id }
+                .map {
+                    val (selected, setSelected) = it.enabled
+                    setSelected(enabled)
+                    Log.d("TAG", "name  :: ${it.name}")
+                }
+        }
+        is FilterType.Sort -> {Log.d("TAG", "Sort")
+            val filtersSort = DataProvider.filtersSort
+            filtersSort.filter { it.type == filter.type &&  it.id == filter.id }
+                .map {
+                    val (selected, setSelected) = it.enabled
+                    setSelected(enabled)
+                    Log.d("TAG", "name  :: ${it.name}")
+                }
+        }
+        is FilterType.Groups -> {Log.d("TAG", "Groups")
+            val filtersGroups = DataProvider.filtersGroups
+            filtersGroups.filter { it.type == filter.type &&  it.id == filter.id }
+                .map {
+                    val (selected, setSelected) = it.enabled
+                    setSelected(enabled)
+                    Log.d("TAG", "name  :: ${it.name}")
+                }
+        }
+        is FilterType.Categories -> {Log.d("TAG", "Categories")
+            val filtersCategories = DataProvider.filtersCategories
+            filtersCategories.filter { it.type == filter.type &&  it.id == filter.id }
+                .map {
+                    val (selected, setSelected) = it.enabled
+                    setSelected(enabled)
+                    Log.d("TAG", "name  :: ${it.name}")
+                }
         }
     }
 }

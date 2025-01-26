@@ -210,54 +210,6 @@ fun FilterChip(
 }
 
 fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Unit ) {
-   /* Log.d("TAG","setFilterScreen")
-    val filters = DataProvider.filtersBar
-    filters.filter { it.type == filter.type &&  it.id == filter.id }
-        .map {
-            val (selected, setSelected) = it.enabled
-            setSelected(enabled)
-        }
-
-    when (filter.type) {
-
-        is FilterType.Duration -> {
-            val filtersDuration = DataProvider.filtersDuration
-            filtersDuration.filter { it.type == filter.type &&  it.id == filter.id }
-                .map {
-                    val (selected, setSelected) = it.enabled
-                    setSelected(enabled)
-                }
-        }
-        is FilterType.Sort -> {
-            val filtersSort = DataProvider.filtersSort
-            filtersSort.filter { it.type == filter.type &&  it.id == filter.id }
-                .map {
-                    val (selected, setSelected) = it.enabled
-                    setSelected(enabled)
-                }
-            if (enabled) setSortState(filter.id) else setSortState(DataProvider.sortDefault)
-        }
-        is FilterType.Groups -> {
-            val filtersGroups = DataProvider.filtersGroups
-            filtersGroups.filter { it.type == filter.type &&  it.id == filter.id }
-                .map {
-                    val (selected, setSelected) = it.enabled
-                    setSelected(enabled)
-                }
-        }
-        is FilterType.Categories -> {
-            val filtersCategories = DataProvider.filtersCategories
-            filtersCategories.filter { it.type == filter.type &&  it.id == filter.id }
-                .map {
-                    val (selected, setSelected) = it.enabled
-                    setSelected(enabled)
-                }
-        }
-    }
-    */
-
-
-    Log.d("TAG","setFilterScreen")
     val filtersBar = DataProvider.filtersBar
     filtersBar.filter { it.type == filter.type &&  it.id == filter.id }
         .map {

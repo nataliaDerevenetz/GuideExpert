@@ -65,9 +65,6 @@ fun FilterScreen(
     onDismiss: () -> Unit
 ) {
     val sortState = viewModel.sortState.collectAsState()
-   // var sortState by remember { mutableStateOf(DataProvider.sortDefault) }
-
-    Log.d("TAG","SORT ID :: ${sortState.value.toString()}")
 
     Box(
         modifier = Modifier

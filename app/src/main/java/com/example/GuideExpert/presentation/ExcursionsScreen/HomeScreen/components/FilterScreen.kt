@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.R
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
+import com.example.GuideExpert.domain.models.FilterType
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
@@ -148,7 +149,6 @@ fun FilterScreen(
                 sortState = sortState.value,
                 onFilterChange = { filter ->
                     viewModel.setSortState(filter.id)
-                 //   sortState = filter.id
                 }
             )
 
@@ -166,12 +166,8 @@ fun FilterScreen(
                 title = stringResource(id = R.string.duration),
                 filters = DataProvider.filtersDuration
             )
-
-
         }
-
     }
-
 }
 
 @Composable
@@ -198,12 +194,12 @@ fun FilterTitle(text: String) {
 @Composable
 fun SortFilters(
     sortFilters: List<Filter> = DataProvider.filtersSort,
-    sortState: Int,
+    filtersBar: List<Filter> = DataProvider.filtersBar,
+        sortState: Int,
     onChanged: (Filter) -> Unit
 ) {
 
-    val filtersBar = DataProvider.filtersBar
-    filtersBar.forEach{
+    filtersBar.filter{  it.type == FilterType.Sort }.map{
             val (selected, setSelected) = it.enabled
             setSelected(false)
     }

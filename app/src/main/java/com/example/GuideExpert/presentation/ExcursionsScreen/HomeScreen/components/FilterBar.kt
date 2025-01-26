@@ -149,10 +149,6 @@ fun FilterChip(
         if (sortState.value == filter.id) selected = true
     }
 
-
-
-
-
     val backgroundColor by animateColorAsState(
         if (selected) Shadow1 else MaterialTheme.colorScheme.background,
         label = "background color"
@@ -214,7 +210,7 @@ fun FilterChip(
 }
 
 fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Unit ) {
-    Log.d("TAG","setFilterScreen")
+   /* Log.d("TAG","setFilterScreen")
     val filters = DataProvider.filtersBar
     filters.filter { it.type == filter.type &&  it.id == filter.id }
         .map {
@@ -258,4 +254,33 @@ fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Uni
                 }
         }
     }
+    */
+
+
+    Log.d("TAG","setFilterScreen")
+    val filtersBar = DataProvider.filtersBar
+    filtersBar.filter { it.type == filter.type &&  it.id == filter.id }
+        .map {
+            val (selected, setSelected) = it.enabled
+            setSelected(enabled)
+        }
+
+    var filters = listOf<Filter>()
+    when (filter.type) {
+        is FilterType.Duration -> filters = DataProvider.filtersDuration
+        is FilterType.Sort -> {
+            filters = DataProvider.filtersSort
+            if (enabled) setSortState(filter.id) else setSortState(DataProvider.sortDefault)
+        }
+        is FilterType.Groups -> filters = DataProvider.filtersGroups
+        is FilterType.Categories -> filters = DataProvider.filtersCategories
+    }
+
+    filters.filter { it.type == filter.type &&  it.id == filter.id }
+        .map {
+            val (selected, setSelected) = it.enabled
+            setSelected(enabled)
+        }
+
+
 }

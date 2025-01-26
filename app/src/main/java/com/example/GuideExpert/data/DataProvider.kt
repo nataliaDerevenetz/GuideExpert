@@ -15,7 +15,7 @@ object DataProvider {
     val filtersSort = listOf(
         Filter(id = 1, name = "Топ",type = FilterType.Sort),
         Filter(id = 2, name = "Новые",type = FilterType.Sort),
-        Filter(id = 3, name = "Рейтинг",type = FilterType.Sort),)
+        Filter(id = 3, name = "По умолчанию",type = FilterType.Sort),)
 
     val filtersCategories = listOf(
         Filter(id = 1, name = "Обзорные",type = FilterType.Categories),
@@ -34,7 +34,7 @@ object DataProvider {
         Filter(id = 2, name = "Индивидуальные",type = FilterType.Groups),
     )
 
-    var sortDefault = filtersSort.get(0).id
+    var sortDefault = filtersSort.get(2).id
   /*
     val excursionList = listOf(
         Excursion(

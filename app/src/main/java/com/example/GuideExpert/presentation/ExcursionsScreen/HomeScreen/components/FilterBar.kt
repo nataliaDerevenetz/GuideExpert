@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Surface
@@ -28,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,9 +40,11 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
 
@@ -139,9 +140,19 @@ fun FilterBar(
 fun FilterChip(
     filter: Filter,
     modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.small
+    shape: Shape = MaterialTheme.shapes.small,
+    viewModel: ExcursionsViewModel = hiltViewModel(),
 ) {
-    val (selected, setSelected) = filter.enabled
+    val sortState = viewModel.sortState.collectAsState()
+    var (selected, setSelected) = filter.enabled
+    if (filter.type == FilterType.Sort) {
+        if (sortState.value == filter.id) selected = true
+    }
+
+
+
+
+
     val backgroundColor by animateColorAsState(
         if (selected) Shadow1 else MaterialTheme.colorScheme.background,
         label = "background color"
@@ -180,7 +191,7 @@ fun FilterChip(
             modifier = Modifier
                 .toggleable(
                     value = selected,
-                    onValueChange = {setFilterScreen(filter,it)},
+                    onValueChange = {setFilterScreen(filter,it,viewModel::setSortState)},
                     interactionSource = interactionSource,
                     indication = null
                 )
@@ -202,7 +213,8 @@ fun FilterChip(
     }
 }
 
-fun setFilterScreen(filter: Filter, enabled: Boolean) {
+fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Unit ) {
+    Log.d("TAG","setFilterScreen")
     val filters = DataProvider.filtersBar
     filters.filter { it.type == filter.type &&  it.id == filter.id }
         .map {
@@ -227,6 +239,7 @@ fun setFilterScreen(filter: Filter, enabled: Boolean) {
                     val (selected, setSelected) = it.enabled
                     setSelected(enabled)
                 }
+            if (enabled) setSortState(filter.id) else setSortState(DataProvider.sortDefault)
         }
         is FilterType.Groups -> {
             val filtersGroups = DataProvider.filtersGroups

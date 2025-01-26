@@ -1,9 +1,14 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.models.Excursion
@@ -54,6 +59,9 @@ class ExcursionsViewModel @Inject constructor(
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
+    private val _sortState = MutableStateFlow(DataProvider.sortDefault)
+    val sortState: StateFlow<Int> = _sortState
+
 
     init {
         handleEvent(ExcursionsUiEvent.OnLoadExcursions)
@@ -89,6 +97,10 @@ class ExcursionsViewModel @Inject constructor(
         }
     }
 
+
+    fun setSortState(sortState:Int) {
+        _sortState.update { sortState }
+    }
 
     private fun setFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {

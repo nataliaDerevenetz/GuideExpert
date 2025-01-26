@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,9 +48,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.R
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
 
@@ -57,11 +60,13 @@ context(SharedTransitionScope, AnimatedVisibilityScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterScreen(
+    viewModel: ExcursionsViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
-    var sortState by remember { mutableStateOf(DataProvider.sortDefault) }
+    val sortState = viewModel.sortState.collectAsState()
+   // var sortState by remember { mutableStateOf(DataProvider.sortDefault) }
 
-    Log.d("TAG","SORT ID :: ${sortState.toString()}")
+    Log.d("TAG","SORT ID :: ${sortState.value.toString()}")
 
     Box(
         modifier = Modifier
@@ -140,11 +145,11 @@ fun FilterScreen(
             }
 
             SortFiltersSection(
-                sortState = sortState,
+                sortState = sortState.value,
                 onFilterChange = { filter ->
-                    sortState = filter.id
-                   // val (selected, setSelected) = filter.enabled
-                   // setSelected(true)
+                    viewModel.setSortState(filter.id)
+                 //   sortState = filter.id
+
 
                 }
             )

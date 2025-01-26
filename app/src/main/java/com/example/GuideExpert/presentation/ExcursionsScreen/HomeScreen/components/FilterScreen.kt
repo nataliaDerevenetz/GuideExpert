@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -35,11 +34,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,16 +52,34 @@ import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
-import com.example.GuideExpert.ui.theme.Shadow2
+import kotlinx.coroutines.flow.StateFlow
+
+
+@Stable
+class FilterState(
+    val sortState:  StateFlow<Int>,
+    val setSortState: (Int) -> Unit,
+)
+
+@Composable
+fun rememberFilterState(
+    sortState:  StateFlow<Int>,
+    setSortState: (Int) -> Unit,
+): FilterState = remember(sortState,setSortState) {
+    FilterState(sortState,setSortState)
+}
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterScreen(
     viewModel: ExcursionsViewModel = hiltViewModel(),
+    state: FilterState = rememberFilterState(
+        sortState = viewModel.sortState,
+        setSortState = viewModel::setSortState),
     onDismiss: () -> Unit
 ) {
-    val sortState = viewModel.sortState.collectAsState()
+    val sortState = state.sortState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -145,7 +160,7 @@ fun FilterScreen(
             SortFiltersSection(
                 sortState = sortState.value,
                 onFilterChange = { filter ->
-                    viewModel.setSortState(filter.id)
+                    state.setSortState(filter.id)
                 }
             )
 

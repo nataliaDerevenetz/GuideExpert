@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -28,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -142,8 +140,11 @@ fun FilterChip(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.small,
     viewModel: ExcursionsViewModel = hiltViewModel(),
+    state: FilterState = rememberFilterState(
+        sortState = viewModel.sortState,
+        setSortState = viewModel::setSortState),
 ) {
-    val sortState = viewModel.sortState.collectAsState()
+    val sortState = state.sortState.collectAsState()
     var (selected, setSelected) = filter.enabled
     if (filter.type == FilterType.Sort) {
         if (sortState.value == filter.id) selected = true
@@ -187,7 +188,7 @@ fun FilterChip(
             modifier = Modifier
                 .toggleable(
                     value = selected,
-                    onValueChange = {setFilterScreen(filter,it,viewModel::setSortState)},
+                    onValueChange = {setFilterScreen(filter,it,state.setSortState)},
                     interactionSource = interactionSource,
                     indication = null
                 )

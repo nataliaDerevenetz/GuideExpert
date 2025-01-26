@@ -149,8 +149,6 @@ fun FilterScreen(
                 onFilterChange = { filter ->
                     viewModel.setSortState(filter.id)
                  //   sortState = filter.id
-
-
                 }
             )
 
@@ -203,6 +201,12 @@ fun SortFilters(
     sortState: Int,
     onChanged: (Filter) -> Unit
 ) {
+
+    val filtersBar = DataProvider.filtersBar
+    filtersBar.forEach{
+            val (selected, setSelected) = it.enabled
+            setSelected(false)
+    }
 
     sortFilters.forEach { filter ->
         SortOption(

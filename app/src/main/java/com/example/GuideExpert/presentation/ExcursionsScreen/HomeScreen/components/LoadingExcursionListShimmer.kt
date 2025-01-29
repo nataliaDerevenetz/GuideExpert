@@ -26,34 +26,40 @@ fun LoadingExcursionListShimmer(
         modifier = Modifier.fillMaxSize()
     ) {
         items(20) {
-
-            Column(
-                modifier = Modifier.padding(15.dp).fillMaxWidth()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                        .clip(shape= RoundedCornerShape(30.dp))
-                        .shimmerEffect()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .height(20.dp)
-                        .shimmerEffect()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .height(20.dp)
-                        .shimmerEffect()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            ColumnExcursionShimmer()
         }
+    }
+
+}
+
+@Composable
+fun ColumnExcursionShimmer(
+){
+    Column(
+        modifier = Modifier.padding(15.dp).fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+                .clip(shape= RoundedCornerShape(30.dp))
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .height(20.dp)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.3f)
+                .height(20.dp)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
     }
 
 }

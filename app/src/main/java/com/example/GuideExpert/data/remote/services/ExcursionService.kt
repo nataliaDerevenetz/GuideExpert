@@ -12,7 +12,9 @@ interface ExcursionService {
     suspend fun getExcursions(): Response<List<ExcursionPOJO>>
 
     @GET("server.php")
-    suspend fun getExcursionsPaging(@Query("offset") offset:Int, @Query("limit") limit:Int): Response<ExcursionsPagingPOJO>
+    suspend fun getExcursionsSearchPaging(@Query("offset") offset:Int, @Query("limit") limit:Int): Response<ExcursionsPagingPOJO>
 
+    @GET("server.php")
+    suspend fun getExcursionsFiltersPaging(@Query("offset") offset:Int, @Query("limit") limit:Int): Response<ExcursionsPagingPOJO>
 
 }

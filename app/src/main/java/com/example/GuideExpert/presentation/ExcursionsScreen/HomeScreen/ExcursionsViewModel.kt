@@ -1,24 +1,29 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetAllExcursionsUseCase
+import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.Filters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,6 +32,7 @@ import javax.inject.Inject
 
 
 sealed interface ExcursionsUiEvent {
+    object GetFilterExcursions : ExcursionsUiEvent
     data class OnClickFavoriteExcursion(val excursion: Excursion) : ExcursionsUiEvent
     data object OnLoadExcursions : ExcursionsUiEvent
 
@@ -50,7 +56,8 @@ sealed class SnackbarEffect {
 @HiltViewModel
 class ExcursionsViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    val getAllExcursionsUseCase: GetAllExcursionsUseCase
+    val getAllExcursionsUseCase: GetAllExcursionsUseCase,
+    val getExcursionByFiltersUseCase: GetExcursionByFiltersUseCase
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ExcursionsUIState())
@@ -62,15 +69,17 @@ class ExcursionsViewModel @Inject constructor(
     private val _sortState = MutableStateFlow(DataProvider.sortDefault)
     val sortState: StateFlow<Int> = _sortState
 
+    private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
+    val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
-    init {
-        handleEvent(ExcursionsUiEvent.OnLoadExcursions)
-    }
 
     fun handleEvent(event: ExcursionsUiEvent) {
-        when (event) {
-            is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
-            is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
+        viewModelScope.launch {
+            when (event) {
+                is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
+                is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
+                is ExcursionsUiEvent.GetFilterExcursions -> getFiltersExcursions()
+            }
         }
     }
 
@@ -110,5 +119,45 @@ class ExcursionsViewModel @Inject constructor(
         }
     }
 
+    private val sortParamsFlow = MutableStateFlow(listOf(sortState.value))
+
+    private val categoriesParamsFlow = MutableStateFlow(DataProvider.filtersCategories.filter { it.enabled.value })
+
+    private val durationParamsFlow = MutableStateFlow(DataProvider.filtersDuration.filter { it.enabled.value })
+
+    private val groupParamsFlow = MutableStateFlow(DataProvider.filtersGroups.filter { it.enabled.value })
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun getFiltersExcursions() {
+        Log.d("TAG", "getFiltersExcursions")
+        combine(
+            sortParamsFlow,
+            categoriesParamsFlow,
+            durationParamsFlow,
+            groupParamsFlow
+        ) { (sort, categories, duration,group) ->
+            Log.d("TAG", "getFiltersExcursions!!!")
+            Filters(sort, categories, duration,group)
+        }.flowOn(Dispatchers.IO)
+            .flatMapLatest {
+                Log.d("TAG", "getFiltersExcursionsOooooo")
+                getExcursionByFiltersUseCase(it)
+            }.cachedIn(viewModelScope).collect {
+                Log.d("TAG", "getFiltersExcursions999999999")
+              //  if(_stateView.value.contentState is ExcursionListSearchUIState.Loading){
+              //      updateExcursionListSearchUIState(ExcursionListSearchUIState.Data)
+              //  }
+                _uiPagingState.value = it
+              //  Log.d("TAG", "ExcursionListSearchUIState.Data")
+            }
+
+
+    }
+
+    init {
+        handleEvent(ExcursionsUiEvent.OnLoadExcursions)
+        handleEvent(ExcursionsUiEvent.GetFilterExcursions)
+    }
 
 }

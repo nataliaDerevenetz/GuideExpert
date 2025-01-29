@@ -192,7 +192,7 @@ private fun HomeScreenContent(
     toolbarHeightDp: Int,
     filterScreenVisible: Boolean,
     onFiltersSelected: () -> Unit,
-    viewModel: ExcursionSearchViewModel = hiltViewModel(), //delete
+    viewModel: ExcursionsViewModel = hiltViewModel(), //delete
 ) {
 
     val filters = DataProvider.filtersBar

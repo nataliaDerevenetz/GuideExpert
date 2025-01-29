@@ -8,25 +8,29 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.GuideExpert.data.local.db.ExcursionsRoomDatabase
 import com.example.GuideExpert.data.local.models.ExcursionEntity
+import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
 import com.example.GuideExpert.data.local.models.RemoteKeyEntity
 import com.example.GuideExpert.data.mappers.toExcursionEntity
+import com.example.GuideExpert.data.mappers.toExcursionFilterEntity
 import com.example.GuideExpert.data.remote.services.ExcursionService
-import com.example.GuideExpert.domain.models.FilterQuery
+import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.utils.Constant.REMOTE_KEY_ID
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
+
 @OptIn(ExperimentalPagingApi::class)
-class ExcursionSearchRemoteMediator @Inject constructor(
+class ExcursionFiltersRemoteMediator @Inject constructor(
     private val excursionService: ExcursionService,
     private val excursionsRoomDatabase: ExcursionsRoomDatabase,
-    private val filterQuery: FilterQuery
-) : RemoteMediator<Int, ExcursionEntity>() {
+    private val filters: Filters
+) : RemoteMediator<Int, ExcursionFilterEntity>() {
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, ExcursionEntity>
+        state: PagingState<Int, ExcursionFilterEntity>
     ): MediatorResult {
+        Log.d("TAG","MEDIATOR FILTER")
         return try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> 0
@@ -41,15 +45,15 @@ class ExcursionSearchRemoteMediator @Inject constructor(
             }
 
 
-            Log.d("TAG","${filterQuery.query}  ${filterQuery.sort}")
+           // Log.d("TAG","FILTERS ${filters.sort.get(0)} ")
             // MAKE API CALL
-            val apiResponse = excursionService.getExcursionsSearchPaging(
+            val apiResponse = excursionService.getExcursionsFiltersPaging(
                 offset = offset,
                 limit = state.config.pageSize,
             )
 
             val results = apiResponse.body()?.excursions
-                ?.map { it.toExcursionEntity() } ?: listOf<ExcursionEntity>()
+                ?.map { it.toExcursionFilterEntity() } ?: listOf<ExcursionFilterEntity>()
             val nextOffset = apiResponse.body()?.nextOffset ?: 0
 
 
@@ -60,11 +64,11 @@ class ExcursionSearchRemoteMediator @Inject constructor(
                 Log.d("TAG", "withTransaction")
                 if (loadType == LoadType.REFRESH) {
                     // IF REFRESHING, CLEAR DATABASE FIRST
-                    excursionsRoomDatabase.excursionDao().clearAll()
+                    excursionsRoomDatabase.excursionFilterDao().clearAll()
                     excursionsRoomDatabase.remoteKeyDao().deleteById(REMOTE_KEY_ID)
                 }
                 Log.d("TAG", "insert")
-                excursionsRoomDatabase.excursionDao().insertAll(results)
+                excursionsRoomDatabase.excursionFilterDao().insertAll(results)
                 excursionsRoomDatabase.remoteKeyDao().insert(
                     RemoteKeyEntity(
                         id = REMOTE_KEY_ID,

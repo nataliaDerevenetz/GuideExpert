@@ -5,16 +5,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.GuideExpert.data.local.models.ExcursionEntity
+import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
 
 @Dao
 interface ExcursionFilterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(users: List<ExcursionEntity>)
+    suspend fun insertAll(users: List<ExcursionFilterEntity>)
 
-    @Query("SELECT * FROM excursionEntity")
-    fun pagingSource(): PagingSource<Int, ExcursionEntity>
+    @Query("SELECT * FROM excursionFilterEntity")
+    fun pagingSource(): PagingSource<Int, ExcursionFilterEntity>
 
-    @Query("DELETE FROM excursionEntity")
+    @Query("DELETE FROM excursionFilterEntity")
     suspend fun clearAll()
 }

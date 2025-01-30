@@ -18,8 +18,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -49,10 +51,11 @@ sealed interface HomeScreenUiState {
 data class ExcursionsUIState(
     val content: HomeScreenUiState = HomeScreenUiState.Empty
 )
-/*
-sealed class SnackbarEffect {
-    data class ShowSnackbar(val message: String, val actionLabel: String? = null) : SnackbarEffect()
-}*/
+
+sealed class Event {
+    class ChangeFilters: Event()
+    class ShowSnackbarString(val message: String): Event()
+}
 
 @HiltViewModel
 class ExcursionsViewModel @Inject constructor(
@@ -72,6 +75,9 @@ class ExcursionsViewModel @Inject constructor(
 
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<Event>(replay = 1)
+    val eventsFlow = _eventFlow.asSharedFlow()
 
 
     fun handleEvent(event: ExcursionsUiEvent) {
@@ -120,62 +126,38 @@ class ExcursionsViewModel @Inject constructor(
         }
     }
 
-    private val sortParamsFlow = MutableStateFlow(listOf(sortState.value))
 
-    private val categoriesParamsFlow = MutableStateFlow(DataProvider.filtersCategories.filter { it.enabled.value })
-
-    private val durationParamsFlow = MutableStateFlow(DataProvider.filtersDuration.filter { it.enabled.value })
-
-    private val groupParamsFlow = MutableStateFlow(DataProvider.filtersGroups.filter { it.enabled.value })
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun getFiltersExcursions() {
+    private fun getFiltersExcursions() {
         Log.d("TAG", "getFiltersExcursions")
-      /*  combine(
-            sortParamsFlow,
-            categoriesParamsFlow,
-            durationParamsFlow,
-            groupParamsFlow
-        ) { (sort, categories, duration,group) ->
-            Filters(sort, categories, duration,group)
-        }.flowOn(Dispatchers.IO)
-            .flatMapLatest {
-                getExcursionByFiltersUseCase(it)
-            }.cachedIn(viewModelScope).collect {
-              //  if(_stateView.value.contentState is ExcursionListSearchUIState.Loading){
-              //      updateExcursionListSearchUIState(ExcursionListSearchUIState.Data)
-              //  }
-                _uiPagingState.value = it
-              //  Log.d("TAG", "ExcursionListSearchUIState.Data")
-            }
-*/
+        viewModelScope.launch {
+            eventsFlow.collectLatest { event ->
+                Log.d("TAG", "collect event")
+                when (event) {
+                    is Event.ChangeFilters -> {
+                        val filters = Filters(1, listOf(1), listOf(1), listOf(1))
+                        getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest {
+                            _uiPagingState.value = it
+                        }
+                    }
 
-        _eventChangeFilter.collect {
-            val filters = Filters(1, listOf(1), listOf(1),listOf(1))
-            getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest{
-                _uiPagingState.value = it
+                    is Event.ShowSnackbarString -> {}
+                }
             }
         }
-
 
     }
 
-    private val _eventChangeFilter = TriggerStateFlow()
     init {
         handleEvent(ExcursionsUiEvent.OnLoadExcursions)
         handleEvent(ExcursionsUiEvent.GetFilterExcursions)
-        _eventChangeFilter.call()
-/*        viewModelScope.launch{
-            _eventChangeFilter.collect {
-                Log.d("TAG", "CALL _eventChangeFilter")
-            }
+        sendEvent(Event.ChangeFilters())
+    }
+
+    fun sendEvent(event: Event) {
+        Log.d("TAG", "sendEvent")
+        viewModelScope.launch {
+            _eventFlow.emit(event)
         }
-
-        _eventChangeFilter.call()
-        _eventChangeFilter.call()
-
- */
     }
 
 }

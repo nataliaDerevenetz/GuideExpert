@@ -50,6 +50,7 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.Event
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import kotlinx.coroutines.flow.StateFlow
@@ -59,14 +60,16 @@ import kotlinx.coroutines.flow.StateFlow
 class FilterState(
     val sortState:  StateFlow<Int>,
     val setSortState: (Int) -> Unit,
+    val sendEvent: (Event) -> Unit
 )
 
 @Composable
 fun rememberFilterState(
     sortState:  StateFlow<Int>,
     setSortState: (Int) -> Unit,
-): FilterState = remember(sortState,setSortState) {
-    FilterState(sortState,setSortState)
+    sendEvent: (Event) -> Unit
+): FilterState = remember(sortState,setSortState,sendEvent) {
+    FilterState(sortState,setSortState,sendEvent)
 }
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
@@ -76,7 +79,8 @@ fun FilterScreen(
     viewModel: ExcursionsViewModel = hiltViewModel(),
     state: FilterState = rememberFilterState(
         sortState = viewModel.sortState,
-        setSortState = viewModel::setSortState),
+        setSortState = viewModel::setSortState,
+        sendEvent = viewModel::sendEvent),
     onDismiss: () -> Unit
 ) {
     val sortState = state.sortState.collectAsState()
@@ -100,6 +104,7 @@ fun FilterScreen(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
+                    state.sendEvent(Event.ChangeFilters())
                     onDismiss()
                 }
         )
@@ -127,7 +132,8 @@ fun FilterScreen(
                 .skipToLookaheadSize(),
         ) {
             Row(modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton(onClick = onDismiss) {
+                IconButton(onClick = { state.sendEvent(Event.ChangeFilters())
+                    onDismiss()}) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = ""

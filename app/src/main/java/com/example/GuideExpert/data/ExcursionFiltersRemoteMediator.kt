@@ -30,7 +30,6 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
         loadType: LoadType,
         state: PagingState<Int, ExcursionFilterEntity>
     ): MediatorResult {
-        Log.d("TAG","MEDIATOR FILTER")
         return try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> 0

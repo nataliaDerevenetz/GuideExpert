@@ -12,6 +12,7 @@ import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filters
+import com.example.GuideExpert.utils.TriggerStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -131,33 +132,50 @@ class ExcursionsViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun getFiltersExcursions() {
         Log.d("TAG", "getFiltersExcursions")
-        combine(
+      /*  combine(
             sortParamsFlow,
             categoriesParamsFlow,
             durationParamsFlow,
             groupParamsFlow
         ) { (sort, categories, duration,group) ->
-            Log.d("TAG", "getFiltersExcursions!!!")
             Filters(sort, categories, duration,group)
         }.flowOn(Dispatchers.IO)
             .flatMapLatest {
-                Log.d("TAG", "getFiltersExcursionsOooooo")
                 getExcursionByFiltersUseCase(it)
             }.cachedIn(viewModelScope).collect {
-                Log.d("TAG", "getFiltersExcursions999999999")
               //  if(_stateView.value.contentState is ExcursionListSearchUIState.Loading){
               //      updateExcursionListSearchUIState(ExcursionListSearchUIState.Data)
               //  }
                 _uiPagingState.value = it
               //  Log.d("TAG", "ExcursionListSearchUIState.Data")
             }
+*/
+
+        _eventChangeFilter.collect {
+            val filters = Filters(1, listOf(1), listOf(1),listOf(1))
+            getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest{
+                _uiPagingState.value = it
+            }
+        }
 
 
     }
 
+    private val _eventChangeFilter = TriggerStateFlow()
     init {
         handleEvent(ExcursionsUiEvent.OnLoadExcursions)
         handleEvent(ExcursionsUiEvent.GetFilterExcursions)
+        _eventChangeFilter.call()
+/*        viewModelScope.launch{
+            _eventChangeFilter.collect {
+                Log.d("TAG", "CALL _eventChangeFilter")
+            }
+        }
+
+        _eventChangeFilter.call()
+        _eventChangeFilter.call()
+
+ */
     }
 
 }

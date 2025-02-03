@@ -140,11 +140,15 @@ fun FilterChip(
     filter: Filter,
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.small,
+    isFilterScreen : Boolean = false,
     viewModel: ExcursionsViewModel = hiltViewModel(),
     state: FilterState = rememberFilterState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,
-        handleEvent = viewModel::handleEvent),
+        handleEvent = viewModel::handleEvent,
+        setOldFilters = viewModel::setOldFilters,
+        isChangedFilters = viewModel::isChangedFilters
+        ),
 ) {
     val sortState = state.sortState.collectAsState()
     var (selected, setSelected) = filter.enabled
@@ -191,7 +195,7 @@ fun FilterChip(
                 .toggleable(
                     value = selected,
                     onValueChange = {setFilterScreen(filter,it,state.setSortState)
-                                    state.handleEvent(ExcursionsUiEvent.ChangeFilters)},
+                                   if(!isFilterScreen) state.handleEvent(ExcursionsUiEvent.ChangeFilters)},
                     interactionSource = interactionSource,
                     indication = null
                 )

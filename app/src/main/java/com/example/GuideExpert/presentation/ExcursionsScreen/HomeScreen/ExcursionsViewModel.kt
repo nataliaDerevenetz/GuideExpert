@@ -71,6 +71,7 @@ class ExcursionsViewModel @Inject constructor(
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
+    private var olfFilters:Filters = Filters(DataProvider.sortDefault, listOf(), listOf(), listOf())
 
     fun handleEvent(event: ExcursionsUiEvent) {
         viewModelScope.launch {
@@ -106,6 +107,17 @@ class ExcursionsViewModel @Inject constructor(
     }
 
 
+    fun isChangedFilters(): Boolean {
+        if (olfFilters.sort != sortState.value) return true
+        if (olfFilters.categories != DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id}) return true
+        if (olfFilters.duration != DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id}) return true
+        if (olfFilters.group != DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id}) return true
+        return false
+    }
+
+    fun setOldFilters(filters:Filters) {
+        olfFilters = filters
+    }
     fun setSortState(sortState:Int) {
         _sortState.update { sortState }
     }
@@ -120,7 +132,10 @@ class ExcursionsViewModel @Inject constructor(
 
     private fun loadExcursionsFilters() {
         viewModelScope.launch {
-            val filters = Filters(1, listOf(1), listOf(1), listOf(1))
+            val filters = Filters(sortState.value,
+                DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id},
+                DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id},
+                DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id})
             getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest {
                 _uiPagingState.value = it
             }

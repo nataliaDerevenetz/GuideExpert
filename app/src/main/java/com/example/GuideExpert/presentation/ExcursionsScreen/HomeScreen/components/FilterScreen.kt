@@ -34,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
+import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
@@ -60,16 +62,20 @@ import kotlinx.coroutines.flow.StateFlow
 class FilterState(
     val sortState:  StateFlow<Int>,
     val setSortState: (Int) -> Unit,
-    val handleEvent: (ExcursionsUiEvent) -> Unit
+    val handleEvent: (ExcursionsUiEvent) -> Unit,
+    val setOldFilters:(Filters) -> Unit,
+    val isChangedFilters:() -> Boolean
 )
 
 @Composable
 fun rememberFilterState(
     sortState:  StateFlow<Int>,
     setSortState: (Int) -> Unit,
-    handleEvent: (ExcursionsUiEvent) -> Unit
-): FilterState = remember(sortState,setSortState,handleEvent) {
-    FilterState(sortState,setSortState,handleEvent)
+    handleEvent: (ExcursionsUiEvent) -> Unit,
+    setOldFilters:(Filters) -> Unit,
+    isChangedFilters:() -> Boolean
+): FilterState = remember(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters) {
+    FilterState(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters)
 }
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
@@ -80,11 +86,42 @@ fun FilterScreen(
     state: FilterState = rememberFilterState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,
-        handleEvent = viewModel::handleEvent),
+        handleEvent = viewModel::handleEvent,
+        setOldFilters = viewModel::setOldFilters,
+        isChangedFilters = viewModel::isChangedFilters),
     onDismiss: () -> Unit
 ) {
     val sortState = state.sortState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        state.setOldFilters(
+            Filters(sortState.value,//DataProvider.filtersSort.filter { it.enabled.value}.map{it.id}.first(),
+                if (DataProvider.filtersCategories.isNotEmpty()) DataProvider.filtersCategories.filter {  it.enabled.value  }.map{it.id}
+                else listOf(),
+                if (DataProvider.filtersDuration.isNotEmpty()) DataProvider.filtersDuration.filter {  it.enabled.value  }.map{it.id}
+                else listOf(),
+                if (DataProvider.filtersGroups.isNotEmpty()) DataProvider.filtersGroups.filter {  it.enabled.value  }.map{it.id}
+                else listOf()
+            )
+        )
+
+        /*
+        val olfFilters = Filters(sortState.value,//DataProvider.filtersSort.filter { it.enabled.value}.map{it.id}.first(),
+            if (DataProvider.filtersCategories.isNotEmpty()) DataProvider.filtersCategories.filter {  it.enabled.value  }.map{it.id}
+            else listOf(),
+            if (DataProvider.filtersDuration.isNotEmpty()) DataProvider.filtersDuration.filter {  it.enabled.value  }.map{it.id}
+            else listOf(),
+            if (DataProvider.filtersGroups.isNotEmpty()) DataProvider.filtersGroups.filter {  it.enabled.value  }.map{it.id}
+            else listOf()
+        )
+
+        Log.d("TAG", "sort :: ${olfFilters.sort}")
+        olfFilters.categories.forEach { Log.d("TAG", "categories :: $it") }
+        olfFilters.duration.forEach { Log.d("TAG", "duration :: $it") }
+        olfFilters.group.forEach { Log.d("TAG", "group :: $it") }
+
+         */
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -104,7 +141,7 @@ fun FilterScreen(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    state.handleEvent(ExcursionsUiEvent.ChangeFilters)
+                    if (state.isChangedFilters()) state.handleEvent(ExcursionsUiEvent.ChangeFilters)
                     onDismiss()
                 }
         )
@@ -132,7 +169,7 @@ fun FilterScreen(
                 .skipToLookaheadSize(),
         ) {
             Row(modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton(onClick = { state.handleEvent(ExcursionsUiEvent.ChangeFilters)
+                IconButton(onClick = { if(state.isChangedFilters()) state.handleEvent(ExcursionsUiEvent.ChangeFilters)
                     onDismiss()}) {
                     Icon(
                         imageVector = Icons.Filled.Close,
@@ -280,7 +317,8 @@ fun FilterChipSection(title: String, filters: List<Filter>) {
             FilterChip(
                 filter = filter,
                 modifier = Modifier.padding(end = 4.dp, bottom = 8.dp),
-                shape = CircleShape
+                shape = CircleShape,
+                isFilterScreen = true
             )
         }
     }

@@ -50,7 +50,7 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.Event
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import kotlinx.coroutines.flow.StateFlow
@@ -60,16 +60,16 @@ import kotlinx.coroutines.flow.StateFlow
 class FilterState(
     val sortState:  StateFlow<Int>,
     val setSortState: (Int) -> Unit,
-    val sendEvent: (Event) -> Unit
+    val handleEvent: (ExcursionsUiEvent) -> Unit
 )
 
 @Composable
 fun rememberFilterState(
     sortState:  StateFlow<Int>,
     setSortState: (Int) -> Unit,
-    sendEvent: (Event) -> Unit
-): FilterState = remember(sortState,setSortState,sendEvent) {
-    FilterState(sortState,setSortState,sendEvent)
+    handleEvent: (ExcursionsUiEvent) -> Unit
+): FilterState = remember(sortState,setSortState,handleEvent) {
+    FilterState(sortState,setSortState,handleEvent)
 }
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
@@ -80,7 +80,7 @@ fun FilterScreen(
     state: FilterState = rememberFilterState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,
-        sendEvent = viewModel::sendEvent),
+        handleEvent = viewModel::handleEvent),
     onDismiss: () -> Unit
 ) {
     val sortState = state.sortState.collectAsState()
@@ -104,7 +104,7 @@ fun FilterScreen(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    state.sendEvent(Event.ChangeFilters())
+                    state.handleEvent(ExcursionsUiEvent.ChangeFilters)
                     onDismiss()
                 }
         )
@@ -132,7 +132,7 @@ fun FilterScreen(
                 .skipToLookaheadSize(),
         ) {
             Row(modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton(onClick = { state.sendEvent(Event.ChangeFilters())
+                IconButton(onClick = { state.handleEvent(ExcursionsUiEvent.ChangeFilters)
                     onDismiss()}) {
                     Icon(
                         imageVector = Icons.Filled.Close,

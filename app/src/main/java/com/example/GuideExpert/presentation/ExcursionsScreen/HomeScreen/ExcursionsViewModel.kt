@@ -35,9 +35,9 @@ import javax.inject.Inject
 
 
 sealed interface ExcursionsUiEvent {
-    object GetFilterExcursions : ExcursionsUiEvent
     data class OnClickFavoriteExcursion(val excursion: Excursion) : ExcursionsUiEvent
     data object OnLoadExcursions : ExcursionsUiEvent
+    object ChangeFilters : ExcursionsUiEvent
 
 }
 
@@ -51,11 +51,6 @@ sealed interface HomeScreenUiState {
 data class ExcursionsUIState(
     val content: HomeScreenUiState = HomeScreenUiState.Empty
 )
-
-sealed class Event {
-    class ChangeFilters: Event()
-    class ShowSnackbarString(val message: String): Event()
-}
 
 @HiltViewModel
 class ExcursionsViewModel @Inject constructor(
@@ -76,16 +71,13 @@ class ExcursionsViewModel @Inject constructor(
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<Event>(replay = 1)
-    val eventsFlow = _eventFlow.asSharedFlow()
-
 
     fun handleEvent(event: ExcursionsUiEvent) {
         viewModelScope.launch {
             when (event) {
                 is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
                 is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
-                is ExcursionsUiEvent.GetFilterExcursions -> getFiltersExcursions()
+                is ExcursionsUiEvent.ChangeFilters -> loadExcursionsFilters()
             }
         }
     }
@@ -126,38 +118,19 @@ class ExcursionsViewModel @Inject constructor(
         }
     }
 
-
-    private fun getFiltersExcursions() {
-        Log.d("TAG", "getFiltersExcursions")
+    private fun loadExcursionsFilters() {
         viewModelScope.launch {
-            eventsFlow.collectLatest { event ->
-                Log.d("TAG", "collect event")
-                when (event) {
-                    is Event.ChangeFilters -> {
-                        val filters = Filters(1, listOf(1), listOf(1), listOf(1))
-                        getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest {
-                            _uiPagingState.value = it
-                        }
-                    }
-
-                    is Event.ShowSnackbarString -> {}
-                }
+            val filters = Filters(1, listOf(1), listOf(1), listOf(1))
+            getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest {
+                _uiPagingState.value = it
             }
         }
-
     }
 
     init {
         handleEvent(ExcursionsUiEvent.OnLoadExcursions)
-        handleEvent(ExcursionsUiEvent.GetFilterExcursions)
-        sendEvent(Event.ChangeFilters())
+        handleEvent(ExcursionsUiEvent.ChangeFilters)
     }
 
-    fun sendEvent(event: Event) {
-        Log.d("TAG", "sendEvent")
-        viewModelScope.launch {
-            _eventFlow.emit(event)
-        }
-    }
 
 }

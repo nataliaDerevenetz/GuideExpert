@@ -14,7 +14,7 @@ import com.example.GuideExpert.data.mappers.toExcursionEntity
 import com.example.GuideExpert.data.mappers.toExcursionFilterEntity
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Filters
-import com.example.GuideExpert.utils.Constant.REMOTE_KEY_ID
+import com.example.GuideExpert.utils.Constant.REMOTE_KEY_FILTE_ID
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -36,7 +36,7 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     // RETRIEVE NEXT OFFSET FROM DATABASE
-                    val remoteKey = excursionsRoomDatabase.remoteKeyDao().getById(REMOTE_KEY_ID)
+                    val remoteKey = excursionsRoomDatabase.remoteKeyDao().getById(REMOTE_KEY_FILTE_ID)
                     if (remoteKey == null || remoteKey.nextOffset == 0) // END OF PAGINATION REACHED
                         return MediatorResult.Success(endOfPaginationReached = true)
                     remoteKey.nextOffset
@@ -64,13 +64,13 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
                 if (loadType == LoadType.REFRESH) {
                     // IF REFRESHING, CLEAR DATABASE FIRST
                     excursionsRoomDatabase.excursionFilterDao().clearAll()
-                    excursionsRoomDatabase.remoteKeyDao().deleteById(REMOTE_KEY_ID)
+                    excursionsRoomDatabase.remoteKeyDao().deleteById(REMOTE_KEY_FILTE_ID)
                 }
                 Log.d("TAG", "insert")
                 excursionsRoomDatabase.excursionFilterDao().insertAll(results)
                 excursionsRoomDatabase.remoteKeyDao().insert(
                     RemoteKeyEntity(
-                        id = REMOTE_KEY_ID,
+                        id = REMOTE_KEY_FILTE_ID,
                         nextOffset = nextOffset,
                     )
                 )

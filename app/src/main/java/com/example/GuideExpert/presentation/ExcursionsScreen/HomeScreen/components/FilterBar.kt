@@ -42,7 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.Event
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
@@ -144,7 +144,7 @@ fun FilterChip(
     state: FilterState = rememberFilterState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,
-        sendEvent = viewModel::sendEvent),
+        handleEvent = viewModel::handleEvent),
 ) {
     val sortState = state.sortState.collectAsState()
     var (selected, setSelected) = filter.enabled
@@ -191,7 +191,7 @@ fun FilterChip(
                 .toggleable(
                     value = selected,
                     onValueChange = {setFilterScreen(filter,it,state.setSortState)
-                                    state.sendEvent(Event.ChangeFilters())},
+                                    state.handleEvent(ExcursionsUiEvent.ChangeFilters)},
                     interactionSource = interactionSource,
                     indication = null
                 )

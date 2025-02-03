@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,10 +43,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
+import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
+import kotlinx.coroutines.flow.StateFlow
 
 fun Modifier.fadeInDiagonalGradientBorder(
     showBorder: Boolean,
@@ -90,6 +93,22 @@ fun Modifier.offsetGradientBackground(
 )
 
 object FilterSharedElementKey
+
+@Stable
+class FilterChipState(
+    val sortState: StateFlow<Int>,
+    val setSortState: (Int) -> Unit,
+    val handleEvent: (ExcursionsUiEvent) -> Unit,
+)
+
+@Composable
+fun rememberFilterChipState(
+    sortState: StateFlow<Int>,
+    setSortState: (Int) -> Unit,
+    handleEvent: (ExcursionsUiEvent) -> Unit,
+): FilterChipState = remember(sortState,setSortState,handleEvent) {
+    FilterChipState(sortState,setSortState,handleEvent)
+}
 
 context(SharedTransitionScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -142,14 +161,10 @@ fun FilterChip(
     shape: Shape = MaterialTheme.shapes.small,
     isFilterScreen : Boolean = false,
     viewModel: ExcursionsViewModel = hiltViewModel(),
-    state: FilterState = rememberFilterState(
+    state: FilterChipState = rememberFilterChipState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,
-        handleEvent = viewModel::handleEvent,
-        setOldFilters = viewModel::setOldFilters,
-        isChangedFilters = viewModel::isChangedFilters,
-        isChangedDefaultFilters = viewModel::isChangedDefaultFilters,
-        resetFilters = viewModel::resetFilters
+        handleEvent = viewModel::handleEvent
         ),
 ) {
     val sortState = state.sortState.collectAsState()

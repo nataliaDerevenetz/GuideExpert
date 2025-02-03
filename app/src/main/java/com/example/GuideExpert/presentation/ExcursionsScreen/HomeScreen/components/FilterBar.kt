@@ -147,7 +147,9 @@ fun FilterChip(
         setSortState = viewModel::setSortState,
         handleEvent = viewModel::handleEvent,
         setOldFilters = viewModel::setOldFilters,
-        isChangedFilters = viewModel::isChangedFilters
+        isChangedFilters = viewModel::isChangedFilters,
+        isChangedDefaultFilters = viewModel::isChangedDefaultFilters,
+        resetFilters = viewModel::resetFilters
         ),
 ) {
     val sortState = state.sortState.collectAsState()

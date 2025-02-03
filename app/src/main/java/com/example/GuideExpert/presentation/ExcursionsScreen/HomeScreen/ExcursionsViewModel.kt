@@ -11,22 +11,16 @@ import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
-import com.example.GuideExpert.utils.TriggerStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -71,7 +65,9 @@ class ExcursionsViewModel @Inject constructor(
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
-    private var olfFilters:Filters = Filters(DataProvider.sortDefault, listOf(), listOf(), listOf())
+    private var oldFilters:Filters = Filters(DataProvider.sortDefault, listOf(), listOf(), listOf())
+    private val defaultFilters:Filters = Filters(DataProvider.sortDefault, listOf(), listOf(), listOf())
+
 
     fun handleEvent(event: ExcursionsUiEvent) {
         viewModelScope.launch {
@@ -106,17 +102,58 @@ class ExcursionsViewModel @Inject constructor(
         }
     }
 
+    fun resetFilters() {
+        _sortState.value = DataProvider.sortDefault
+        val filtersBar = DataProvider.filtersBar
+        filtersBar.map {
+                val (selected, setSelected) = it.enabled
+                setSelected(false)
+            }
+
+        val filtersCategories = DataProvider.filtersCategories
+        filtersCategories.map {
+                val (selected, setSelected) = it.enabled
+                setSelected(false)
+            }
+
+        val filtersGroups = DataProvider.filtersGroups
+        filtersGroups.map {
+            val (selected, setSelected) = it.enabled
+            setSelected(false)
+        }
+
+        val filtersDuration = DataProvider.filtersDuration
+        filtersDuration.map {
+            val (selected, setSelected) = it.enabled
+            setSelected(false)
+        }
+
+        val filtersSort = DataProvider.filtersSort
+        filtersSort.map {
+            val (selected, setSelected) = it.enabled
+            setSelected(false)
+        }
+    }
 
     fun isChangedFilters(): Boolean {
-        if (olfFilters.sort != sortState.value) return true
-        if (olfFilters.categories != DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id}) return true
-        if (olfFilters.duration != DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id}) return true
-        if (olfFilters.group != DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.sort != sortState.value) return true
+        if (oldFilters.categories != DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.duration != DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.group != DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id}) return true
         return false
     }
 
+    fun isChangedDefaultFilters(): Boolean {
+        if (defaultFilters.sort != sortState.value) return true
+        if (defaultFilters.categories != DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.duration != DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.group != DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id}) return true
+        return false
+    }
+
+
     fun setOldFilters(filters:Filters) {
-        olfFilters = filters
+        oldFilters = filters
     }
     fun setSortState(sortState:Int) {
         _sortState.update { sortState }

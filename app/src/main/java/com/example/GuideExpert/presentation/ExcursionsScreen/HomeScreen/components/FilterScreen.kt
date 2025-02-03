@@ -64,7 +64,9 @@ class FilterState(
     val setSortState: (Int) -> Unit,
     val handleEvent: (ExcursionsUiEvent) -> Unit,
     val setOldFilters:(Filters) -> Unit,
-    val isChangedFilters:() -> Boolean
+    val isChangedFilters:() -> Boolean,
+    val isChangedDefaultFilters:() -> Boolean,
+    val resetFilters:() -> Unit
 )
 
 @Composable
@@ -73,9 +75,11 @@ fun rememberFilterState(
     setSortState: (Int) -> Unit,
     handleEvent: (ExcursionsUiEvent) -> Unit,
     setOldFilters:(Filters) -> Unit,
-    isChangedFilters:() -> Boolean
-): FilterState = remember(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters) {
-    FilterState(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters)
+    isChangedFilters:() -> Boolean,
+    isChangedDefaultFilters:() -> Boolean,
+    resetFilters:() -> Unit
+): FilterState = remember(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters,isChangedDefaultFilters,resetFilters) {
+    FilterState(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters,isChangedDefaultFilters,resetFilters)
 }
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
@@ -88,14 +92,16 @@ fun FilterScreen(
         setSortState = viewModel::setSortState,
         handleEvent = viewModel::handleEvent,
         setOldFilters = viewModel::setOldFilters,
-        isChangedFilters = viewModel::isChangedFilters),
+        isChangedFilters = viewModel::isChangedFilters,
+        isChangedDefaultFilters = viewModel::isChangedDefaultFilters,
+        resetFilters = viewModel::resetFilters),
     onDismiss: () -> Unit
 ) {
     val sortState = state.sortState.collectAsState()
 
     LaunchedEffect(Unit) {
         state.setOldFilters(
-            Filters(sortState.value,//DataProvider.filtersSort.filter { it.enabled.value}.map{it.id}.first(),
+            Filters(sortState.value,
                 if (DataProvider.filtersCategories.isNotEmpty()) DataProvider.filtersCategories.filter {  it.enabled.value  }.map{it.id}
                 else listOf(),
                 if (DataProvider.filtersDuration.isNotEmpty()) DataProvider.filtersDuration.filter {  it.enabled.value  }.map{it.id}
@@ -104,23 +110,6 @@ fun FilterScreen(
                 else listOf()
             )
         )
-
-        /*
-        val olfFilters = Filters(sortState.value,//DataProvider.filtersSort.filter { it.enabled.value}.map{it.id}.first(),
-            if (DataProvider.filtersCategories.isNotEmpty()) DataProvider.filtersCategories.filter {  it.enabled.value  }.map{it.id}
-            else listOf(),
-            if (DataProvider.filtersDuration.isNotEmpty()) DataProvider.filtersDuration.filter {  it.enabled.value  }.map{it.id}
-            else listOf(),
-            if (DataProvider.filtersGroups.isNotEmpty()) DataProvider.filtersGroups.filter {  it.enabled.value  }.map{it.id}
-            else listOf()
-        )
-
-        Log.d("TAG", "sort :: ${olfFilters.sort}")
-        olfFilters.categories.forEach { Log.d("TAG", "categories :: $it") }
-        olfFilters.duration.forEach { Log.d("TAG", "duration :: $it") }
-        olfFilters.group.forEach { Log.d("TAG", "group :: $it") }
-
-         */
     }
     Box(
         modifier = Modifier
@@ -184,10 +173,11 @@ fun FilterScreen(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge
                 )
-                val resetEnabled = true//sortState != defaultFilter
+
+                val resetEnabled = state.isChangedDefaultFilters()
 
                 IconButton(
-                    onClick = { /* TODO: Open search */ },
+                    onClick = { state.resetFilters() },
                     enabled = resetEnabled
                 ) {
                     Icon(

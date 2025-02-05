@@ -19,5 +19,5 @@ class Filter(
     enabled: Boolean = false,
     val icon: ImageVector? = null
 ) {
-    val enabled = mutableStateOf(enabled)
+    var enabled = mutableStateOf(enabled)
 }

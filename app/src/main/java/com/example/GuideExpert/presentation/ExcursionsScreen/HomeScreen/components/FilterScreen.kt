@@ -244,10 +244,7 @@ fun SortFilters(
     onChanged: (Filter) -> Unit
 ) {
 
-    filtersBar.filter{  it.type == FilterType.Sort }.map{
-            val (selected, setSelected) = it.enabled
-            setSelected(false)
-    }
+    filtersBar.filter{  it.type == FilterType.Sort }.map{ it.enabled.value = false }
 
     sortFilters.forEach { filter ->
         SortOption(

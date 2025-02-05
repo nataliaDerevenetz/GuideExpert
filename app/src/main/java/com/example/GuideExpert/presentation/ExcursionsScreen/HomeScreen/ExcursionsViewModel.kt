@@ -105,34 +105,19 @@ class ExcursionsViewModel @Inject constructor(
     fun resetFilters() {
         _sortState.value = DataProvider.sortDefault
         val filtersBar = DataProvider.filtersBar
-        filtersBar.map {
-                val (selected, setSelected) = it.enabled
-                setSelected(false)
-            }
+        filtersBar.map { it.enabled.value = false }
 
         val filtersCategories = DataProvider.filtersCategories
-        filtersCategories.map {
-                val (selected, setSelected) = it.enabled
-                setSelected(false)
-            }
+        filtersCategories.map { it.enabled.value = false }
 
         val filtersGroups = DataProvider.filtersGroups
-        filtersGroups.map {
-            val (selected, setSelected) = it.enabled
-            setSelected(false)
-        }
+        filtersGroups.map { it.enabled.value = false }
 
         val filtersDuration = DataProvider.filtersDuration
-        filtersDuration.map {
-            val (selected, setSelected) = it.enabled
-            setSelected(false)
-        }
+        filtersDuration.map { it.enabled.value = false }
 
         val filtersSort = DataProvider.filtersSort
-        filtersSort.map {
-            val (selected, setSelected) = it.enabled
-            setSelected(false)
-        }
+        filtersSort.map { it.enabled.value = false }
     }
 
     fun isChangedFilters(): Boolean {

@@ -168,22 +168,22 @@ fun FilterChip(
         ),
 ) {
     val sortState = state.sortState.collectAsState()
-    var (selected, setSelected) = filter.enabled
+    val selected = filter.enabled
     if (filter.type == FilterType.Sort) {
-        if (sortState.value == filter.id) selected = true
+        if (sortState.value == filter.id) selected.value = true
     }
 
     val backgroundColor by animateColorAsState(
-        if (selected) Shadow1 else MaterialTheme.colorScheme.background,
+        if (selected.value) Shadow1 else MaterialTheme.colorScheme.background,
         label = "background color"
     )
     val border = Modifier.fadeInDiagonalGradientBorder(
-        showBorder = !selected,
+        showBorder = !selected.value,
         colors = listOf(Shadow1, Shadow2),
         shape = shape
     )
     val textColor by animateColorAsState(
-        if (selected) Color.Black else Color.White,
+        if (selected.value) Color.Black else Color.White,
         label = "text color"
     )
 
@@ -210,7 +210,7 @@ fun FilterChip(
         Box(
             modifier = Modifier
                 .toggleable(
-                    value = selected,
+                    value = selected.value,
                     onValueChange = {setFilterScreen(filter,it,state.setSortState)
                                    if(!isFilterScreen) state.handleEvent(ExcursionsUiEvent.ChangeFilters)},
                     interactionSource = interactionSource,
@@ -228,7 +228,7 @@ fun FilterChip(
                     vertical = 6.dp
                 ),
                 fontWeight = FontWeight.Bold,
-                color = if (selected) Color.White else MaterialTheme.typography.labelMedium.color
+                color = if (selected.value) Color.White else MaterialTheme.typography.labelMedium.color
             )
         }
     }
@@ -237,10 +237,7 @@ fun FilterChip(
 fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Unit ) {
     val filtersBar = DataProvider.filtersBar
     filtersBar.filter { it.type == filter.type &&  it.id == filter.id }
-        .map {
-            val (selected, setSelected) = it.enabled
-            setSelected(enabled)
-        }
+        .map { it.enabled.value = enabled }
 
     var filters = listOf<Filter>()
     when (filter.type) {
@@ -254,10 +251,6 @@ fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Uni
     }
 
     filters.filter { it.type == filter.type &&  it.id == filter.id }
-        .map {
-            val (selected, setSelected) = it.enabled
-            setSelected(enabled)
-        }
-
+        .map { it.enabled.value = enabled }
 
 }

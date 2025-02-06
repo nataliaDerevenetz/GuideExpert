@@ -6,10 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
+import com.example.GuideExpert.domain.GetFiltersBarUseCase
+import com.example.GuideExpert.domain.GetFiltersCategoriesUseCase
+import com.example.GuideExpert.domain.GetFiltersDurationUseCase
+import com.example.GuideExpert.domain.GetFiltersGroupsUseCase
+import com.example.GuideExpert.domain.GetFiltersSortUseCase
+import com.example.GuideExpert.domain.GetSortDefaultUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
@@ -50,7 +55,13 @@ data class ExcursionsUIState(
 class ExcursionsViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getAllExcursionsUseCase: GetAllExcursionsUseCase,
-    val getExcursionByFiltersUseCase: GetExcursionByFiltersUseCase
+    val getExcursionByFiltersUseCase: GetExcursionByFiltersUseCase,
+    val getFiltersBarUseCase: GetFiltersBarUseCase,
+    val getFiltersDurationUseCase: GetFiltersDurationUseCase,
+    val getFiltersSortUseCase: GetFiltersSortUseCase,
+    val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
+    val getFiltersCategoriesUseCase: GetFiltersCategoriesUseCase,
+    val getSortDefaultUseCase: GetSortDefaultUseCase
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ExcursionsUIState())
@@ -59,14 +70,36 @@ class ExcursionsViewModel @Inject constructor(
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
-    private val _sortState = MutableStateFlow(DataProvider.sortDefault)
+    val sortDefault = getSortDefaultUseCase()
+    private val _sortState = MutableStateFlow(sortDefault)
     val sortState: StateFlow<Int> = _sortState
 
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
-    private var oldFilters:Filters = Filters(DataProvider.sortDefault, listOf(), listOf(), listOf())
-    private val defaultFilters:Filters = Filters(DataProvider.sortDefault, listOf(), listOf(), listOf())
+
+    fun getFiltersBar():List<Filter> {
+        return getFiltersBarUseCase()
+    }
+
+    fun getFiltersDuration():List<Filter> {
+        return getFiltersDurationUseCase()
+    }
+
+    fun getFiltersSort():List<Filter> {
+        return getFiltersSortUseCase()
+    }
+
+    fun getFiltersGroups():List<Filter> {
+        return getFiltersGroupsUseCase()
+    }
+
+    fun getFiltersCategories():List<Filter> {
+        return getFiltersCategoriesUseCase()
+    }
+
+    private var oldFilters:Filters = Filters(sortDefault, listOf(), listOf(), listOf())
+    private val defaultFilters:Filters = Filters(sortDefault, listOf(), listOf(), listOf())
 
 
     fun handleEvent(event: ExcursionsUiEvent) {
@@ -103,36 +136,36 @@ class ExcursionsViewModel @Inject constructor(
     }
 
     fun resetFilters() {
-        _sortState.value = DataProvider.sortDefault
-        val filtersBar = DataProvider.filtersBar
+        _sortState.value = sortDefault
+        val filtersBar = getFiltersBar()
         filtersBar.map { it.enabled.value = false }
 
-        val filtersCategories = DataProvider.filtersCategories
+        val filtersCategories = getFiltersCategories()
         filtersCategories.map { it.enabled.value = false }
 
-        val filtersGroups = DataProvider.filtersGroups
+        val filtersGroups = getFiltersGroups()
         filtersGroups.map { it.enabled.value = false }
 
-        val filtersDuration = DataProvider.filtersDuration
+        val filtersDuration = getFiltersDuration()
         filtersDuration.map { it.enabled.value = false }
 
-        val filtersSort = DataProvider.filtersSort
+        val filtersSort = getFiltersSort()
         filtersSort.map { it.enabled.value = false }
     }
 
     fun isChangedFilters(): Boolean {
         if (oldFilters.sort != sortState.value) return true
-        if (oldFilters.categories != DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id}) return true
-        if (oldFilters.duration != DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id}) return true
-        if (oldFilters.group != DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.categories != getFiltersCategories().filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.duration != getFiltersDuration().filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.group != getFiltersGroups().filter { it.enabled.value}.map{it.id}) return true
         return false
     }
 
     fun isChangedDefaultFilters(): Boolean {
         if (defaultFilters.sort != sortState.value) return true
-        if (defaultFilters.categories != DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id}) return true
-        if (defaultFilters.duration != DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id}) return true
-        if (defaultFilters.group != DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.categories != getFiltersCategories().filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.duration != getFiltersDuration().filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.group != getFiltersGroups().filter { it.enabled.value}.map{it.id}) return true
         return false
     }
 
@@ -155,9 +188,9 @@ class ExcursionsViewModel @Inject constructor(
     private fun loadExcursionsFilters() {
         viewModelScope.launch {
             val filters = Filters(sortState.value,
-                DataProvider.filtersCategories.filter { it.enabled.value}.map{it.id},
-                DataProvider.filtersDuration.filter { it.enabled.value}.map{it.id},
-                DataProvider.filtersGroups.filter { it.enabled.value}.map{it.id})
+                getFiltersCategories().filter { it.enabled.value}.map{it.id},
+                getFiltersDuration().filter { it.enabled.value}.map{it.id},
+                getFiltersGroups().filter { it.enabled.value}.map{it.id})
             getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest {
                 _uiPagingState.value = it
             }

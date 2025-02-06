@@ -40,10 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
-import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
@@ -99,6 +97,12 @@ class FilterChipState(
     val sortState: StateFlow<Int>,
     val setSortState: (Int) -> Unit,
     val handleEvent: (ExcursionsUiEvent) -> Unit,
+    val getFiltersBar:() -> List<Filter>,
+    val getFiltersDuration: () -> List<Filter>,
+    val getFiltersSort: () -> List<Filter>,
+    val getFiltersGroups: () -> List<Filter>,
+    val getFiltersCategories: () -> List<Filter>,
+    val sortDefault: Int
 )
 
 @Composable
@@ -106,8 +110,16 @@ fun rememberFilterChipState(
     sortState: StateFlow<Int>,
     setSortState: (Int) -> Unit,
     handleEvent: (ExcursionsUiEvent) -> Unit,
-): FilterChipState = remember(sortState,setSortState,handleEvent) {
-    FilterChipState(sortState,setSortState,handleEvent)
+    getFiltersBar:() -> List<Filter>,
+    getFiltersDuration:() -> List<Filter>,
+    getFiltersSort:() -> List<Filter>,
+    getFiltersGroups: () -> List<Filter>,
+    getFiltersCategories: () -> List<Filter>,
+    sortDefault: Int
+): FilterChipState = remember(sortState,setSortState,handleEvent,getFiltersBar,getFiltersDuration,
+    getFiltersSort,getFiltersGroups,getFiltersCategories,sortDefault) {
+    FilterChipState(sortState,setSortState,handleEvent,getFiltersBar,getFiltersDuration,
+        getFiltersSort,getFiltersGroups,getFiltersCategories,sortDefault)
 }
 
 context(SharedTransitionScope)
@@ -164,7 +176,13 @@ fun FilterChip(
     state: FilterChipState = rememberFilterChipState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,
-        handleEvent = viewModel::handleEvent
+        handleEvent = viewModel::handleEvent,
+        getFiltersBar = viewModel::getFiltersBar,
+        getFiltersDuration = viewModel::getFiltersDuration,
+        getFiltersSort = viewModel::getFiltersSort,
+        getFiltersGroups = viewModel::getFiltersGroups,
+        getFiltersCategories = viewModel::getFiltersCategories,
+        sortDefault = viewModel::sortDefault.get()
         ),
 ) {
     val sortState = state.sortState.collectAsState()
@@ -211,8 +229,10 @@ fun FilterChip(
             modifier = Modifier
                 .toggleable(
                     value = selected.value,
-                    onValueChange = {setFilterScreen(filter,it,state.setSortState)
-                                   if(!isFilterScreen) state.handleEvent(ExcursionsUiEvent.ChangeFilters)},
+                    onValueChange = {setFilterScreen(filter,it,state.setSortState,state.getFiltersBar,
+                        state.getFiltersDuration,state.getFiltersSort,state.getFiltersGroups,state.getFiltersCategories,
+                        state.sortDefault)
+                        if(!isFilterScreen) state.handleEvent(ExcursionsUiEvent.ChangeFilters)},
                     interactionSource = interactionSource,
                     indication = null
                 )
@@ -234,20 +254,22 @@ fun FilterChip(
     }
 }
 
-fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Unit ) {
-    val filtersBar = DataProvider.filtersBar
-    filtersBar.filter { it.type == filter.type &&  it.id == filter.id }
+fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Unit,
+                    getFiltersBar:() -> List<Filter>,getFiltersDuration: () -> List<Filter>,
+                    getFiltersSort: () -> List<Filter>,getFiltersGroups: () -> List<Filter>,
+                    getFiltersCategories: () -> List<Filter>, sortDefault: Int) {
+    getFiltersBar().filter { it.type == filter.type &&  it.id == filter.id }
         .map { it.enabled.value = enabled }
 
     var filters = listOf<Filter>()
     when (filter.type) {
-        is FilterType.Duration -> filters = DataProvider.filtersDuration
+        is FilterType.Duration -> filters = getFiltersDuration()
         is FilterType.Sort -> {
-            filters = DataProvider.filtersSort
-            if (enabled) setSortState(filter.id) else setSortState(DataProvider.sortDefault)
+            filters = getFiltersSort()
+            if (enabled) setSortState(filter.id) else setSortState(sortDefault)
         }
-        is FilterType.Groups -> filters = DataProvider.filtersGroups
-        is FilterType.Categories -> filters = DataProvider.filtersCategories
+        is FilterType.Groups -> filters = getFiltersGroups()
+        is FilterType.Categories -> filters = getFiltersCategories()
     }
 
     filters.filter { it.type == filter.type &&  it.id == filter.id }

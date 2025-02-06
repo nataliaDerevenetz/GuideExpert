@@ -1,8 +1,10 @@
 package com.example.GuideExpert.data.di
 
 import com.example.GuideExpert.data.repository.DataPagingRepositoryImpl
+import com.example.GuideExpert.data.repository.DataProviderRepositoryImpl
 import com.example.GuideExpert.data.repository.DataSourceRepositoryImpl
 import com.example.GuideExpert.domain.repository.DataPagingRepository
+import com.example.GuideExpert.domain.repository.DataProviderRepository
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import dagger.Binds
 import dagger.Module
@@ -26,5 +28,11 @@ abstract class RepositoryModuleBinder {
     abstract fun bindDataSourceRepository(
         dataSourceRepositoryImpl: DataSourceRepositoryImpl
     ) : DataSourceRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindDataProviderRepository(
+        dataProviderRepositoryImpl: DataProviderRepositoryImpl
+    ) : DataProviderRepository
 
 }

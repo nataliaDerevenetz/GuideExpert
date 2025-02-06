@@ -48,7 +48,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.R
-import com.example.GuideExpert.data.DataProvider
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
 import com.example.GuideExpert.domain.models.Filters
@@ -66,7 +65,12 @@ class FilterState(
     val setOldFilters:(Filters) -> Unit,
     val isChangedFilters:() -> Boolean,
     val isChangedDefaultFilters:() -> Boolean,
-    val resetFilters:() -> Unit
+    val resetFilters:() -> Unit,
+    val getFiltersBar:() -> List<Filter>,
+    val getFiltersDuration: () -> List<Filter>,
+    val getFiltersSort: () -> List<Filter>,
+    val getFiltersGroups: () -> List<Filter>,
+    val getFiltersCategories: () -> List<Filter>
 )
 
 @Composable
@@ -77,9 +81,18 @@ fun rememberFilterState(
     setOldFilters:(Filters) -> Unit,
     isChangedFilters:() -> Boolean,
     isChangedDefaultFilters:() -> Boolean,
-    resetFilters:() -> Unit
-): FilterState = remember(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters,isChangedDefaultFilters,resetFilters) {
-    FilterState(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters,isChangedDefaultFilters,resetFilters)
+    resetFilters:() -> Unit,
+    getFiltersBar:() -> List<Filter>,
+    getFiltersDuration: () -> List<Filter>,
+    getFiltersSort: () -> List<Filter>,
+    getFiltersGroups: () -> List<Filter>,
+    getFiltersCategories: () -> List<Filter>
+): FilterState = remember(sortState,setSortState,
+    handleEvent,setOldFilters,isChangedFilters,isChangedDefaultFilters,resetFilters,
+    getFiltersBar,getFiltersDuration,getFiltersSort,getFiltersGroups,getFiltersCategories) {
+    FilterState(sortState,setSortState,handleEvent,setOldFilters,isChangedFilters,
+        isChangedDefaultFilters,resetFilters,getFiltersBar,getFiltersDuration,getFiltersSort,
+        getFiltersGroups,getFiltersCategories)
 }
 
 context(SharedTransitionScope, AnimatedVisibilityScope)
@@ -94,7 +107,13 @@ fun FilterScreen(
         setOldFilters = viewModel::setOldFilters,
         isChangedFilters = viewModel::isChangedFilters,
         isChangedDefaultFilters = viewModel::isChangedDefaultFilters,
-        resetFilters = viewModel::resetFilters),
+        resetFilters = viewModel::resetFilters,
+        getFiltersBar= viewModel::getFiltersBar,
+        getFiltersDuration = viewModel::getFiltersDuration,
+        getFiltersSort = viewModel::getFiltersSort,
+        getFiltersGroups = viewModel::getFiltersGroups,
+        getFiltersCategories = viewModel::getFiltersCategories
+        ),
     onDismiss: () -> Unit
 ) {
     val sortState = state.sortState.collectAsState()
@@ -102,11 +121,11 @@ fun FilterScreen(
     LaunchedEffect(Unit) {
         state.setOldFilters(
             Filters(sortState.value,
-                if (DataProvider.filtersCategories.isNotEmpty()) DataProvider.filtersCategories.filter {  it.enabled.value  }.map{it.id}
+                if (state.getFiltersCategories().isNotEmpty()) state.getFiltersCategories().filter {  it.enabled.value  }.map{it.id}
                 else listOf(),
-                if (DataProvider.filtersDuration.isNotEmpty()) DataProvider.filtersDuration.filter {  it.enabled.value  }.map{it.id}
+                if (state.getFiltersDuration().isNotEmpty()) state.getFiltersDuration().filter {  it.enabled.value  }.map{it.id}
                 else listOf(),
-                if (DataProvider.filtersGroups.isNotEmpty()) DataProvider.filtersGroups.filter {  it.enabled.value  }.map{it.id}
+                if (state.getFiltersGroups().isNotEmpty()) state.getFiltersGroups().filter {  it.enabled.value  }.map{it.id}
                 else listOf()
             )
         )
@@ -194,34 +213,39 @@ fun FilterScreen(
                 sortState = sortState.value,
                 onFilterChange = { filter ->
                     state.setSortState(filter.id)
-                }
+                },
+                getFiltersBar = state.getFiltersBar,
+                getFiltersSort = state.getFiltersSort
             )
 
             FilterChipSection(
                 title = stringResource(id = R.string.categories),
-                filters = DataProvider.filtersCategories
+                filters = state.getFiltersCategories()
             )
 
             FilterChipSection(
                 title = stringResource(id = R.string.groups),
-                filters = DataProvider.filtersGroups
+                filters = state.getFiltersGroups()
             )
 
             FilterChipSection(
                 title = stringResource(id = R.string.duration),
-                filters = DataProvider.filtersDuration
+                filters = state.getFiltersDuration()
             )
         }
     }
 }
 
 @Composable
-fun SortFiltersSection(sortState: Int, onFilterChange: (Filter) -> Unit) {
+fun SortFiltersSection(sortState: Int, onFilterChange: (Filter) -> Unit, getFiltersBar: ()-> List<Filter>,
+                       getFiltersSort: ()-> List<Filter>) {
     FilterTitle(text = stringResource(id = R.string.sort))
     Column(Modifier.padding(bottom = 24.dp)) {
         SortFilters(
             sortState = sortState,
-            onChanged = onFilterChange
+            onChanged = onFilterChange,
+            getFiltersBar = getFiltersBar,
+            getFiltersSort = getFiltersSort
         )
     }
 }
@@ -238,15 +262,15 @@ fun FilterTitle(text: String) {
 
 @Composable
 fun SortFilters(
-    sortFilters: List<Filter> = DataProvider.filtersSort,
-    filtersBar: List<Filter> = DataProvider.filtersBar,
-        sortState: Int,
-    onChanged: (Filter) -> Unit
+    sortState: Int,
+    onChanged: (Filter) -> Unit,
+    getFiltersBar: () -> List<Filter>,
+    getFiltersSort: () -> List<Filter>
 ) {
 
-    filtersBar.filter{  it.type == FilterType.Sort }.map{ it.enabled.value = false }
+    getFiltersBar().filter{  it.type == FilterType.Sort }.map{ it.enabled.value = false }
 
-    sortFilters.forEach { filter ->
+    getFiltersSort().forEach { filter ->
         SortOption(
             text = filter.name,
             icon = filter.icon,

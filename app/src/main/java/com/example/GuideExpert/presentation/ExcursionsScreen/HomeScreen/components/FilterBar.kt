@@ -232,7 +232,7 @@ fun FilterChip(
                     onValueChange = {setFilterScreen(filter,it,state.setSortState,state.getFiltersBar,
                         state.getFiltersDuration,state.getFiltersSort,state.getFiltersGroups,state.getFiltersCategories,
                         state.sortDefault)
-                        if(!isFilterScreen) state.handleEvent(ExcursionsUiEvent.ChangeFilters)},
+                        if(!isFilterScreen) state.handleEvent(ExcursionsUiEvent.OnChangeFilters)},
                     interactionSource = interactionSource,
                     indication = null
                 )

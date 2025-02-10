@@ -20,12 +20,14 @@ import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,7 +38,8 @@ import javax.inject.Inject
 sealed interface ExcursionsUiEvent {
     data class OnClickFavoriteExcursion(val excursion: Excursion) : ExcursionsUiEvent
     data object OnLoadExcursions : ExcursionsUiEvent
-    object ChangeFilters : ExcursionsUiEvent
+    data object OnLoadExcursionsFilters : ExcursionsUiEvent
+    data object OnChangeFilters : ExcursionsUiEvent
 
 }
 
@@ -77,6 +80,23 @@ class ExcursionsViewModel @Inject constructor(
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
+    private var oldFilters:Filters = Filters(sortDefault, listOf(), listOf(), listOf())
+    private val defaultFilters:Filters = Filters(sortDefault, listOf(), listOf(), listOf())
+
+    private val _changeFilter = MutableStateFlow(defaultFilters)
+    val changeFilter: StateFlow<Filters> = _changeFilter
+
+
+    fun handleEvent(event: ExcursionsUiEvent) {
+        viewModelScope.launch {
+            when (event) {
+                is ExcursionsUiEvent.OnLoadExcursionsFilters -> loadExcursionsFilters()
+                is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
+                is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
+                is ExcursionsUiEvent.OnChangeFilters -> changedFilters()
+            }
+        }
+    }
 
     fun getFiltersBar():List<Filter> {
         return getFiltersBarUseCase()
@@ -98,18 +118,12 @@ class ExcursionsViewModel @Inject constructor(
         return getFiltersCategoriesUseCase()
     }
 
-    private var oldFilters:Filters = Filters(sortDefault, listOf(), listOf(), listOf())
-    private val defaultFilters:Filters = Filters(sortDefault, listOf(), listOf(), listOf())
-
-
-    fun handleEvent(event: ExcursionsUiEvent) {
-        viewModelScope.launch {
-            when (event) {
-                is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
-                is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
-                is ExcursionsUiEvent.ChangeFilters -> loadExcursionsFilters()
-            }
-        }
+    private fun changedFilters() {
+        val filters = Filters(sortState.value,
+            getFiltersCategories().filter { it.enabled.value}.map{it.id},
+            getFiltersDuration().filter { it.enabled.value}.map{it.id},
+            getFiltersGroups().filter { it.enabled.value}.map{it.id})
+        _changeFilter.update {filters}
     }
 
     private fun loadExcursions() {
@@ -185,22 +199,19 @@ class ExcursionsViewModel @Inject constructor(
         }
     }
 
-    private fun loadExcursionsFilters() {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun loadExcursionsFilters() {
         Log.d("TAG","loadExcursionsFilters")
-        viewModelScope.launch {
-            val filters = Filters(sortState.value,
-                getFiltersCategories().filter { it.enabled.value}.map{it.id},
-                getFiltersDuration().filter { it.enabled.value}.map{it.id},
-                getFiltersGroups().filter { it.enabled.value}.map{it.id})
-            getExcursionByFiltersUseCase(filters).cachedIn(viewModelScope).collectLatest {
-                _uiPagingState.value = it
-            }
+        changeFilter.flatMapLatest{
+            getExcursionByFiltersUseCase(changeFilter.value)
+        }.cachedIn(viewModelScope).collectLatest{
+            _uiPagingState.value = it
         }
     }
 
     init {
         handleEvent(ExcursionsUiEvent.OnLoadExcursions)
-        handleEvent(ExcursionsUiEvent.ChangeFilters)
+        handleEvent(ExcursionsUiEvent.OnLoadExcursionsFilters)
     }
 
 

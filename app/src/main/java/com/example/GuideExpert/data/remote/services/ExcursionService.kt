@@ -20,8 +20,7 @@ interface ExcursionService {
     suspend fun getExcursionsSearchPaging(@Query("offset") offset:Int, @Query("limit") limit:Int): Response<ExcursionsPagingPOJO>
 
     @FormUrlEncoded
-    @POST("server.php")
-   // suspend fun getExcursionsFiltersPaging(@Query("offset") offset:Int, @Query("limit") limit:Int): Response<ExcursionsPagingPOJO>
+    @POST("excursionsfilter.php")
     suspend fun getExcursionsFiltersPaging(@Query("offset") offset:Int, @Query("limit") limit:Int,
                                            @Query("sort") sort:Int,@Field("categories[]") categories: List<Int>): Response<ExcursionsPagingPOJO>
 

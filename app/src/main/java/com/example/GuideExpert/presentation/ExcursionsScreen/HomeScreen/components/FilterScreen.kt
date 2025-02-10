@@ -149,7 +149,7 @@ fun FilterScreen(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    if (state.isChangedFilters()) state.handleEvent(ExcursionsUiEvent.ChangeFilters)
+                    if (state.isChangedFilters()) state.handleEvent(ExcursionsUiEvent.OnChangeFilters)
                     onDismiss()
                 }
         )
@@ -177,7 +177,7 @@ fun FilterScreen(
                 .skipToLookaheadSize(),
         ) {
             Row(modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton(onClick = { if(state.isChangedFilters()) state.handleEvent(ExcursionsUiEvent.ChangeFilters)
+                IconButton(onClick = { if(state.isChangedFilters()) state.handleEvent(ExcursionsUiEvent.OnChangeFilters)
                     onDismiss()}) {
                     Icon(
                         imageVector = Icons.Filled.Close,

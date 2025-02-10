@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -18,10 +19,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,14 +72,6 @@ fun HomeScreen(
     viewModel: ExcursionsViewModel = hiltViewModel()
 ) {
 
-    val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
-
-    effectFlow?.let {
-        //(effectFlow as SnackbarEffect.ShowSnackbar).message
-        // send to snackbar  --> message
-    }
-
     val screenHeightDp =  LocalConfiguration.current.screenHeightDp
 
     var toolbarHeight by rememberSaveable { mutableStateOf(screenHeightDp) }
@@ -108,30 +103,20 @@ fun HomeScreen(
             Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
         ) {
 
-            when (uiState.content) {
-
-                is HomeScreenUiState.Empty -> HomeScreenEmpty()
-
-                is HomeScreenUiState.Content ->
-                    HomeScreenContent(
-                        excursions = (uiState.content as HomeScreenUiState.Content).excursions,
-                        onSetFavoriteExcursionButtonClick = {
-                            viewModel.handleEvent(
-                                ExcursionsUiEvent.OnClickFavoriteExcursion(it)
-                            )
-                        },
-                        navigateToExcursion = navigateToExcursion,
-                        toolbarHeightDp = toolbarHeightDp,
-                        filterScreenVisible = filtersVisible,
-                        onFiltersSelected = {
-                            filtersVisible = true
-                        },
+            HomeScreenContent(
+                snackbarHostState = snackbarHostState,
+                onSetFavoriteExcursionButtonClick = {
+                    viewModel.handleEvent(
+                        ExcursionsUiEvent.OnClickFavoriteExcursion(it)
                     )
-
-                is HomeScreenUiState.Loading -> {}
-
-                is HomeScreenUiState.Error -> {}
-            }
+                },
+                navigateToExcursion = navigateToExcursion,
+                toolbarHeightDp = toolbarHeightDp,
+                filterScreenVisible = filtersVisible,
+                onFiltersSelected = {
+                    filtersVisible = true
+                },
+            )
 
 
             MainTopBar(modifier = Modifier.fillMaxSize(),
@@ -186,7 +171,7 @@ context(SharedTransitionScope)
 @Composable
 private fun HomeScreenContent(
     modifier: Modifier = Modifier,
-    excursions: List<Excursion>,
+    snackbarHostState:SnackbarHostState,
     onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
     navigateToExcursion: (Excursion) -> Unit,
     toolbarHeightDp: Int,
@@ -195,9 +180,32 @@ private fun HomeScreenContent(
     viewModel: ExcursionsViewModel = hiltViewModel(), //delete
 ) {
 
-    val filters = DataProvider.filtersBar
-    val excursions by rememberUpdatedState(newValue = viewModel.uiPagingState.collectAsLazyPagingItems()) //delete
+    val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
 
+    LaunchedEffect(snackbarHostState) {
+        effectFlow?.let {
+            when (it) {
+                is SnackbarEffect.ShowSnackbar -> snackbarHostState.showSnackbar(it.message)
+            }
+        }
+    }
+
+    val filters = viewModel.getFiltersBar()
+    val excursionPagingItems by rememberUpdatedState(newValue = viewModel.uiPagingState.collectAsLazyPagingItems()) //delete
+
+    if (excursionPagingItems.loadState.refresh is LoadState.Error) {
+        LaunchedEffect(key1 = snackbarHostState) {
+            viewModel.sendEffectFlow((excursionPagingItems.loadState.refresh as LoadState.Error).error.message ?: "",null)
+            Log.d("TAG", excursionPagingItems.loadState.refresh.toString())
+        }
+    }
+
+    if (excursionPagingItems.loadState.append is LoadState.Error) {
+        LaunchedEffect(key1 = snackbarHostState) {
+            viewModel.sendEffectFlow((excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",null)
+            Log.d("TAG", excursionPagingItems.loadState.append.toString())
+        }
+    }
 
     LazyColumn(
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)
@@ -213,23 +221,31 @@ private fun HomeScreenContent(
             )
         }
 
-      /*  items(20) {
-            ColumnExcursionShimmer()
-        }*/
 
-        items(
-            count = excursions.itemCount,
-            key = excursions.itemKey { it.id },
-        ) { index ->
-            val excursion = excursions[index]
-            if (excursion != null) {
-               // ExcursionListSearchItem(excursion,onEvent,navigateToExcursion)
-                ExcursionListFilterItem(excursion,onSetFavoriteExcursionButtonClick,navigateToExcursion)
+        if (excursionPagingItems.loadState.refresh is LoadState.Loading) {
+            items(20) {
+                ColumnExcursionShimmer()
+            }
+        } else {
+            items(
+                count = excursionPagingItems.itemCount,
+                key = excursionPagingItems.itemKey { it.id },
+            ) { index ->
+                val excursion = excursionPagingItems[index]
+                if (excursion != null) {
+                    ExcursionListFilterItem(
+                        excursion,
+                        onSetFavoriteExcursionButtonClick,
+                        navigateToExcursion
+                    )
+                }
+            }
+            item {
+                if (excursionPagingItems.loadState.append is LoadState.Loading) {
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                }
             }
         }
 
-      //  items(excursions, key = { it.id }) {
-      //      ExcursionListFilterItem(it,onSetFavoriteExcursionButtonClick,navigateToExcursion)
-       // }
     }
 }

@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.GuideExpert.data.repository.UIResources
-import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.GetFiltersBarUseCase
 import com.example.GuideExpert.domain.GetFiltersCategoriesUseCase
@@ -31,33 +29,20 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 sealed interface ExcursionsUiEvent {
     data class OnClickFavoriteExcursion(val excursion: Excursion) : ExcursionsUiEvent
-    data object OnLoadExcursions : ExcursionsUiEvent
     data object OnLoadExcursionsFilters : ExcursionsUiEvent
     data object OnChangeFilters : ExcursionsUiEvent
 
 }
 
-sealed interface HomeScreenUiState {
-    data object Error: HomeScreenUiState
-    data object Loading: HomeScreenUiState
-    data object Empty: HomeScreenUiState
-    data class Content(val excursions: List<Excursion>): HomeScreenUiState
-}
-
-data class ExcursionsUIState(
-    val content: HomeScreenUiState = HomeScreenUiState.Empty
-)
 
 @HiltViewModel
 class ExcursionsViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    val getAllExcursionsUseCase: GetAllExcursionsUseCase,
     val getExcursionByFiltersUseCase: GetExcursionByFiltersUseCase,
     val getFiltersBarUseCase: GetFiltersBarUseCase,
     val getFiltersDurationUseCase: GetFiltersDurationUseCase,
@@ -66,9 +51,6 @@ class ExcursionsViewModel @Inject constructor(
     val getFiltersCategoriesUseCase: GetFiltersCategoriesUseCase,
     val getSortDefaultUseCase: GetSortDefaultUseCase
 ) : ViewModel() {
-
-    private val _viewState = MutableStateFlow(ExcursionsUIState())
-    val viewState: StateFlow<ExcursionsUIState> = _viewState
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
@@ -91,7 +73,6 @@ class ExcursionsViewModel @Inject constructor(
         viewModelScope.launch {
             when (event) {
                 is ExcursionsUiEvent.OnLoadExcursionsFilters -> loadExcursionsFilters()
-                is ExcursionsUiEvent.OnLoadExcursions -> loadExcursions()
                 is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
                 is ExcursionsUiEvent.OnChangeFilters -> changedFilters()
             }
@@ -126,28 +107,6 @@ class ExcursionsViewModel @Inject constructor(
         _changeFilter.update {filters}
     }
 
-    private fun loadExcursions() {
-        viewModelScope.launch(Dispatchers.IO) {  // Perform loading on the IO thread
-            getAllExcursionsUseCase().collectLatest { resource ->
-                when (resource) {
-                    is UIResources.Loading -> withContext(Dispatchers.Main) {
-                        _viewState.update { it.copy(content = HomeScreenUiState.Loading)  }
-                    }
-                    is UIResources.Success -> withContext(Dispatchers.Main) {
-                        _viewState.update {
-                            it.copy(content = HomeScreenUiState.Content(resource.data) )
-                        }
-                    }
-                    is UIResources.Error -> withContext(Dispatchers.Main) {
-
-                        Log.d("TAG","Error loading excursions: ${resource.message}")
-                        _viewState.update {  it.copy(content = HomeScreenUiState.Error) }
-                        _effectChannel.send(SnackbarEffect.ShowSnackbar("Error loading excursions: ${resource.message}"))
-                    }
-                }
-            }
-        }
-    }
 
     fun resetFilters() {
         _sortState.value = sortDefault
@@ -209,8 +168,11 @@ class ExcursionsViewModel @Inject constructor(
         }
     }
 
+    suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {
+        _effectChannel.send(SnackbarEffect.ShowSnackbar(message))
+    }
+
     init {
-        handleEvent(ExcursionsUiEvent.OnLoadExcursions)
         handleEvent(ExcursionsUiEvent.OnLoadExcursionsFilters)
     }
 

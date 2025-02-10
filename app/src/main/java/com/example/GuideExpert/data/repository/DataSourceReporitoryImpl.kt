@@ -31,15 +31,6 @@ class DataSourceRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,
 ): DataSourceRepository {
 
-    override fun getAllExcursionFlow(): Flow<UIResources<List<Excursion>>> = flow {
-        emit(UIResources.Loading)
-        dbStorage.getAllExcursionFlow().collect { excursions ->
-            emit(UIResources.Success(excursions))
-        }
-    }.catch { e ->
-        emit(UIResources.Error(e.localizedMessage ?: "Unknown error occurred"))
-    }
-
     override fun getUserInfo(userId:String): Flow<UserInfo> {
         return flow{
             withContext(Dispatchers.IO) {

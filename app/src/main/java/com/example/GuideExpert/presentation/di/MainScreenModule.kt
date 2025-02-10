@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.di
 
-import com.example.GuideExpert.domain.GetAllExcursionsUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
@@ -10,7 +9,6 @@ import com.example.GuideExpert.domain.GetFiltersDurationUseCase
 import com.example.GuideExpert.domain.GetFiltersGroupsUseCase
 import com.example.GuideExpert.domain.GetFiltersSortUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
-import com.example.GuideExpert.domain.impl.GetAllExcursionsUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByFiltersUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByQueryUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionDetailUseCaseImpl
@@ -34,11 +32,6 @@ abstract class MainScreenModule {
     abstract fun bindGetExcursionDetailUseCase(
         getExcursionDetailUseCaseImpl: GetExcursionDetailUseCaseImpl
     ) : GetExcursionDetailUseCase
-
-    @Binds
-    abstract fun bindGetExcursionAllUseCase(
-        getAllNotesUseCaseImpl: GetAllExcursionsUseCaseImpl
-    ) : GetAllExcursionsUseCase
 
     @Binds
     abstract fun bindGetExcursionByQueryUseCase(

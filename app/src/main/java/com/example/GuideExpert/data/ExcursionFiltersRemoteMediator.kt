@@ -44,11 +44,19 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
             }
 
 
-           // Log.d("TAG","FILTERS ${filters.sort.get(0)} ")
+            Log.d("TAG","FILTERS SORT:  ${filters.sort} ")
+            if (filters.categories.isNotEmpty()) {
+                filters.categories.forEach { Log.d("TAG","FILTERS CAT ${it} ")}
+            }
+            if (filters.duration.isNotEmpty()) {
+                filters.duration.forEach { Log.d("TAG","FILTERS DUR ${it} ")}
+            }
             // MAKE API CALL
             val apiResponse = excursionService.getExcursionsFiltersPaging(
                 offset = offset,
                 limit = state.config.pageSize,
+                sort = filters.sort,
+                categories = filters.categories
             )
 
             val results = apiResponse.body()?.excursions

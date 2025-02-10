@@ -1,6 +1,5 @@
 package com.example.GuideExpert.data.repository
 
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -46,13 +45,13 @@ class DataPagingRepositoryImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalPagingApi::class)
-    override fun getExcursionByFiltersFlow(filters: Filters): Flow<PagingData<Excursion>> {
+    override fun getExcursionByFiltersFlow(filter: Filters): Flow<PagingData<Excursion>> {
         return Pager(
             config = PagingConfig(pageSize = PAGE_SIZE, maxSize = 30),
             remoteMediator = ExcursionFiltersRemoteMediator(
                 excursionsRoomDatabase = excursionsRoomDatabase,
                 excursionService = excursionService,
-                filters = filters
+                filters = filter
             ),
             pagingSourceFactory = {
                 excursionsRoomDatabase.excursionFilterDao().pagingSource()

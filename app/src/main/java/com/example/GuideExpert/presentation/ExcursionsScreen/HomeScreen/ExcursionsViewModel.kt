@@ -186,6 +186,7 @@ class ExcursionsViewModel @Inject constructor(
     }
 
     private fun loadExcursionsFilters() {
+        Log.d("TAG","loadExcursionsFilters")
         viewModelScope.launch {
             val filters = Filters(sortState.value,
                 getFiltersCategories().filter { it.enabled.value}.map{it.id},

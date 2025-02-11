@@ -151,7 +151,7 @@ fun HomeScreenContent(
                 if (excursion != null) {
                     ExcursionListFilterItem(
                         excursion,
-                        {state.onEvent(ExcursionsUiEvent.OnClickFavoriteExcursion(excursion))},
+                        state.onEvent,
                         state.navigateToExcursion
                     )
                 }

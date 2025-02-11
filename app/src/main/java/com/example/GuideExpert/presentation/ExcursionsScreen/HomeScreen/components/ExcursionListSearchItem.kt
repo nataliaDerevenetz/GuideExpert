@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.typography
@@ -59,17 +62,16 @@ fun ExcursionListSearchItem(
                 Box {
                     ExcursionImageSearch(excursion)
                     Image(
-                        imageVector = ImageVector.vectorResource(R.drawable.favorite_border) ,
+                        imageVector = Icons.Filled.FavoriteBorder,
                         contentDescription = "featured",
                         colorFilter = ColorFilter.tint(Color.White),
-                        modifier = Modifier.align(Alignment.TopEnd)
+                        modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
                             .graphicsLayer {
                                 clip = true
                                 shape = RoundedCornerShape(15.dp)
                             }
                             .clickable {
                                 onEvent(SearchEvent.OnClickFavoriteExcursion(excursion))
-                             //   onSetFavoriteExcursionButtonClick(excursion)
                                 Log.d("CLICK","featured") }
                     )
                 }
@@ -83,7 +85,6 @@ fun ExcursionListSearchItem(
 @Composable
 private fun ExcursionImageSearch(excursion: Excursion) {
     Image(
-       // painter = painterResource(id = excursion.photo),
         painter = painterResource(id = R.drawable.excurs2),
         contentDescription = null,
         contentScale = ContentScale.Crop,

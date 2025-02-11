@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.typography
@@ -30,11 +34,13 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 
 @Composable
 fun ExcursionListFilterItem(
     excursion: Excursion,
-    onSetFavoriteExcursionButtonClick: (Excursion) -> Unit,
+    onEvent: (ExcursionsUiEvent) -> Unit,
     navigateToProfile: (Excursion) -> Unit,
 ) {
     Card(
@@ -59,17 +65,16 @@ fun ExcursionListFilterItem(
                 Box {
                     ExcursionImage(excursion)
                     Image(
-                        imageVector = ImageVector.vectorResource(R.drawable.favorite_border) ,
+                        imageVector = Icons.Filled.FavoriteBorder,
                         contentDescription = "featured",
                         colorFilter = ColorFilter.tint(Color.White),
-                        modifier = Modifier.align(Alignment.TopEnd)
+                        modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
                             .graphicsLayer {
                                 clip = true
                                 shape = RoundedCornerShape(15.dp)
                             }
                             .clickable {
-                                //onEvent(SearchEvent.OnClickFavoriteExcursion(excursion))
-                                onSetFavoriteExcursionButtonClick(excursion)
+                                onEvent(ExcursionsUiEvent.OnClickFavoriteExcursion(excursion))
                                 Log.d("CLICK","featured") }
                     )
                 }
@@ -83,7 +88,6 @@ fun ExcursionListFilterItem(
 @Composable
 private fun ExcursionImage(excursion: Excursion) {
     Image(
-        // painter = painterResource(id = excursion.photo),
         painter = painterResource(id = R.drawable.excurs2),
         contentDescription = null,
         contentScale = ContentScale.Crop,

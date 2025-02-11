@@ -196,16 +196,12 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
             is ExcursionListSearchUIState.Idle -> {
                 SearchScreenStart()
             }
-            is ExcursionListSearchUIState.Loading -> {
-               // SearchScreenEmpty()
-            }
+            is ExcursionListSearchUIState.Loading -> {}
             is ExcursionListSearchUIState.Data -> {
                 SearchResult(excursions, state.snackbarHostState,state.sendEffectFlow,
                     state.onEvent,state.navigateToExcursion)
             }
-            is ExcursionListSearchUIState.Error -> {
-
-            }
+            is ExcursionListSearchUIState.Error -> {}
         }
 
     }
@@ -263,6 +259,14 @@ fun SearchResult(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    if(excursionPagingItems.loadState.source.refresh is LoadState.NotLoading &&
+                        excursionPagingItems.loadState.append.endOfPaginationReached && excursionPagingItems.itemCount == 0)
+                    {
+                        item{
+                            SearchScreenEmpty()
+                        }
+                    }
+
                     items(
                         count = excursionPagingItems.itemCount,
                         key = excursionPagingItems.itemKey { it.id },

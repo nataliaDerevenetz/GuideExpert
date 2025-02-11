@@ -52,6 +52,7 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
                 filters.duration.forEach { Log.d("TAG","FILTERS DUR ${it} ")}
             }
             // MAKE API CALL
+
             val apiResponse = excursionService.getExcursionsFiltersPaging(
                 offset = offset,
                 limit = state.config.pageSize,

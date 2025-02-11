@@ -137,7 +137,7 @@ fun HomeScreenContent(
             }
         } else {
             if(excursionPagingItems.loadState.source.refresh is LoadState.NotLoading &&
-                excursionPagingItems.loadState.append.endOfPaginationReached)
+                excursionPagingItems.loadState.append.endOfPaginationReached && excursionPagingItems.itemCount == 0)
             {
                 item{
                     HomeScreenEmpty()

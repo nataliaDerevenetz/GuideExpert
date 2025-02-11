@@ -112,17 +112,3 @@ fun HomeScreen(
     }
 
 }
-/*
-@Composable
-private fun HomeScreenEmpty(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = stringResource(R.string.no_excursions_found),
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 27.sp,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-*/

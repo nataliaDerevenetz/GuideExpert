@@ -17,12 +17,14 @@ interface ExcursionService {
     suspend fun getExcursions(): Response<List<ExcursionPOJO>>
 
     @GET("server.php")
-    suspend fun getExcursionsSearchPaging(@Query("offset") offset:Int, @Query("limit") limit:Int): Response<ExcursionsPagingPOJO>
+    suspend fun getExcursionsSearchPaging(@Query("offset") offset:Int, @Query("limit") limit:Int,
+                                          @Query("query") query:String): Response<ExcursionsPagingPOJO>
 
     @FormUrlEncoded
     @POST("excursionsfilter.php")
     suspend fun getExcursionsFiltersPaging(@Query("offset") offset:Int, @Query("limit") limit:Int,
-                                           @Query("sort") sort:Int,@Field("categories[]") categories: List<Int>): Response<ExcursionsPagingPOJO>
+                                           @Query("sort") sort:Int,@Field("categories[]") categories: List<Int>,
+                                           @Field("duration[]") duration: List<Int>,@Field("group[]") group: List<Int>): Response<ExcursionsPagingPOJO>
 
 
 

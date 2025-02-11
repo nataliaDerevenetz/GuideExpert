@@ -46,6 +46,7 @@ class ExcursionSearchRemoteMediator @Inject constructor(
             val apiResponse = excursionService.getExcursionsSearchPaging(
                 offset = offset,
                 limit = state.config.pageSize,
+                query = filterQuery.query
             )
 
             val results = apiResponse.body()?.excursions

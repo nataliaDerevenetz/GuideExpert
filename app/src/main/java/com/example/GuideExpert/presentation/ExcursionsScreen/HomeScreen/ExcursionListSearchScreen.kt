@@ -194,10 +194,10 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
 
         when(uiState.contentState){
             is ExcursionListSearchUIState.Idle -> {
-                SearchScreenEmpty()
+                SearchScreenStart()
             }
             is ExcursionListSearchUIState.Loading -> {
-                SearchScreenEmpty()
+               // SearchScreenEmpty()
             }
             is ExcursionListSearchUIState.Data -> {
                 SearchResult(excursions, state.snackbarHostState,state.sendEffectFlow,
@@ -294,5 +294,11 @@ private fun SearchScreenEmpty(modifier: Modifier = Modifier) {
             fontSize = 27.sp,
             textAlign = TextAlign.Center,
         )
+    }
+}
+
+@Composable
+private fun SearchScreenStart(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
     }
 }

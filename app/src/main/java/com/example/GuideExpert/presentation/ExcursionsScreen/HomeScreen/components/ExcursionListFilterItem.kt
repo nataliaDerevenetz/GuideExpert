@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -62,6 +63,10 @@ fun ExcursionListFilterItem(
                         contentDescription = "featured",
                         colorFilter = ColorFilter.tint(Color.White),
                         modifier = Modifier.align(Alignment.TopEnd)
+                            .graphicsLayer {
+                                clip = true
+                                shape = RoundedCornerShape(15.dp)
+                            }
                             .clickable {
                                 //onEvent(SearchEvent.OnClickFavoriteExcursion(excursion))
                                 onSetFavoriteExcursionButtonClick(excursion)

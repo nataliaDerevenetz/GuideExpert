@@ -30,9 +30,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.GuideExpert.R
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
 
@@ -68,7 +70,7 @@ fun ProfileBox(modifier: Modifier = Modifier,
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        "Войти",
+                        stringResource(id = R.string.enter),
                         fontSize = 16.sp,
                         color = Color.Blue,
                         textDecoration = TextDecoration.Underline

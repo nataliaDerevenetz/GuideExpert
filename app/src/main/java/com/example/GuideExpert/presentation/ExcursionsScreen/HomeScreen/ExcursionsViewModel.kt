@@ -36,7 +36,7 @@ sealed interface ExcursionsUiEvent {
     data class OnClickFavoriteExcursion(val excursion: Excursion) : ExcursionsUiEvent
     data object OnLoadExcursionsFilters : ExcursionsUiEvent
     data object OnChangeFilters : ExcursionsUiEvent
-
+    data object OnLoadConfig : ExcursionsUiEvent
 }
 
 
@@ -75,6 +75,7 @@ class ExcursionsViewModel @Inject constructor(
                 is ExcursionsUiEvent.OnLoadExcursionsFilters -> loadExcursionsFilters()
                 is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
                 is ExcursionsUiEvent.OnChangeFilters -> changedFilters()
+                is ExcursionsUiEvent.OnLoadConfig -> loadConfig()
             }
         }
     }
@@ -97,6 +98,13 @@ class ExcursionsViewModel @Inject constructor(
 
     fun getFiltersCategories():List<Filter> {
         return getFiltersCategoriesUseCase()
+    }
+
+    private fun loadConfig() {
+
+
+        //!!!!!!!!!!!!
+
     }
 
     private fun changedFilters() {
@@ -173,6 +181,7 @@ class ExcursionsViewModel @Inject constructor(
     }
 
     init {
+        handleEvent(ExcursionsUiEvent.OnLoadConfig)
         handleEvent(ExcursionsUiEvent.OnLoadExcursionsFilters)
     }
 

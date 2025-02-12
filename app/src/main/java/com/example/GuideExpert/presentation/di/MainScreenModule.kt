@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.di
 
+import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
@@ -9,6 +10,7 @@ import com.example.GuideExpert.domain.GetFiltersDurationUseCase
 import com.example.GuideExpert.domain.GetFiltersGroupsUseCase
 import com.example.GuideExpert.domain.GetFiltersSortUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
+import com.example.GuideExpert.domain.impl.GetConfigUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByFiltersUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByQueryUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionDetailUseCaseImpl
@@ -78,5 +80,11 @@ abstract class MainScreenModule {
     abstract fun bindGetSortDefaultUseCase(
         getGetSortDefaultUseCaseImpl: GetSortDefaultUseCaseImpl
     ) : GetSortDefaultUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindGetConfigUseCase(
+        getGetConfigUseCaseImpl: GetConfigUseCaseImpl
+    ) : GetConfigUseCase
 
 }

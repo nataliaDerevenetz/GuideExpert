@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.GuideExpert.data.repository.UIResources
+import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.GetFiltersBarUseCase
 import com.example.GuideExpert.domain.GetFiltersCategoriesUseCase
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,7 +52,8 @@ class ExcursionsViewModel @Inject constructor(
     val getFiltersSortUseCase: GetFiltersSortUseCase,
     val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
     val getFiltersCategoriesUseCase: GetFiltersCategoriesUseCase,
-    val getSortDefaultUseCase: GetSortDefaultUseCase
+    val getSortDefaultUseCase: GetSortDefaultUseCase,
+    val getConfigUseCase: GetConfigUseCase
 ) : ViewModel() {
 
     private val _effectChannel = Channel<SnackbarEffect>()
@@ -100,11 +104,19 @@ class ExcursionsViewModel @Inject constructor(
         return getFiltersCategoriesUseCase()
     }
 
-    private fun loadConfig() {
-
-
-        //!!!!!!!!!!!!
-
+    private suspend fun loadConfig() {
+        Log.d("TAG","loadConfig")
+        getConfigUseCase().flowOn(Dispatchers.IO).collectLatest { resource ->
+            when(resource) {
+                is UIResources.Error -> {Log.d("TAG2","loadConfig Error")}
+                is UIResources.Loading -> {Log.d("TAG2","loadConfig Loading")}
+                is UIResources.Success -> {
+                    Log.d("TAG2","loadConfig Success")
+                    Log.d("TAG2","${resource.data.banners[0].photo}")
+                  //  Log.d("TAG","SIZE BANNER :: ${resource.data.banners.size}")
+                }
+            }
+        }
     }
 
     private fun changedFilters() {

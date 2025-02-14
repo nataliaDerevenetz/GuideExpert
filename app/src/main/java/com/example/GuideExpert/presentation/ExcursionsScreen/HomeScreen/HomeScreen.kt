@@ -7,13 +7,19 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -27,9 +33,10 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.MainTopBar
 import com.example.GuideExpert.utils.Constant.STATUSBAR_HEIGHT
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     snackbarHostState: SnackbarHostState,
@@ -63,9 +70,19 @@ fun HomeScreen(
         mutableStateOf(false)
     }
 
+
+    val coroutineScope = rememberCoroutineScope()
+    var isRefreshing by remember { mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            isRefreshing = true
+        }
+    )
+
     SharedTransitionLayout {
         Box(
-            Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
+            Modifier.fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
         ) {
 
             HomeScreenContent(
@@ -76,6 +93,12 @@ fun HomeScreen(
                 onFiltersSelected = {
                     filtersVisible = true
                 },
+                isRefreshing = isRefreshing,
+                stopRefreshing = {
+                    coroutineScope.launch {
+                          isRefreshing = false
+                    }
+                }
             )
 
 
@@ -108,6 +131,12 @@ fun HomeScreen(
                     scrolling = true
                 }
             }
+
+            PullRefreshIndicator(
+                refreshing = isRefreshing,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 

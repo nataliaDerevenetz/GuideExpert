@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -68,7 +69,7 @@ fun rememberHomeScreenContentState(
 }
 
 context(SharedTransitionScope)
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
     modifier: Modifier = Modifier,
@@ -77,6 +78,8 @@ fun HomeScreenContent(
     toolbarHeightDp: Int,
     filterScreenVisible: Boolean,
     onFiltersSelected: () -> Unit,
+    isRefreshing: Boolean,
+    stopRefreshing:() -> Unit,
     viewModel: ExcursionsViewModel = hiltViewModel(),
     state: HomeScreenContentState = rememberHomeScreenContentState(
         filterListState = viewModel.uiPagingState,
@@ -116,10 +119,17 @@ fun HomeScreenContent(
         }
     }
 
+    if (isRefreshing){
+        LaunchedEffect(Unit) {
+            excursionPagingItems.refresh()
+            stopRefreshing()
+        }
+    }
+
     LazyColumn(
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)
     ) {
-        item{
+        item {
             ImageSlider()
         }
         item {
@@ -136,10 +146,10 @@ fun HomeScreenContent(
                 ColumnExcursionShimmer()
             }
         } else {
-            if(excursionPagingItems.loadState.source.refresh is LoadState.NotLoading &&
-                excursionPagingItems.loadState.append.endOfPaginationReached && excursionPagingItems.itemCount == 0)
-            {
-                item{
+            if (excursionPagingItems.loadState.source.refresh is LoadState.NotLoading &&
+                excursionPagingItems.loadState.append.endOfPaginationReached && excursionPagingItems.itemCount == 0
+            ) {
+                item {
                     HomeScreenEmpty()
                 }
             }

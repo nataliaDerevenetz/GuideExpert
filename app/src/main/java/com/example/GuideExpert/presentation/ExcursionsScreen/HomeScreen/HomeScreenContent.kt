@@ -92,45 +92,42 @@ fun HomeScreenContent(
     )
 ) {
 
-    val effectFlow by state.effectFlow.collectAsStateWithLifecycle(null)
-
     LaunchedEffect(state.snackbarHostState) {
-        effectFlow?.let {
-            when (it) {
-                is SnackbarEffect.ShowSnackbar -> snackbarHostState.showSnackbar(it.message)
+        state.effectFlow.collect { effect ->
+            when (effect) {
+                is SnackbarEffect.ShowSnackbar -> state.snackbarHostState.showSnackbar(effect.message)
             }
         }
     }
-
     val filters = state.getFiltersBar()
     val excursionPagingItems by rememberUpdatedState(newValue = state.filterListState.collectAsLazyPagingItems())
 
     if (excursionPagingItems.loadState.refresh is LoadState.Error) {
-        LaunchedEffect(key1 = snackbarHostState) {
+        LaunchedEffect(key1 = state.snackbarHostState) {
             state.sendEffectFlow((excursionPagingItems.loadState.refresh as LoadState.Error).error.message ?: "",null)
             Log.d("TAG", excursionPagingItems.loadState.refresh.toString())
         }
     }
 
     if (excursionPagingItems.loadState.append is LoadState.Error) {
-        LaunchedEffect(key1 = snackbarHostState) {
+        LaunchedEffect(key1 = state.snackbarHostState) {
             state.sendEffectFlow((excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",null)
             Log.d("TAG", excursionPagingItems.loadState.append.toString())
         }
     }
 
     if (isRefreshing){
-        LaunchedEffect(Unit) {
-            excursionPagingItems.refresh()
-            stopRefreshing()
-        }
+        excursionPagingItems.refresh()
+        stopRefreshing()
     }
 
     LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(top = toolbarHeightDp.dp)
     ) {
         item {
-            ImageSlider()
+            ImageSlider(navigateToExcursion = state.navigateToExcursion)
         }
         item {
             FilterBar(

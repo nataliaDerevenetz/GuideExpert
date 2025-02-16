@@ -15,6 +15,7 @@ import com.example.GuideExpert.domain.GetFiltersDurationUseCase
 import com.example.GuideExpert.domain.GetFiltersGroupsUseCase
 import com.example.GuideExpert.domain.GetFiltersSortUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
+import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
@@ -72,6 +73,9 @@ class ExcursionsViewModel @Inject constructor(
     private val _changeFilter = MutableStateFlow(defaultFilters)
     val changeFilter: StateFlow<Filters> = _changeFilter
 
+    private val _configApp = MutableStateFlow(Config())
+    val configApp: StateFlow<Config> = _configApp
+
 
     fun handleEvent(event: ExcursionsUiEvent) {
         viewModelScope.launch {
@@ -112,8 +116,7 @@ class ExcursionsViewModel @Inject constructor(
                 is UIResources.Loading -> {Log.d("TAG2","loadConfig Loading")}
                 is UIResources.Success -> {
                     Log.d("TAG2","loadConfig Success")
-                    Log.d("TAG2","${resource.data.banners[0].photo}")
-                  //  Log.d("TAG","SIZE BANNER :: ${resource.data.banners.size}")
+                    _configApp.update { resource.data }
                 }
             }
         }

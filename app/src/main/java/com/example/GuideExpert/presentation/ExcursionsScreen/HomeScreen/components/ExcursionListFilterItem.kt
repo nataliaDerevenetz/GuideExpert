@@ -2,7 +2,6 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.compone
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,21 +25,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 
 @Composable
 fun ExcursionListFilterItem(
     excursion: Excursion,
     onEvent: (ExcursionsUiEvent) -> Unit,
-    navigateToProfile: (Excursion) -> Unit,
+    navigateToExcursion: (Excursion) -> Unit,
 ) {
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
@@ -56,7 +51,7 @@ fun ExcursionListFilterItem(
         //  Log.e("TEST","row")
         Row( modifier = Modifier.clickable{
             Log.d("TAG", "clickable :: ${excursion.id}")
-            navigateToProfile(excursion) }){
+            navigateToExcursion(excursion) }){
             Column ( modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()

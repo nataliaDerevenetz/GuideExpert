@@ -1,41 +1,29 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
@@ -59,20 +47,22 @@ fun ImageSlider(modifier: Modifier = Modifier,
 
     val pagerState = rememberPagerState(initialPage = 0)
 
-
+    if (configApp.value.banners.isEmpty()) return
     LaunchedEffect(Unit) {
         while (true) {
             yield()
             delay(8600)
-            if (pagerState.pageCount > 0) pagerState.animateScrollToPage(
-                page = (pagerState.currentPage + 1) % (pagerState.pageCount)
-            )
+            if (pagerState.pageCount > 0) {
+                pagerState.animateScrollToPage(
+                    page = (pagerState.currentPage + 1) % (pagerState.pageCount)
+                )
+            }
         }
     }
 
     Box(Modifier.padding(top=10.dp)) {
         HorizontalPager(
-            count = configApp.value.banners.size,//imageSlider.size,
+            count = configApp.value.banners.size,
             state = pagerState,
             contentPadding = PaddingValues(horizontal = 16.dp),
             modifier = modifier
@@ -101,7 +91,6 @@ fun ImageSlider(modifier: Modifier = Modifier,
                         )
                     }
                     .clickable {
-                        Log.d("TAG", "photo :: ${configApp.value.banners[page].photo}")
                         navigateToExcursion(Excursion(id =configApp.value.banners[page].id,title = "",
                             description = "", photo = 1))
                     }

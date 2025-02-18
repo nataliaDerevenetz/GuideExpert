@@ -4,11 +4,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.ExcursionData
 
 @Composable
 fun ExcursionDetailScreen(
@@ -16,14 +19,18 @@ fun ExcursionDetailScreen(
     onIcr :()->Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel()
 ) {
-    val excursion by viewModel.excursion.collectAsStateWithLifecycle()
-    val excursionData by viewModel.excursionData.observeAsState()
+  //  val excursion by viewModel.excursion.collectAsStateWithLifecycle()
+  //  val excursionData by viewModel.excursionData.observeAsState()
+
+    val excursionData2 by viewModel.excursionData2.collectAsStateWithLifecycle(ExcursionData())
+    //collectAsStateWithLifecycle(Excursion)
+
     Column {
         Text("ExcursionDetailScreen")
-        Text("id ${excursion.id}")
-        Text("Excursion ${excursionData?.title}")
-        Text("Excursion ${excursionData?.company}")
-        Text("Excursion ${excursionData?.excursionId}")
+        Text("id ${excursionData2.excursionId}")
+        Text("Excursion ${excursionData2.title}")
+        Text("Excursion ${excursionData2.owner}")
+        Text("Excursion ${excursionData2.excursionId}")
 
         Column {
             Text("Incr :: $count")

@@ -41,7 +41,7 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     navigateToExcursion: (Excursion) -> Unit,
-    viewModel: ExcursionsViewModel = hiltViewModel()
+  //  viewModel: ExcursionsViewModel = hiltViewModel()
 ) {
 
     val screenHeightDp =  LocalConfiguration.current.screenHeightDp

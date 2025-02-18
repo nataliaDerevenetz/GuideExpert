@@ -3,11 +3,14 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,10 +22,14 @@ class ExcursionDetailViewModel @Inject constructor(
 
     private val excursionDetail = ExcursionDetail.from(savedStateHandle)
 
-    private val _excursion = MutableStateFlow(excursionDetail.excursion)
+   // private val _excursion = MutableStateFlow(excursionDetail.excursion)
 
-    val excursion = _excursion.asStateFlow()
+   // val excursion = _excursion.asStateFlow()
 
-    val excursionData = getExcursionDetailUseCase(excursionDetail.excursion.id).asLiveData()
+   // val excursionData = getExcursionDetailUseCase(excursionDetail.excursion.id).asLiveData()
+
+    val excursionData2 = getExcursionDetailUseCase(excursionDetail.excursion.id)
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), replay = 1)
+
 
 }

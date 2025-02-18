@@ -64,8 +64,7 @@ fun ImageSlider(modifier: Modifier = Modifier,
         while (true) {
             yield()
             delay(8600)
-            if (pagerState.pageCount > 0)
-            pagerState.animateScrollToPage(
+            if (pagerState.pageCount > 0) pagerState.animateScrollToPage(
                 page = (pagerState.currentPage + 1) % (pagerState.pageCount)
             )
         }
@@ -100,7 +99,8 @@ fun ImageSlider(modifier: Modifier = Modifier,
                             stop = 1f,
                             fraction = 1f - pageOffset.coerceIn(0f, 1f)
                         )
-                    }.clickable {
+                    }
+                    .clickable {
                         Log.d("TAG", "photo :: ${configApp.value.banners[page].photo}")
                         navigateToExcursion(Excursion(id =configApp.value.banners[page].id,title = "",
                             description = "", photo = 1))

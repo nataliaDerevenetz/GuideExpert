@@ -117,10 +117,10 @@ fun ImageSlider(modifier: Modifier = Modifier,
 @Composable
 fun NetworkImage(url: String, contentDescription: String?, width: Int, height: Int) {
     SubcomposeAsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
+        model = url/*ImageRequest.Builder(LocalContext.current)
             .data(url)
             .setHeader("User-Agent", "Mozilla/5.0")
-            .build(),
+            .build()*/,
         contentDescription = contentDescription,
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxWidth().height(height.dp),

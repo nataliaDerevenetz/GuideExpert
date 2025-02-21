@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.repository.UIResources
+import com.example.GuideExpert.domain.GetExcursionDataUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
@@ -40,7 +41,8 @@ data class UIState(
 @HiltViewModel
 class ExcursionDetailViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    val getExcursionDetailUseCase: GetExcursionDetailUseCase
+    val getExcursionDetailUseCase: GetExcursionDetailUseCase,
+    val getExcursionDataUseCase: GetExcursionDataUseCase
 ) : ViewModel() {
 
 
@@ -50,7 +52,7 @@ class ExcursionDetailViewModel @Inject constructor(
     val stateView: StateFlow<UIState> = _stateView.asStateFlow()
 
 
-  //  val excursion: Flow<ExcursionData> = getExcursionDataUseCase()
+    val excursion: Flow<ExcursionData?> = getExcursionDataUseCase(excursionDetail.excursion.id)
 
   //  val images: Flow<List<Image>> = getImagesExcursionDataUseCase()
 

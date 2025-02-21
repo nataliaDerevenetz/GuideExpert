@@ -2,9 +2,7 @@ package com.example.GuideExpert.domain.impl
 
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetConfigUseCase
-import com.example.GuideExpert.domain.GetExcursionDetailUseCase
 import com.example.GuideExpert.domain.models.Config
-import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

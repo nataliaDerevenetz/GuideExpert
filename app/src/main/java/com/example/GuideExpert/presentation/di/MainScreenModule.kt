@@ -3,6 +3,7 @@ package com.example.GuideExpert.presentation.di
 import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
+import com.example.GuideExpert.domain.GetExcursionDataUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
 import com.example.GuideExpert.domain.GetFiltersBarUseCase
 import com.example.GuideExpert.domain.GetFiltersCategoriesUseCase
@@ -13,6 +14,7 @@ import com.example.GuideExpert.domain.GetSortDefaultUseCase
 import com.example.GuideExpert.domain.impl.GetConfigUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByFiltersUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByQueryUseCaseImpl
+import com.example.GuideExpert.domain.impl.GetExcursionDataUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionDetailUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersBarUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersCategoriesUseCaseImpl
@@ -86,5 +88,11 @@ abstract class MainScreenModule {
     abstract fun bindGetConfigUseCase(
         getGetConfigUseCaseImpl: GetConfigUseCaseImpl
     ) : GetConfigUseCase
+
+    @Binds
+    abstract fun bindGetExcursionDataUseCase(
+        getExcursionDataUseCaseImpl: GetExcursionDataUseCaseImpl
+    ) : GetExcursionDataUseCase
+
 
 }

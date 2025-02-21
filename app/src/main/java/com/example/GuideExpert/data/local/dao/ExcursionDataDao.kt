@@ -24,7 +24,7 @@ interface ExcursionDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertImages(images: List<ImageEntity>)
 
-    @Query("DELETE FROM excursionFilterEntity  WHERE id = :id")
+    @Query("DELETE FROM excursionDataEntity  WHERE id = :id")
     suspend fun deleteExcursionById(id:Int)
 
     @Transaction

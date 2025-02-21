@@ -13,4 +13,6 @@ interface DataSourceRepository {
     suspend fun getExcursionInfo(excursionId:Int): Flow<UIResources<ExcursionData>>
 
     suspend fun getConfigInfo(): Flow<UIResources<Config>>
+
+    fun getExcursionData(excursionId:Int): Flow<ExcursionData?>
 }

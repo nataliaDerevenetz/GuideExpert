@@ -6,7 +6,7 @@ import com.example.GuideExpert.domain.models.Image
 import kotlinx.coroutines.flow.Flow
 
 interface DBStorage {
-    fun getExcursionInfo(excursionId:Int): Flow<ExcursionData>
-
+  //  fun getExcursionInfo(excursionId:Int): Flow<ExcursionData>
+    fun getExcursionData(excursionId:Int): Flow<ExcursionData?>
     suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>)
 }

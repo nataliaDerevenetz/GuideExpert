@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import java.io.IOException
@@ -72,5 +73,9 @@ class DataSourceRepositoryImpl @Inject constructor(
         }
     }.catch { e->
         emit(UIResources.Error(e.localizedMessage ?: "Unknown error"))
+    }
+
+    override fun getExcursionData(excursionId:Int): Flow<ExcursionData?> {
+        return dbStorage.getExcursionData(excursionId).flowOn(Dispatchers.IO)
     }
 }

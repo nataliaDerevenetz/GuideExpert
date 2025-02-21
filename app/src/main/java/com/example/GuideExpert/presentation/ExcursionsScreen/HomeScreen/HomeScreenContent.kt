@@ -26,7 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -40,6 +43,8 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.componen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlin.reflect.KFunction1
 import kotlin.reflect.KSuspendFunction2
 
@@ -92,12 +97,25 @@ fun HomeScreenContent(
     )
 ) {
 
-    LaunchedEffect(state.snackbarHostState) {
-        state.effectFlow.collect { effect ->
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(true) {
+
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch {
+                Log.d("TAG", "lifecycleOwner")
+                state.effectFlow.collectLatest { effect ->
+                    when (effect) {
+                        is SnackbarEffect.ShowSnackbar -> state.snackbarHostState.showSnackbar(effect.message)
+                    }
+                }
+            }
+        }
+
+        /*state.effectFlow.collect { effect ->
             when (effect) {
                 is SnackbarEffect.ShowSnackbar -> state.snackbarHostState.showSnackbar(effect.message)
             }
-        }
+        }*/
     }
     val filters = state.getFiltersBar()
     val excursionPagingItems by rememberUpdatedState(newValue = state.filterListState.collectAsLazyPagingItems())

@@ -6,6 +6,7 @@ import com.example.GuideExpert.data.local.dao.ExcursionDao
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
 import com.example.GuideExpert.data.local.models.ExcursionDataEntity
 import com.example.GuideExpert.data.local.models.ImageEntity
+import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionDataEntity
 import com.example.GuideExpert.data.mappers.toImageEntity
 import com.example.GuideExpert.domain.models.Excursion
@@ -14,6 +15,7 @@ import com.example.GuideExpert.domain.models.Image
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 class DBStorageImpl @Inject constructor(
@@ -21,7 +23,7 @@ class DBStorageImpl @Inject constructor(
     private val excursionDataDao: ExcursionDataDao
 ): DBStorage{
 
-    override fun getExcursionInfo(excursionId: Int): Flow<ExcursionData> {
+   /* override fun getExcursionInfo(excursionId: Int): Flow<ExcursionData> {
         Log.d("TAG","excursionId::   ${excursionId.toString()}")
         return flow{
             /*   withContext(Dispatchers.IO) {
@@ -31,11 +33,16 @@ class DBStorageImpl @Inject constructor(
              */
             emit(ExcursionData(excursionId = excursionId))
         }
-    }
+    }*/
 
 
     override suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>) {
        excursionDataDao.insertExcursionAndImages(excursion.toExcursionDataEntity(),
            images.map{it.toImageEntity()})
+    }
+
+    override fun getExcursionData(excursionId: Int): Flow<ExcursionData?> {
+        return excursionDataDao.getById(excursionId).mapNotNull { it?.toExcursionData() ?: null }
+           // .map{ it.toExcursionData()}
     }
 }

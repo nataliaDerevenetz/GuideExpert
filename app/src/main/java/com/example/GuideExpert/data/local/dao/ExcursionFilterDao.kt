@@ -10,7 +10,7 @@ import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
 @Dao
 interface ExcursionFilterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(users: List<ExcursionFilterEntity>)
+    suspend fun insertAll(excursions: List<ExcursionFilterEntity>)
 
     @Query("SELECT * FROM excursionFilterEntity")
     fun pagingSource(): PagingSource<Int, ExcursionFilterEntity>

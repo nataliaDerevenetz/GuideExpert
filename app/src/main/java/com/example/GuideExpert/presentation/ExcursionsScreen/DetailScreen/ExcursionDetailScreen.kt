@@ -22,15 +22,15 @@ fun ExcursionDetailScreen(
   //  val excursion by viewModel.excursion.collectAsStateWithLifecycle()
   //  val excursionData by viewModel.excursionData.observeAsState()
 
-    val excursionData2 by viewModel.excursionData2.collectAsStateWithLifecycle(ExcursionData())
+  //  val excursionData2 by viewModel.excursionData2.collectAsStateWithLifecycle(ExcursionData())
     //collectAsStateWithLifecycle(Excursion)
 
     Column {
         Text("ExcursionDetailScreen")
-        Text("id ${excursionData2.excursionId}")
-        Text("Excursion ${excursionData2.title}")
-        Text("Excursion ${excursionData2.owner}")
-        Text("Excursion ${excursionData2.excursionId}")
+    //    Text("id ${excursionData2.excursionId}")
+     //   Text("Excursion ${excursionData2.title}")
+     //   Text("Excursion ${excursionData2.owner}")
+     //   Text("Excursion ${excursionData2.excursionId}")
 
         Column {
             Text("Incr :: $count")

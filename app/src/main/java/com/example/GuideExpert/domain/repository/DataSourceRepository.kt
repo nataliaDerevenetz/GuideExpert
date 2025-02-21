@@ -10,7 +10,7 @@ interface DataSourceRepository {
 
     fun getUserInfo(userId:String): Flow<UserInfo>
 
-    fun getExcursionInfo(excursionId:Int): Flow<ExcursionData>
+    suspend fun getExcursionInfo(excursionId:Int): Flow<UIResources<ExcursionData>>
 
     suspend fun getConfigInfo(): Flow<UIResources<Config>>
 }

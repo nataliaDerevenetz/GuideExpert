@@ -1,6 +1,7 @@
 package com.example.GuideExpert.data.remote.services
 
 import com.example.GuideExpert.data.remote.pojo.ConfigPOJO
+import com.example.GuideExpert.data.remote.pojo.ExcursionDataPOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionPOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionsPagingPOJO
 import retrofit2.Response
@@ -31,5 +32,7 @@ interface ExcursionService {
                                            @Field("duration[]") duration: List<Int>,@Field("group[]") group: List<Int>): Response<ExcursionsPagingPOJO>
 
 
+    @GET("excursiondetail.php")
+    suspend fun getExcursionData(@Query("id") id:Int): Response<ExcursionDataPOJO>
 
 }

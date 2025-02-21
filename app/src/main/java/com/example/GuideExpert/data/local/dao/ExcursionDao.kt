@@ -20,7 +20,7 @@ interface ExcursionDao {
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(users: List<ExcursionEntity>)
+    suspend fun insertAll(excursions: List<ExcursionEntity>)
 
     @Query("SELECT * FROM excursionEntity")
     fun pagingSource(): PagingSource<Int, ExcursionEntity>

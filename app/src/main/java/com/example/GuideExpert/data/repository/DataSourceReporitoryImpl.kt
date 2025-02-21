@@ -1,8 +1,10 @@
 package com.example.GuideExpert.data.repository
 
 import android.util.Log
+import androidx.paging.RemoteMediator.MediatorResult
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toConfig
+import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import java.io.IOException
 import javax.inject.Inject
 
 @Serializable
@@ -46,9 +49,18 @@ class DataSourceRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getExcursionInfo(excursionId:Int): Flow<ExcursionData> {
-        return dbStorage.getExcursionInfo(excursionId)
 
+    override suspend fun getExcursionInfo(excursionId:Int): Flow<UIResources<ExcursionData>> = flow {
+       try {
+           emit(UIResources.Loading)
+           val result = excursionService.getExcursionData(excursionId)
+           val data = result.body()?.toExcursionData() ?: ExcursionData()
+           Log.d("TAG", "DATA:::  ${data.title}")
+           emit(UIResources.Success(data))
+           dbStorage.insertExcursionInfo(data, data.images)
+       } catch (e: IOException) {
+           emit(UIResources.Error(e.message.toString()))
+       }
     }
 
     override suspend fun getConfigInfo(): Flow<UIResources<Config>> = flow<UIResources<Config>> {
@@ -61,18 +73,4 @@ class DataSourceRepositoryImpl @Inject constructor(
     }.catch { e->
         emit(UIResources.Error(e.localizedMessage ?: "Unknown error"))
     }
-
-   /*
-
-    {
-        val result = excursionService.getConfig()
-
-        if (result.isSuccessful) {
-            //val config = result.body()?.map { it.toExcursionEntity() } ?: listOf<ExcursionEntity>()
-           // excursionDao.insertAll(excursions)
-        } else {
-            Log.d("TAG", result.errorBody().toString())
-        }
-
-    }*/
 }

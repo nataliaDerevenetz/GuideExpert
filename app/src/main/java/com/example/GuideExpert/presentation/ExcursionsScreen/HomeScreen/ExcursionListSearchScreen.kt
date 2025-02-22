@@ -1,7 +1,9 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +22,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +53,7 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListSearchItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -105,11 +110,13 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
     val keyboardController = LocalSoftwareKeyboardController.current
     val coroutineScope = rememberCoroutineScope()
 
-
-    LaunchedEffect(state.snackbarHostState) {
-        state.effectFlow.collect { effect ->
-            when (effect) {
-                is SnackbarEffect.ShowSnackbar -> state.snackbarHostState.showSnackbar(effect.message)
+    val effectFlow by state.effectFlow.collectAsStateWithLifecycle(null)
+    LaunchedEffect(effectFlow) {
+        effectFlow?.let {
+            when (it) {
+                is SnackbarEffect.ShowSnackbar -> {
+                    state.snackbarHostState.showSnackbar(it.message)
+                }
             }
         }
     }
@@ -224,17 +231,18 @@ fun SearchResult(
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    if (excursionPagingItems.loadState.refresh is LoadState.Error) {
-        LaunchedEffect(key1 = snackbarHostState) {
-            sendEffectFlow((excursionPagingItems.loadState.refresh as LoadState.Error).error.message ?: "",null)
-            Log.d("TAG", excursionPagingItems.loadState.refresh.toString())
-        }
-    }
+    val scope = rememberCoroutineScope()
 
     if (excursionPagingItems.loadState.append is LoadState.Error) {
-        LaunchedEffect(key1 = snackbarHostState) {
-            sendEffectFlow((excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",null)
-            Log.d("TAG", excursionPagingItems.loadState.append.toString())
+        LaunchedEffect(key1 = excursionPagingItems.loadState.append) {
+            scope.launch {
+                sendEffectFlow(
+                    (excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",
+                    null
+                )
+                delay(1000)
+                excursionPagingItems.retry()
+            }
         }
     }
 
@@ -259,6 +267,19 @@ fun SearchResult(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+
+                    if (excursionPagingItems.loadState.refresh is LoadState.Error) {
+                        item {
+                            Row(Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically){
+                                Text(stringResource(id = R.string.failedload),color= Color.Gray)
+                                TextButton({excursionPagingItems.retry()}) {
+                                    Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+                                }
+                            }
+                        }
+                    }
+
                     if(excursionPagingItems.loadState.source.refresh is LoadState.NotLoading &&
                         excursionPagingItems.loadState.append.endOfPaginationReached && excursionPagingItems.itemCount == 0)
                     {
@@ -279,6 +300,19 @@ fun SearchResult(
                     item {
                         if (excursionPagingItems.loadState.append is LoadState.Loading) {
                             CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                        }
+                    }
+
+                    item {
+                        if (excursionPagingItems.loadState.append is LoadState.Error) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
                         }
                     }
                 }

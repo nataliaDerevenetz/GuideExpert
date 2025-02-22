@@ -21,7 +21,7 @@ class LocalSourceModuleProvider {
     fun provideImageDao(database: ExcursionsRoomDatabase) = database.imageDao()
 
     @Provides
-    fun provideExcursionDao(database: ExcursionsRoomDatabase) = database.excursionDao()
+    fun provideExcursionSearchDao(database: ExcursionsRoomDatabase) = database.excursionSearchDao()
 
     @Provides
     fun provideExcursionFilterDao(database: ExcursionsRoomDatabase) = database.excursionFilterDao()

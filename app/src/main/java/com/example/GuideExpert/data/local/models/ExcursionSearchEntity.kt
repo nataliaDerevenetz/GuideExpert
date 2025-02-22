@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class ExcursionEntity(
+data class ExcursionSearchEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     @ColumnInfo val title: String,

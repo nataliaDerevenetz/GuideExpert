@@ -2,8 +2,8 @@ package com.example.GuideExpert.data.local
 
 import android.util.Log
 import com.example.GuideExpert.data.mappers.toExcursion
-import com.example.GuideExpert.data.local.dao.ExcursionDao
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
+import com.example.GuideExpert.data.local.dao.ExcursionSearchDao
 import com.example.GuideExpert.data.local.models.ExcursionDataEntity
 import com.example.GuideExpert.data.local.models.ImageEntity
 import com.example.GuideExpert.data.mappers.toExcursionData
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 class DBStorageImpl @Inject constructor(
-    private val excursionDao: ExcursionDao,
+    private val excursionSearchDao: ExcursionSearchDao,
     private val excursionDataDao: ExcursionDataDao
 ): DBStorage{
 

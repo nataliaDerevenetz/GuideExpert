@@ -1,6 +1,5 @@
 package com.example.GuideExpert.data.mappers
 
-import com.example.GuideExpert.data.local.models.ExcursionEntity
 import com.example.GuideExpert.data.remote.pojo.BannerPOJO
 import com.example.GuideExpert.data.remote.pojo.ConfigPOJO
 import com.example.GuideExpert.domain.models.Banner

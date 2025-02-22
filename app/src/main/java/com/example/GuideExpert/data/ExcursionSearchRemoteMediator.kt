@@ -7,9 +7,9 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.GuideExpert.data.local.db.ExcursionsRoomDatabase
-import com.example.GuideExpert.data.local.models.ExcursionEntity
+import com.example.GuideExpert.data.local.models.ExcursionSearchEntity
 import com.example.GuideExpert.data.local.models.RemoteKeyEntity
-import com.example.GuideExpert.data.mappers.toExcursionEntity
+import com.example.GuideExpert.data.mappers.toExcursionSearchEntity
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.utils.Constant.REMOTE_KEY_ID
@@ -22,10 +22,10 @@ class ExcursionSearchRemoteMediator @Inject constructor(
     private val excursionService: ExcursionService,
     private val excursionsRoomDatabase: ExcursionsRoomDatabase,
     private val filterQuery: FilterQuery
-) : RemoteMediator<Int, ExcursionEntity>() {
+) : RemoteMediator<Int, ExcursionSearchEntity>() {
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, ExcursionEntity>
+        state: PagingState<Int, ExcursionSearchEntity>
     ): MediatorResult {
         return try {
             val offset = when (loadType) {
@@ -50,7 +50,7 @@ class ExcursionSearchRemoteMediator @Inject constructor(
             )
 
             val results = apiResponse.body()?.excursions
-                ?.map { it.toExcursionEntity() } ?: listOf<ExcursionEntity>()
+                ?.map { it.toExcursionSearchEntity() } ?: listOf<ExcursionSearchEntity>()
             val nextOffset = apiResponse.body()?.nextOffset ?: 0
 
 
@@ -61,11 +61,11 @@ class ExcursionSearchRemoteMediator @Inject constructor(
                 Log.d("TAG", "withTransaction")
                 if (loadType == LoadType.REFRESH) {
                     // IF REFRESHING, CLEAR DATABASE FIRST
-                    excursionsRoomDatabase.excursionDao().clearAll()
+                    excursionsRoomDatabase.excursionSearchDao().clearAll()
                     excursionsRoomDatabase.remoteKeyDao().deleteById(REMOTE_KEY_ID)
                 }
                 Log.d("TAG", "insert")
-                excursionsRoomDatabase.excursionDao().insertAll(results)
+                excursionsRoomDatabase.excursionSearchDao().insertAll(results)
                 excursionsRoomDatabase.remoteKeyDao().insert(
                     RemoteKeyEntity(
                         id = REMOTE_KEY_ID,

@@ -37,7 +37,7 @@ class DataPagingRepositoryImpl @Inject constructor(
                 filterQuery = filterQuery
             ),
             pagingSourceFactory = {
-                excursionsRoomDatabase.excursionDao().pagingSource()
+                excursionsRoomDatabase.excursionSearchDao().pagingSource()
             },
         ).flow.map { pagingData -> pagingData.map { it.toExcursion() } }
             .flowOn(Dispatchers.IO)

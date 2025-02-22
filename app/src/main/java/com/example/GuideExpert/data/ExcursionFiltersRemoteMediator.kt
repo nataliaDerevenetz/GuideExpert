@@ -7,10 +7,8 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.GuideExpert.data.local.db.ExcursionsRoomDatabase
-import com.example.GuideExpert.data.local.models.ExcursionEntity
 import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
 import com.example.GuideExpert.data.local.models.RemoteKeyEntity
-import com.example.GuideExpert.data.mappers.toExcursionEntity
 import com.example.GuideExpert.data.mappers.toExcursionFilterEntity
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Filters

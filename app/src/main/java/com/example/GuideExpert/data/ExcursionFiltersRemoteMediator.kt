@@ -94,6 +94,7 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
             Log.d("TAG", "error :: ${e.message.toString()}")
             MediatorResult.Error(e)
         } catch (e: HttpException) {
+            Log.d("TAG", "error http :: ${e.message.toString()}")
             MediatorResult.Error(e)
         }
 

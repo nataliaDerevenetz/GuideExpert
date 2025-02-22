@@ -76,7 +76,6 @@ class ExcursionsViewModel @Inject constructor(
     private val _configApp = MutableStateFlow(Config())
     val configApp: StateFlow<Config> = _configApp
 
-
     fun handleEvent(event: ExcursionsUiEvent) {
         viewModelScope.launch {
             when (event) {

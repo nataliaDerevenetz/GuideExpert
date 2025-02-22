@@ -9,4 +9,6 @@
     <string name="groups">Размер</string>
     <string name="duration">Продолжительность</string>
     <string name="enter">Войти</string>
+    <string name="failedload">Ошибка загрузки</string>
+    <string name="update">Обновить</string>
 </resources>

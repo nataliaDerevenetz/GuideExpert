@@ -3,24 +3,31 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 import android.util.Log
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -41,6 +49,7 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.componen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -97,40 +106,31 @@ fun HomeScreenContent(
     )
 ) {
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(true) {
-
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                Log.d("TAG", "lifecycleOwner")
-                state.effectFlow.collectLatest { effect ->
-                    when (effect) {
-                        is SnackbarEffect.ShowSnackbar -> state.snackbarHostState.showSnackbar(effect.message)
-                    }
+    val effectFlow by state.effectFlow.collectAsStateWithLifecycle(null)
+    LaunchedEffect(effectFlow) {
+        effectFlow?.let {
+            when (it) {
+                is SnackbarEffect.ShowSnackbar -> {
+                    state.snackbarHostState.showSnackbar(it.message)
                 }
             }
         }
-
-        /*state.effectFlow.collect { effect ->
-            when (effect) {
-                is SnackbarEffect.ShowSnackbar -> state.snackbarHostState.showSnackbar(effect.message)
-            }
-        }*/
     }
     val filters = state.getFiltersBar()
     val excursionPagingItems by rememberUpdatedState(newValue = state.filterListState.collectAsLazyPagingItems())
 
-    if (excursionPagingItems.loadState.refresh is LoadState.Error) {
-        LaunchedEffect(key1 = state.snackbarHostState) {
-            state.sendEffectFlow((excursionPagingItems.loadState.refresh as LoadState.Error).error.message ?: "",null)
-            Log.d("TAG", excursionPagingItems.loadState.refresh.toString())
-        }
-    }
+    val scope = rememberCoroutineScope()
 
     if (excursionPagingItems.loadState.append is LoadState.Error) {
-        LaunchedEffect(key1 = state.snackbarHostState) {
-            state.sendEffectFlow((excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",null)
-            Log.d("TAG", excursionPagingItems.loadState.append.toString())
+        LaunchedEffect(key1 = excursionPagingItems.loadState.append) {
+            scope.launch {
+                state.sendEffectFlow(
+                    (excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",
+                    null
+                )
+                delay(1000)
+                excursionPagingItems.retry()
+            }
         }
     }
 
@@ -155,6 +155,18 @@ fun HomeScreenContent(
             )
         }
 
+
+        if (excursionPagingItems.loadState.refresh is LoadState.Error) {
+            item {
+                Row(Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically){
+                    Text(stringResource(id = R.string.failedload),color=Color.Gray)
+                    TextButton({excursionPagingItems.retry()}) {
+                        Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+                    }
+                }
+            }
+        }
 
         if (excursionPagingItems.loadState.refresh is LoadState.Loading) {
             items(20) {
@@ -183,7 +195,15 @@ fun HomeScreenContent(
             }
             item {
                 if (excursionPagingItems.loadState.append is LoadState.Loading) {
-                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                   // CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }

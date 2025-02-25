@@ -4,10 +4,12 @@ import android.util.Log
 import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
 import com.example.GuideExpert.data.local.dao.ExcursionSearchDao
+import com.example.GuideExpert.data.local.dao.ImageDao
 import com.example.GuideExpert.data.local.models.ExcursionDataEntity
 import com.example.GuideExpert.data.local.models.ImageEntity
 import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionDataEntity
+import com.example.GuideExpert.data.mappers.toImage
 import com.example.GuideExpert.data.mappers.toImageEntity
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
@@ -20,7 +22,8 @@ import javax.inject.Inject
 
 class DBStorageImpl @Inject constructor(
     private val excursionSearchDao: ExcursionSearchDao,
-    private val excursionDataDao: ExcursionDataDao
+    private val excursionDataDao: ExcursionDataDao,
+    private val imageDao: ImageDao
 ): DBStorage{
 
    /* override fun getExcursionInfo(excursionId: Int): Flow<ExcursionData> {
@@ -44,5 +47,11 @@ class DBStorageImpl @Inject constructor(
     override fun getExcursionData(excursionId: Int): Flow<ExcursionData?> {
         return excursionDataDao.getById(excursionId).mapNotNull { it?.toExcursionData() ?: null }
            // .map{ it.toExcursionData()}
+    }
+
+    override fun getImagesExcursion(excursionId: Int): Flow<List<Image>> {
+        return imageDao.getByExcursionId(excursionId).map{
+            images -> images.map { it.toImage() }
+        }
     }
 }

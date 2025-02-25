@@ -17,3 +17,6 @@ fun ExcursionDataEntity.toExcursionData() = ExcursionData(
     excursionId = id,title = title, description = description,text = text,owner=owner,group=group
 )
 
+fun ImageEntity.toImage() = Image(
+    id = id, excursionId = excursionId, url = url
+)

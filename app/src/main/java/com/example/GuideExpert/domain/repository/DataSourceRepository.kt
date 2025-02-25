@@ -4,6 +4,7 @@ import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.data.repository.UserInfo
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.models.Image
 import kotlinx.coroutines.flow.Flow
 
 interface DataSourceRepository {
@@ -15,4 +16,7 @@ interface DataSourceRepository {
     suspend fun getConfigInfo(): Flow<UIResources<Config>>
 
     fun getExcursionData(excursionId:Int): Flow<ExcursionData?>
+
+    fun getImagesExcursion(excursionId:Int): Flow<List<Image>>
+
 }

@@ -8,5 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface DBStorage {
   //  fun getExcursionInfo(excursionId:Int): Flow<ExcursionData>
     fun getExcursionData(excursionId:Int): Flow<ExcursionData?>
+    fun getImagesExcursion(excursionId:Int): Flow<List<Image>>
     suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>)
 }

@@ -9,6 +9,7 @@ import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -77,5 +78,9 @@ class DataSourceRepositoryImpl @Inject constructor(
 
     override fun getExcursionData(excursionId:Int): Flow<ExcursionData?> {
         return dbStorage.getExcursionData(excursionId).flowOn(Dispatchers.IO)
+    }
+
+    override fun getImagesExcursion(excursionId:Int): Flow<List<Image>> {
+        return dbStorage.getImagesExcursion(excursionId).flowOn(Dispatchers.IO)
     }
 }

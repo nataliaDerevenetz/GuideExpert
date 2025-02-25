@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid

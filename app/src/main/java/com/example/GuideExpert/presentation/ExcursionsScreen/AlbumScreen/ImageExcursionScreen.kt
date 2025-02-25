@@ -1,6 +1,8 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,19 +40,24 @@ fun ImageExcursionScreen(
 
     var scale by remember { mutableStateOf(1f) }
 
-    val state = rememberTransformableState {
-            scaleChange, offsetChange, rotationChange ->  scale *= scaleChange
-    }
 
     excursionImage?.let {
         Box(contentAlignment = Alignment.Center,modifier = Modifier.fillMaxSize()
-            .graphicsLayer(scaleX =  maxOf(1f, minOf(3f, scale)), scaleY =  maxOf(1f, minOf(3f, scale)))
-            .transformable(state = state)) {
+            .pointerInput(Unit) {
+            detectTransformGestures { centroid, pan, zoom, rotation ->
+                scale *= zoom
+            }
+        }
+            ) {
             SubcomposeAsyncImage(
                 model = it.url,
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().height(300.dp),
+                modifier = Modifier.fillMaxWidth().height(300.dp)
+                    .graphicsLayer(
+                        scaleX = maxOf(1f, minOf(3f, scale)),
+                        scaleY = maxOf(1f, minOf(3f, scale)),
+                    ),
                 loading = {
                     CircularProgressIndicator(
                         color = Color.Gray,

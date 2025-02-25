@@ -10,6 +10,7 @@ import com.example.GuideExpert.domain.GetFiltersCategoriesUseCase
 import com.example.GuideExpert.domain.GetFiltersDurationUseCase
 import com.example.GuideExpert.domain.GetFiltersGroupsUseCase
 import com.example.GuideExpert.domain.GetFiltersSortUseCase
+import com.example.GuideExpert.domain.GetImageExcursionUseCase
 import com.example.GuideExpert.domain.GetImagesExcursionDataUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
 import com.example.GuideExpert.domain.impl.GetConfigUseCaseImpl
@@ -22,6 +23,7 @@ import com.example.GuideExpert.domain.impl.GetFiltersCategoriesUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersDurationUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersGroupsUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersSortUseCaseImpl
+import com.example.GuideExpert.domain.impl.GetImageExcursionUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetImagesExcursionDataUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetSortDefaultUseCaseImpl
 import dagger.Binds
@@ -101,5 +103,9 @@ abstract class MainScreenModule {
         getImagesExcursionDataUseCaseImpl: GetImagesExcursionDataUseCaseImpl
     ) : GetImagesExcursionDataUseCase
 
+    @Binds
+    abstract fun bindGetImageExcursionUseCase(
+        getImageExcursionUseCaseImpl: GetImageExcursionUseCaseImpl
+    ) : GetImageExcursionUseCase
 
 }

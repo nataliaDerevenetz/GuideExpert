@@ -9,5 +9,6 @@ interface DBStorage {
   //  fun getExcursionInfo(excursionId:Int): Flow<ExcursionData>
     fun getExcursionData(excursionId:Int): Flow<ExcursionData?>
     fun getImagesExcursion(excursionId:Int): Flow<List<Image>>
+    fun getImageExcursion(excursionId:Int): Flow<Image>
     suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>)
 }

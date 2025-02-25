@@ -54,4 +54,10 @@ class DBStorageImpl @Inject constructor(
             images -> images.map { it.toImage() }
         }
     }
+
+    override fun getImageExcursion(imageId: Int): Flow<Image> {
+        return imageDao.getById(imageId).map{
+                 it.toImage()
+        }
+    }
 }

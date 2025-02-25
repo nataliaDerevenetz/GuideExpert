@@ -19,4 +19,6 @@ interface DataSourceRepository {
 
     fun getImagesExcursion(excursionId:Int): Flow<List<Image>>
 
+    fun getImageExcursion(imageId:Int): Flow<Image>
+
 }

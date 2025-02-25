@@ -1,6 +1,7 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +36,7 @@ import com.example.GuideExpert.domain.models.Excursion
 @Composable
 fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
+    navigateToImage: (Int) -> Unit,
     count :Int,
     onIcr :()->Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel()
@@ -63,7 +65,7 @@ fun ExcursionDetailScreen(
                 Card(
                     modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge))
                 {
-                    NetworkImageCarousel(item.url, "", 500, 250)
+                    NetworkImageCarousel(item.url, "", 500, 250,navigateToImage,item.id )
                 }
                 /* Image(
                 modifier = Modifier.height(205.dp).maskClip(MaterialTheme.shapes.extraLarge),
@@ -95,12 +97,13 @@ fun ExcursionDetailScreen(
 }
 
 @Composable
-fun NetworkImageCarousel(url: String, contentDescription: String?, width: Int, height: Int) {
+fun NetworkImageCarousel(url: String, contentDescription: String?, width: Int, height: Int,
+                         navigateToImage: (Int) -> Unit, imageId:Int) {
     SubcomposeAsyncImage(
         model = url,
         contentDescription = contentDescription,
         contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth().height(height.dp),
+        modifier = Modifier.fillMaxWidth().height(height.dp).clickable { navigateToImage(imageId) },
         loading = {
             CircularProgressIndicator(
                 color = Color.Gray,

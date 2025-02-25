@@ -83,4 +83,8 @@ class DataSourceRepositoryImpl @Inject constructor(
     override fun getImagesExcursion(excursionId:Int): Flow<List<Image>> {
         return dbStorage.getImagesExcursion(excursionId).flowOn(Dispatchers.IO)
     }
+
+    override fun getImageExcursion(imageId:Int): Flow<Image> {
+        return dbStorage.getImageExcursion(imageId).flowOn(Dispatchers.IO)
+    }
 }

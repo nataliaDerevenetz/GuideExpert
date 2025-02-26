@@ -30,7 +30,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
-import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Image
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,11 +41,6 @@ fun ExcursionDetailScreen(
     onIcr :()->Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel()
 ) {
-  //  val excursion by viewModel.excursion.collectAsStateWithLifecycle()
-  //  val excursionData by viewModel.excursionData.observeAsState()
-
-  //  val excursionData2 by viewModel.excursionData2.collectAsStateWithLifecycle(ExcursionData())
-    //collectAsStateWithLifecycle(Excursion)
 
     val excursionData by viewModel.excursion.collectAsStateWithLifecycle(null)
 
@@ -64,16 +58,10 @@ fun ExcursionDetailScreen(
             ) { i ->
                 val item = it[i]
                 Card(
-                    modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge))
-                {
+                    modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
+                ) {
                     NetworkImageCarousel(item.url, "", 500, 250,navigateToImage,item.id,excursionImages!!,i )
                 }
-                /* Image(
-                modifier = Modifier.height(205.dp).maskClip(MaterialTheme.shapes.extraLarge),
-                painter = painterResource(id = item.imageResId),
-                contentDescription = stringResource(item.contentDescriptionResId),
-                contentScale = ContentScale.Crop
-            )*/
             }
         }
 
@@ -94,7 +82,6 @@ fun ExcursionDetailScreen(
             }
         }
     }
-    // TODO("Not yet implemented")
 }
 
 @Composable

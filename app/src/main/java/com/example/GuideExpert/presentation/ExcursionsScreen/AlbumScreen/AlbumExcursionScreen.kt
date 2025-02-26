@@ -28,7 +28,6 @@ fun AlbumExcursionScreen(
 ) {
 
     val excursionImages by images.collectAsStateWithLifecycle(null)
-    Text("Album $excursionId")
     excursionImages?.let {
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Adaptive(200.dp),

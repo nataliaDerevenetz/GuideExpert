@@ -1,7 +1,6 @@
 package com.example.GuideExpert.domain.models
 
 import android.os.Parcelable
-import androidx.room.ColumnInfo
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 

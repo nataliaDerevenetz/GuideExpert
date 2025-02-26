@@ -1,6 +1,10 @@
 package com.example.GuideExpert.presentation
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.icons.Icons
@@ -17,11 +21,15 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -57,10 +65,30 @@ val topLevelRoutes = listOf(
 fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
+    var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
+            BottomBar(navController,bottomBarState)
+        }
+    ) { innerPadding ->
+        NavHost(navController, startDestination = Home, Modifier.padding(innerPadding)) {
+            composable<Home> { ExcursionsScreen(snackbarHostState = snackbarHostState,
+                onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
+                count = viewModel.count, onIcr = {viewModel.increase()}) }
+            composable<Profile> { ProfileScreen(viewModel.count,onIcr = {viewModel.increase()}) }
+        }
+    }
+}
+
+@Composable
+fun BottomBar(navController: NavController, bottomBarState: Boolean) {
+    AnimatedVisibility(
+        visible = bottomBarState,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        content = {
             BottomNavigation(backgroundColor = Purple80){
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -74,12 +102,12 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
                         ) },
 
                         icon = {Icon(
-                                imageVector = if (selected) {
-                                    topLevelRoute.selectedIcon
-                                } else topLevelRoute.unselectedIcon,
-                                contentDescription = topLevelRoute.title,
-                                tint = if (selected) {MaterialTheme.colorScheme.inverseSurface} else Color.Black
-                            )},
+                            imageVector = if (selected) {
+                                topLevelRoute.selectedIcon
+                            } else topLevelRoute.unselectedIcon,
+                            contentDescription = topLevelRoute.title,
+                            tint = if (selected) {MaterialTheme.colorScheme.inverseSurface} else Color.Black
+                        )},
                         alwaysShowLabel = false,
                         onClick = {
                             navController.navigate(topLevelRoute.route) {
@@ -94,10 +122,5 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
                 }
             }
         }
-    ) { innerPadding ->
-        NavHost(navController, startDestination = Home, Modifier.padding(innerPadding)) {
-            composable<Home> { ExcursionsScreen(snackbarHostState = snackbarHostState, count = viewModel.count, onIcr = {viewModel.increase()}) }
-            composable<Profile> { ProfileScreen(viewModel.count,onIcr = {viewModel.increase()}) }
-        }
-    }
+    )
 }

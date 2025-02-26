@@ -26,11 +26,13 @@ import com.google.accompanist.pager.rememberPagerState
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImageExcursionScreen(
-    imageExcursion: ImageExcursion
+    imageExcursion: ImageExcursion,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
 ) {
     var scale by remember { mutableStateOf(1f) }
     val pagerState = rememberPagerState(initialPage = imageExcursion.indexImage)
-    
+    onChangeVisibleBottomBar(false)
+
     imageExcursion.excursionImages?.let {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
             .pointerInput(Unit) {

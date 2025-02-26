@@ -23,10 +23,12 @@ import kotlinx.coroutines.flow.Flow
 fun AlbumExcursionScreen(
     excursionId: Int,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
     viewModel: AlbumExcursionViewModel = hiltViewModel(),
     images: Flow<List<Image>> = viewModel.getImages(excursionId)
 ) {
 
+    onChangeVisibleBottomBar(false)
     val excursionImages by images.collectAsStateWithLifecycle(null)
     excursionImages?.let {
         LazyVerticalStaggeredGrid(

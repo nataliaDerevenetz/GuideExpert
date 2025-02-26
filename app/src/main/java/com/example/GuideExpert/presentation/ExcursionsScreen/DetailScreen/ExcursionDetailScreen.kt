@@ -37,6 +37,7 @@ import com.example.GuideExpert.domain.models.Image
 fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
     count :Int,
     onIcr :()->Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel()
@@ -45,7 +46,7 @@ fun ExcursionDetailScreen(
     val excursionData by viewModel.excursion.collectAsStateWithLifecycle(null)
 
     val excursionImages by viewModel.images.collectAsStateWithLifecycle(null)
-
+    onChangeVisibleBottomBar(true)
     Column(Modifier.padding(start=10.dp, end=10.dp)) {
 
         excursionImages?.let {

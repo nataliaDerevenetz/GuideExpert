@@ -55,6 +55,7 @@ class ExcursionDetail(val excursion : Excursion) {
 @Composable
 fun NavigationHomeScreen(
     snackbarHostState : SnackbarHostState,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
     count :Int,
     onIcr :()->Unit
 ) {
@@ -64,7 +65,7 @@ fun NavigationHomeScreen(
         val onNavigateToAlbum = { excursionId: Int -> navController.navigateToAlbum(excursionId = excursionId) }
         val onNavigateToImage = { imageId: Int,excursionImages: List<Image>,indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
-        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,count,onIcr)
+        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,count,onIcr)
     }
 }
 
@@ -72,22 +73,23 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
                                           onNavigateToExcursion: (Excursion) -> Unit,
                                           onNavigateToAlbum: (Int) -> Unit,
                                           onNavigateToImage: (Int,List<Image>,Int) -> Unit,
+                                          onChangeVisibleBottomBar: (Boolean) -> Unit,
                                           count: Int, onIcr:() -> Unit) {
     composable<ExcursionSearchScreen> {
-        HomeScreen(snackbarHostState,onNavigateToExcursion)
+        HomeScreen(snackbarHostState,onNavigateToExcursion,onChangeVisibleBottomBar=onChangeVisibleBottomBar)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
-        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,count, onIcr)
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar=onChangeVisibleBottomBar,count, onIcr)
     }
     composable<AlbumExcursion> {
         backStackEntry ->
         val excursion = backStackEntry.toRoute<AlbumExcursion>()
-        AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
+        AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage,onChangeVisibleBottomBar=onChangeVisibleBottomBar)
     }
     composable<ImageExcursion>(typeMap = ImageExcursion.typeMap) {
         backStackEntry ->
         val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
-        ImageExcursionScreen(imageExcursion = imageExcursion)
+        ImageExcursionScreen(imageExcursion = imageExcursion,onChangeVisibleBottomBar=onChangeVisibleBottomBar)
     }
 }
 

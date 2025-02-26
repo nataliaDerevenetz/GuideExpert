@@ -4,23 +4,32 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -46,41 +55,68 @@ fun ExcursionDetailScreen(
     val excursionData by viewModel.excursion.collectAsStateWithLifecycle(null)
 
     val excursionImages by viewModel.images.collectAsStateWithLifecycle(null)
-    onChangeVisibleBottomBar(true)
-    Column(Modifier.padding(start=10.dp, end=10.dp)) {
+    onChangeVisibleBottomBar(false)
 
-        excursionImages?.let {
-            HorizontalMultiBrowseCarousel(
-                state = rememberCarouselState { excursionImages!!.count() },
-                modifier = Modifier.fillMaxWidth().height(250.dp),
-                preferredItemWidth = 350.dp,
-                itemSpacing = 1.dp,
-                contentPadding = PaddingValues(horizontal = 0.dp)
-            ) { i ->
-                val item = it[i]
-                Card(
-                    modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
-                ) {
-                    NetworkImageCarousel(item.url, "", 500, 250,navigateToImage,item.id,excursionImages!!,i )
+    val scrollState = rememberScrollState()
+
+    Scaffold(
+        modifier = Modifier.safeDrawingPadding(),
+        topBar = {
+            TopAppBar(
+                title = { Text(excursionData?.title ?: "") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.height(30.dp).shadow(10.dp)
+            )
+        }
+    ) { innerPadding ->
+        Column(Modifier.padding(innerPadding).fillMaxSize()
+            .verticalScroll(scrollState)) {
+            excursionImages?.let {
+                HorizontalMultiBrowseCarousel(
+                    state = rememberCarouselState { excursionImages!!.count() },
+                    modifier = Modifier.padding(top = 5.dp).fillMaxWidth().height(250.dp),
+                    preferredItemWidth = 350.dp,
+                    itemSpacing = 1.dp,
+                    contentPadding = PaddingValues(horizontal = 0.dp)
+                ) { i ->
+                    val item = it[i]
+                    Card(
+                        modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
+                    ) {
+                        NetworkImageCarousel(
+                            item.url,
+                            "",
+                            500,
+                            250,
+                            navigateToImage,
+                            item.id,
+                            excursionImages!!,
+                            i
+                        )
+                    }
                 }
             }
-        }
 
-        TextButton(modifier = Modifier.align(Alignment.End), onClick = {excursionData?.let { navigateToAlbum(it.excursionId)}}) {
-            Text(stringResource(id = R.string.showall),color= Color.Blue)
-        }
+             TextButton(modifier = Modifier.align(Alignment.End), onClick = {excursionData?.let { navigateToAlbum(it.excursionId)}}) {
+                 Text(stringResource(id = R.string.showall),color= Color.Blue)
+             }
 
-        Text("ExcursionDetailScreen")
-        Text("id ${excursionData?.excursionId}")
-        Text("Excursion ${excursionData?.title}")
-        Text("Excursion ${excursionData?.description}")
-        Text("Excursion ${excursionData?.excursionId}")
+            Text("ExcursionDetailScreen")
+            Text("id ${excursionData?.excursionId}")
+            Text("Excursion ${excursionData?.title}")
+            Text("Excursion ${excursionData?.description}")
+            Text("Excursion ${excursionData?.excursionId}")
 
-        Column {
-            Text("Incr :: $count")
-            Button(onClick = {onIcr()}) {
-                Text(text = "Increase", fontSize = 25.sp)
+            Column {
+                Text("Incr :: $count")
+                Button(onClick = { onIcr() }) {
+                    Text(text = "Increase", fontSize = 25.sp)
+                }
             }
+            Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
         }
     }
 }

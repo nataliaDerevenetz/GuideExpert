@@ -41,9 +41,11 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     navigateToExcursion: (Excursion) -> Unit,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
   //  viewModel: ExcursionsViewModel = hiltViewModel()
 ) {
 
+    onChangeVisibleBottomBar(true)
     val screenHeightDp =  LocalConfiguration.current.screenHeightDp
 
     var toolbarHeight by rememberSaveable { mutableStateOf(screenHeightDp) }

@@ -31,12 +31,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.Image
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
-    navigateToImage: (Int) -> Unit,
+    navigateToImage: (Int,List<Image>,Int) -> Unit,
     count :Int,
     onIcr :()->Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel()
@@ -65,7 +66,7 @@ fun ExcursionDetailScreen(
                 Card(
                     modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge))
                 {
-                    NetworkImageCarousel(item.url, "", 500, 250,navigateToImage,item.id )
+                    NetworkImageCarousel(item.url, "", 500, 250,navigateToImage,item.id,excursionImages!!,i )
                 }
                 /* Image(
                 modifier = Modifier.height(205.dp).maskClip(MaterialTheme.shapes.extraLarge),
@@ -98,12 +99,14 @@ fun ExcursionDetailScreen(
 
 @Composable
 fun NetworkImageCarousel(url: String, contentDescription: String?, width: Int, height: Int,
-                         navigateToImage: (Int) -> Unit, imageId:Int) {
+                         navigateToImage: (Int,List<Image>,Int) -> Unit, imageId:Int,
+                         excursionImages: List<Image>,
+                         indexImage:Int) {
     SubcomposeAsyncImage(
         model = url,
         contentDescription = contentDescription,
         contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth().height(height.dp).clickable { navigateToImage(imageId) },
+        modifier = Modifier.fillMaxWidth().height(height.dp).clickable { navigateToImage(imageId,excursionImages,indexImage) },
         loading = {
             CircularProgressIndicator(
                 color = Color.Gray,

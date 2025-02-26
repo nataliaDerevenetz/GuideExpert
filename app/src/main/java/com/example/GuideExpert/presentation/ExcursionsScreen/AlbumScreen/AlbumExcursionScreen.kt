@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun AlbumExcursionScreen(
     excursionId: Int,
-    navigateToImage: (Int) -> Unit = {},
+    navigateToImage: (Int,List<Image>,Int) -> Unit,
     viewModel: AlbumExcursionViewModel = hiltViewModel(),
     images: Flow<List<Image>> = viewModel.getImages(excursionId)
 ) {
@@ -34,8 +35,9 @@ fun AlbumExcursionScreen(
             verticalItemSpacing = 4.dp,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             content = {
-                items(excursionImages!!) {
-                    photo -> NetworkImageCarousel(photo.url, "",500,250,navigateToImage,photo.id)
+                itemsIndexed(excursionImages!!) {
+                        index, item -> NetworkImageCarousel(item.url, "",500,250,navigateToImage,item.id,
+                    excursionImages!!,index)
                 }
 
             }, modifier = Modifier.fillMaxSize()

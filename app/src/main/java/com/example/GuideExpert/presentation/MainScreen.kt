@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -30,6 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionsScreen
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileScreen
+import com.example.GuideExpert.ui.theme.Purple80
 import kotlinx.serialization.Serializable
 
 
@@ -59,7 +61,7 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            BottomNavigation{
+            BottomNavigation(backgroundColor = Purple80){
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 topLevelRoutes.forEach { topLevelRoute ->
@@ -67,14 +69,16 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
                     Log.d("TAG",selected.toString())
                     NavigationBarItem(
                         selected = selected,
-                        label = { Text(topLevelRoute.title) },
+                        label = { Text(topLevelRoute.title,
+                            color = Color.Black
+                        ) },
 
                         icon = {Icon(
                                 imageVector = if (selected) {
                                     topLevelRoute.selectedIcon
                                 } else topLevelRoute.unselectedIcon,
                                 contentDescription = topLevelRoute.title,
-                                tint = Color.Black
+                                tint = if (selected) {MaterialTheme.colorScheme.inverseSurface} else Color.Black
                             )},
                         alwaysShowLabel = false,
                         onClick = {

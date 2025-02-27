@@ -1,6 +1,7 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen
 
 import android.util.Log
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -60,7 +61,7 @@ fun ExcursionDetailScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        modifier = Modifier.safeDrawingPadding(),
+       // modifier = Modifier.safeDrawingPadding(),
         topBar = {
             TopAppBar(
                 title = { Text(excursionData?.title ?: "") },
@@ -68,7 +69,7 @@ fun ExcursionDetailScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
-                modifier = Modifier.height(30.dp).shadow(10.dp)
+                modifier = Modifier.height(56.dp).shadow(6.dp)
             )
         }
     ) { innerPadding ->

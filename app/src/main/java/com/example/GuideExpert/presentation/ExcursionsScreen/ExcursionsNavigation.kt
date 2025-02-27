@@ -94,13 +94,19 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
 }
 
 fun NavController.navigateToExcursionDetail(excursion: Excursion) {
-    navigate(route = ExcursionDetail(excursion))
+    navigate(route = ExcursionDetail(excursion)){
+        launchSingleTop=true
+    }
 }
 
 fun NavController.navigateToAlbum(excursionId: Int) {
-    navigate(route = AlbumExcursion(excursionId))
+    navigate(route = AlbumExcursion(excursionId)){
+        launchSingleTop=true
+    }
 }
 
 fun NavController.navigateToImage(imageId: Int,excursionImages: List<Image>,indexImage:Int) {
-    navigate(route = ImageExcursion(imageId,excursionImages,indexImage))
+    navigate(route = ImageExcursion(imageId,excursionImages,indexImage)){
+        launchSingleTop=true
+    }
 }

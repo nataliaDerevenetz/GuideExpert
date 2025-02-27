@@ -78,17 +78,17 @@ fun Modifier.shimmerEffect(): Modifier = composed {
     )
 
     background(
-        brush = Brush.linearGradient(
+        brush = Brush.horizontalGradient(//linearGradient(
             colors = listOf(
-                //              Color(0xFFB8B5B5),
-                //               Color(0xFF8F8B8B),
-//                Color(0xFFB8B5B5),
-                Color(0xFFE3CAEE),
-                Color(0xFFBB86FC),
-                Color(0xFFE3CAEE),
+                Color(0xFFDCDCDC),
+                Color.White,
+                Color(0xFFDCDCDC)
+//                Color(0xFFE3CAEE),
+//                Color(0xFFBB86FC),
+//                Color(0xFFE3CAEE),
             ),
-            start = Offset(startOffsetX, 0f),
-            end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
+            startX = Offset(startOffsetX, 0f).x,
+            endX = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat()).x
         )
     )
         .onGloballyPositioned {

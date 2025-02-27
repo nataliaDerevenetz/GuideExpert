@@ -66,7 +66,7 @@ fun MainTopBar(modifier: Modifier = Modifier,
                   onActiveChanged = { boxVisible = !it }
               )
 
-            HorizontalDivider(thickness=0.7.dp, modifier =  Modifier.shadow(3.dp))
+            HorizontalDivider(thickness=0.2.dp, modifier =  Modifier.shadow(6.dp),color = Color.Gray)
         }
     }
 }

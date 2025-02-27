@@ -3,6 +3,8 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -35,14 +37,15 @@ fun AlbumExcursionScreen(
             columns = StaggeredGridCells.Adaptive(200.dp),
             verticalItemSpacing = 4.dp,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            content = {
-                itemsIndexed(excursionImages!!) {
-                        index, item -> NetworkImageCarousel(item.url, "",500,250,navigateToImage,item.id,
-                    excursionImages!!,index)
-                }
-
-            }, modifier = Modifier.fillMaxSize()
-        )
+            modifier = Modifier.fillMaxSize().imePadding()
+        ) {
+            itemsIndexed(excursionImages!!) { index, item ->
+                NetworkImageCarousel(
+                    item.url, "", 500, 250, navigateToImage, item.id,
+                    excursionImages!!, index
+                )
+            }
+        }
 
     }
 }

@@ -46,7 +46,6 @@ class DBStorageImpl @Inject constructor(
 
     override fun getExcursionData(excursionId: Int): Flow<ExcursionData?> {
         return excursionDataDao.getById(excursionId).mapNotNull { it?.toExcursionData() ?: null }
-           // .map{ it.toExcursionData()}
     }
 
     override fun getImagesExcursion(excursionId: Int): Flow<List<Image>> {

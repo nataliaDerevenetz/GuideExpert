@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetExcursionDataUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
+import com.example.GuideExpert.domain.GetFiltersGroupsUseCase
 import com.example.GuideExpert.domain.GetImagesExcursionDataUseCase
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +45,8 @@ class ExcursionDetailViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getExcursionDetailUseCase: GetExcursionDetailUseCase,
     val getExcursionDataUseCase: GetExcursionDataUseCase,
-    val getImagesExcursionDataUseCase: GetImagesExcursionDataUseCase
+    val getImagesExcursionDataUseCase: GetImagesExcursionDataUseCase,
+    val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
 ) : ViewModel() {
 
 
@@ -56,6 +59,9 @@ class ExcursionDetailViewModel @Inject constructor(
 
     val images: Flow<List<Image>> = getImagesExcursionDataUseCase(excursionDetail.excursion.id)
 
+    fun getFiltersGroups():List<Filter> {
+        return getFiltersGroupsUseCase()
+    }
     fun handleEvent(event: ExcursionDetailUiEvent) {
         viewModelScope.launch {
             when (event) {

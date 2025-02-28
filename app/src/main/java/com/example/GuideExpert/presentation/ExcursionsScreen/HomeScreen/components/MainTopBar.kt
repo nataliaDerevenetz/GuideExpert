@@ -57,14 +57,14 @@ fun MainTopBar(modifier: Modifier = Modifier,
 
             ProfileBox(boxVisible = boxVisible)
 
-              ExcursionListSearchScreen(
-                  modifier = Modifier,
-                  snackbarHostState = snackbarHostState,
-                  navigateToExcursion = navigateToExcursion,
-                  scrollingOn = scrollingOn,
-                  scrollingOff = scrollingOff,
-                  onActiveChanged = { boxVisible = !it }
-              )
+            ExcursionListSearchScreen(
+                modifier = Modifier,
+                snackbarHostState = snackbarHostState,
+                navigateToExcursion = navigateToExcursion,
+                scrollingOn = scrollingOn,
+                scrollingOff = scrollingOff,
+                onActiveChanged = { boxVisible = !it }
+            )
 
             HorizontalDivider(thickness=0.2.dp, modifier =  Modifier.shadow(6.dp),color = Color.Gray)
         }

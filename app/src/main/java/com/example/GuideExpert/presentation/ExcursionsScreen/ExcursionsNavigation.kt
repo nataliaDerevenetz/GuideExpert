@@ -66,7 +66,8 @@ fun NavigationHomeScreen(
         val onNavigateToAlbum = { excursionId: Int -> navController.navigateToAlbum(excursionId = excursionId) }
         val onNavigateToImage = { imageId: Int,excursionImages: List<Image>,indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
-        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,count,onIcr)
+        val onNavigateToBack = {navController.popBackStack() }
+        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack,count,onIcr)
     }
 }
 
@@ -75,6 +76,7 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
                                           onNavigateToAlbum: (Int) -> Unit,
                                           onNavigateToImage: (Int,List<Image>,Int) -> Unit,
                                           onChangeVisibleBottomBar: (Boolean) -> Unit,
+                                          onNavigateToBack:() -> Boolean,
                                           count: Int, onIcr:() -> Unit) {
     composable<ExcursionSearchScreen> {
         onChangeVisibleBottomBar(true)
@@ -82,7 +84,7 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
-        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,count, onIcr)
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,count, onIcr)
     }
     composable<AlbumExcursion> {
         backStackEntry ->

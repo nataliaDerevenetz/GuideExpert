@@ -3,9 +3,11 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,10 +16,17 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,6 +43,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +58,7 @@ import com.example.GuideExpert.domain.models.Image
 fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
+    onNavigateToBack:() -> Boolean,
     count :Int,
     onIcr :()->Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel()
@@ -62,12 +74,17 @@ fun ExcursionDetailScreen(
        // modifier = Modifier.safeDrawingPadding(),
         topBar = {
             TopAppBar(
-                title = { Text(excursionData?.title ?: "") },
+                title = { Text("") },
+                navigationIcon={ IconButton({ onNavigateToBack()}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")}},
+                actions={
+                    IconButton({ }) { Icon(Icons.Filled.FavoriteBorder, contentDescription = "featured")}
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
-                modifier = Modifier.height(56.dp).shadow(6.dp)
+                modifier = Modifier.height(56.dp).shadow(6.dp),
+                windowInsets = WindowInsets(0)
             )
         }
     ) { innerPadding ->
@@ -103,19 +120,51 @@ fun ExcursionDetailScreen(
                  Text(stringResource(id = R.string.showall),color= Color.Blue)
              }
 
-            Text("ExcursionDetailScreen")
-            Text("id ${excursionData?.excursionId}")
-            Text("Excursion ${excursionData?.title}")
-            Text("Excursion ${excursionData?.description}")
-            Text("Excursion ${excursionData?.excursionId}")
-
-            Column {
-                Text("Incr :: $count")
-                Button(onClick = { onIcr() }) {
-                    Text(text = "Increase", fontSize = 25.sp)
+         //   Text("id ${excursionData?.excursionId}")
+            excursionData?.let{
+                Column(modifier = Modifier.padding(start = 10.dp, end=10.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Text(
+                        text = it.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 26.sp
+                    )
+                    Text(
+                        text = it.description,
+                        modifier = Modifier.height(24.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
+                    if (viewModel.getFiltersGroups().isNotEmpty()) {
+                        val group = viewModel.getFiltersGroups()
+                            .filter { idGroup -> it.group == idGroup.id }
+                            .map { it.description }.first()
+                        Text(
+                            text = group,
+                            color =Color.Gray,
+                            modifier = Modifier.height(24.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontSize = 16.sp
+                        )
+                    }
+                    Text(
+                        text = it.text,
+                        modifier = Modifier.height(24.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 16.sp
+                    )
+                    /*
+                                    Column {
+                                        Text("Incr :: $count")
+                                        Button(onClick = { onIcr() }) {
+                                            Text(text = "Increase", fontSize = 25.sp)
+                                        }
+                                    }*/
+                    Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
                 }
             }
-            Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
+
         }
     }
 }

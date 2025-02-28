@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
@@ -76,20 +77,24 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
                                           onChangeVisibleBottomBar: (Boolean) -> Unit,
                                           count: Int, onIcr:() -> Unit) {
     composable<ExcursionSearchScreen> {
-        HomeScreen(snackbarHostState,onNavigateToExcursion,onChangeVisibleBottomBar=onChangeVisibleBottomBar)
+        onChangeVisibleBottomBar(true)
+        HomeScreen(snackbarHostState,onNavigateToExcursion)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
-        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar=onChangeVisibleBottomBar,count, onIcr)
+        onChangeVisibleBottomBar(false)
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,count, onIcr)
     }
     composable<AlbumExcursion> {
         backStackEntry ->
+        onChangeVisibleBottomBar(false)
         val excursion = backStackEntry.toRoute<AlbumExcursion>()
-        AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage,onChangeVisibleBottomBar=onChangeVisibleBottomBar)
+        AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
     }
     composable<ImageExcursion>(typeMap = ImageExcursion.typeMap) {
         backStackEntry ->
+        onChangeVisibleBottomBar(false)
         val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
-        ImageExcursionScreen(imageExcursion = imageExcursion,onChangeVisibleBottomBar=onChangeVisibleBottomBar)
+        ImageExcursionScreen(imageExcursion = imageExcursion)
     }
 }
 

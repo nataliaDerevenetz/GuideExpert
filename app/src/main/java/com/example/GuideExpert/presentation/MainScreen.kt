@@ -98,8 +98,8 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
 fun BottomBar(navController: NavController, bottomBarState: Boolean) {
     AnimatedVisibility(
         visible = bottomBarState,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it }),
+        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(100)),
+        exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(100)),
         content = {
             BottomNavigation(backgroundColor = Purple80){
                 val navBackStackEntry by navController.currentBackStackEntryAsState()

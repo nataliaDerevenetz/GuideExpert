@@ -72,7 +72,6 @@ interface SearchStateScope {
     val navigateToExcursion : (Excursion) -> Unit
 }
 
-//@Composable
 fun DefaultSearchStateScope(
     searchListState: StateFlow<PagingData<Excursion>>,
     stateView: StateFlow<ExcursionsSearchUIState>,

@@ -1,9 +1,9 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen
 
 import android.util.Log
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -13,14 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +27,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -39,38 +36,81 @@ import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.PagingData
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
-import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsSearchUIState
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchStateScope
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ColumnExcursionShimmer
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.shimmerEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.reflect.KSuspendFunction2
 
 @Stable
-class ExcursionDetailState(
-    val excursionData: Flow<ExcursionData?>,
-    val excursionImages: Flow<List<Image>>,
-    val onNavigateToBack : () -> Boolean,
-    val navigateToExcursion : (Excursion) -> Unit,
-)
+interface ExcursionDetailScope {
+    val excursionData: Flow<ExcursionData?>
+    val excursionImages: Flow<List<Image>>
+    val onNavigateToBack: () -> Boolean
+    val getFiltersGroups: List<Filter>
+    val stateView: StateFlow<UIState>
+    val navigateToAlbum: (Int) -> Unit
+    val navigateToImage: (Int,List<Image>,Int) -> Unit
+}
+
+fun DefaultExcursionDetailScope(
+    excursionData: Flow<ExcursionData?>,
+    excursionImages: Flow<List<Image>>,
+    onNavigateToBack: () -> Boolean,
+    getFiltersGroups: List<Filter>,
+    stateView: StateFlow<UIState>,
+    navigateToAlbum: (Int) -> Unit,
+    navigateToImage: (Int,List<Image>,Int) -> Unit,
+): ExcursionDetailScope {
+    return object : ExcursionDetailScope {
+        override val excursionData: Flow<ExcursionData?>
+            get() = excursionData
+        override val excursionImages: Flow<List<Image>>
+            get() = excursionImages
+        override val onNavigateToBack: () -> Boolean
+            get() = onNavigateToBack
+        override val getFiltersGroups: List<Filter>
+            get() = getFiltersGroups
+        override val stateView: StateFlow<UIState>
+            get() = stateView
+        override val navigateToAlbum: (Int) -> Unit
+            get() = navigateToAlbum
+        override val navigateToImage: (Int,List<Image>,Int) -> Unit
+            get() = navigateToImage
+    }
+}
+
+@Composable
+fun rememberDefaultExcursionDetailScope(
+    excursionData: Flow<ExcursionData?>,
+    excursionImages: Flow<List<Image>>,
+    onNavigateToBack: () -> Boolean,
+    getFiltersGroups: List<Filter>,
+    stateView: StateFlow<UIState>,
+    navigateToAlbum: (Int) -> Unit,
+    navigateToImage: (Int,List<Image>,Int) -> Unit,
+): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage) {
+    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,23 +118,27 @@ fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
     onNavigateToBack:() -> Boolean,
-    count :Int,
-    onIcr :()->Unit,
-    viewModel: ExcursionDetailViewModel = hiltViewModel()
+    viewModel: ExcursionDetailViewModel = hiltViewModel(),
+    scopeState:ExcursionDetailScope = rememberDefaultExcursionDetailScope(
+        excursionData = viewModel.excursion,
+        excursionImages = viewModel.images,
+        onNavigateToBack = onNavigateToBack,
+        getFiltersGroups = viewModel.getFiltersGroups(),
+        stateView = viewModel.stateView,
+        navigateToAlbum = navigateToAlbum,
+        navigateToImage = navigateToImage),
+  //  dataContent: @Composable ExcursionDetailScope.() -> Unit ={},
 ) {
 
-    val excursionData by viewModel.excursion.collectAsStateWithLifecycle(null)
+    val uiState by scopeState.stateView.collectAsStateWithLifecycle()
 
-    val excursionImages by viewModel.images.collectAsStateWithLifecycle(null)
 
-    val scrollState = rememberScrollState()
-
-    Scaffold(
+   Scaffold(
        // modifier = Modifier.safeDrawingPadding(),
         topBar = {
             TopAppBar(
                 title = { Text("") },
-                navigationIcon={ IconButton({ onNavigateToBack()}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")}},
+                navigationIcon={ IconButton({ scopeState.onNavigateToBack()}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")}},
                 actions={
                     IconButton({ }) { Icon(Icons.Filled.FavoriteBorder, contentDescription = "featured")}
                 },
@@ -107,84 +151,99 @@ fun ExcursionDetailScreen(
             )
         }
     ) { innerPadding ->
-        Column(Modifier.padding(innerPadding).fillMaxSize()
-            .verticalScroll(scrollState)) {
-            excursionImages?.let {
-                HorizontalMultiBrowseCarousel(
-                    state = rememberCarouselState { excursionImages!!.count() },
-                    modifier = Modifier.padding(top = 5.dp).fillMaxWidth().height(250.dp),
-                    preferredItemWidth = 350.dp,
-                    itemSpacing = 1.dp,
-                    contentPadding = PaddingValues(horizontal = 0.dp)
-                ) { i ->
-                    val item = it[i]
-                    Card(
-                        modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
-                    ) {
-                        NetworkImageCarousel(
-                            item.url,
-                            "",
-                            500,
-                            250,
-                            navigateToImage,
-                            item.id,
-                            excursionImages!!,
-                            i
-                        )
-                    }
+           when(uiState.contentState){
+               is ExcursionInfoUIState.Data -> { scopeState.ExcursionDataContent(innerPadding) }
+               is ExcursionInfoUIState.Error -> { scopeState.ExcursionDataContent(innerPadding) }
+               is ExcursionInfoUIState.Idle -> {}
+               is ExcursionInfoUIState.Loading -> { LoadingExcursionDetail(innerPadding) }
+           }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
+    val excursionData by excursionData.collectAsStateWithLifecycle(null)
+    val excursionImages by excursionImages.collectAsStateWithLifecycle(null)
+    val scrollState = rememberScrollState()
+
+    Column(Modifier.padding(innerPadding).fillMaxSize()
+        .verticalScroll(scrollState)) {
+        excursionImages?.let {
+            HorizontalMultiBrowseCarousel(
+                state = rememberCarouselState { excursionImages!!.count() },
+                modifier = Modifier.padding(top = 5.dp).fillMaxWidth().height(250.dp),
+                preferredItemWidth = 350.dp,
+                itemSpacing = 1.dp,
+                contentPadding = PaddingValues(horizontal = 0.dp)
+            ) { i ->
+                val item = it[i]
+                Card(
+                    modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
+                ) {
+                    NetworkImageCarousel(
+                        item.url,
+                        "",
+                        500,
+                        250,
+                        navigateToImage,
+                        item.id,
+                        excursionImages!!,
+                        i
+                    )
                 }
             }
+        }
 
-             TextButton(modifier = Modifier.align(Alignment.End), onClick = {excursionData?.let { navigateToAlbum(it.excursionId)}}) {
-                 Text(stringResource(id = R.string.showall),color= Color.Blue)
-             }
+        TextButton(modifier = Modifier.align(Alignment.End), onClick = {excursionData?.let { navigateToAlbum(it.excursionId)}}) {
+            Text(stringResource(id = R.string.showall),color= Color.Blue)
+        }
 
-         //   Text("id ${excursionData?.excursionId}")
-            excursionData?.let{
-                Column(modifier = Modifier.padding(start = 10.dp, end=10.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        //   Text("id ${excursionData?.excursionId}")
+        excursionData?.let{
+            Column(modifier = Modifier.padding(start = 10.dp, end=10.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Text(
+                    text = it.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp
+                )
+                Text(
+                    text = it.description,
+                    modifier = Modifier.height(24.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
+                if (getFiltersGroups.isNotEmpty()) {
+                    val group = getFiltersGroups
+                        .filter { idGroup -> it.group == idGroup.id }
+                        .map { it.description }.first()
                     Text(
-                        text = it.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 26.sp
-                    )
-                    Text(
-                        text = it.description,
-                        modifier = Modifier.height(24.dp),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
-                    if (viewModel.getFiltersGroups().isNotEmpty()) {
-                        val group = viewModel.getFiltersGroups()
-                            .filter { idGroup -> it.group == idGroup.id }
-                            .map { it.description }.first()
-                        Text(
-                            text = group,
-                            color =Color.Gray,
-                            modifier = Modifier.height(24.dp),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontSize = 16.sp
-                        )
-                    }
-                    Text(
-                        text = it.text,
+                        text = group,
+                        color =Color.Gray,
                         modifier = Modifier.height(24.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         fontSize = 16.sp
                     )
-                    /*
-                                    Column {
-                                        Text("Incr :: $count")
-                                        Button(onClick = { onIcr() }) {
-                                            Text(text = "Increase", fontSize = 25.sp)
-                                        }
-                                    }*/
-                    Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
                 }
+                Text(
+                    text = it.text,
+                    modifier = Modifier.height(24.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp
+                )
+                /*
+                                Column {
+                                    Text("Incr :: $count")
+                                    Button(onClick = { onIcr() }) {
+                                        Text(text = "Increase", fontSize = 25.sp)
+                                    }
+                                }*/
+                Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
             }
-
         }
+
     }
 }
 
@@ -210,4 +269,35 @@ fun NetworkImageCarousel(url: String, contentDescription: String?, width: Int, h
             Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
         }
     )
+}
+
+@Composable
+private fun LoadingExcursionDetail(innerPadding: PaddingValues) {
+    Column(
+        modifier = Modifier.padding(innerPadding).fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+                .height(250.dp)
+                .clip(shape= RoundedCornerShape(30.dp))
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .height(20.dp)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.3f)
+                .height(20.dp)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+    }
 }

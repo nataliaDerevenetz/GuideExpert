@@ -18,8 +18,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarDefaults.colors
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -46,7 +49,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.GuideExpert.R
@@ -60,18 +62,18 @@ import kotlinx.coroutines.launch
 import kotlin.reflect.KSuspendFunction2
 
 @Stable
-class SearchScreenState(
-    val searchListState: StateFlow<PagingData<Excursion>>,
-    val stateView: StateFlow<ExcursionsSearchUIState>,
-    val effectFlow: Flow<SnackbarEffect>,
-    val snackbarHostState: SnackbarHostState,
-    val onEvent : (SearchEvent) -> Unit,
-    val sendEffectFlow : KSuspendFunction2<String, String?, Unit>,
-    val navigateToExcursion : (Excursion) -> Unit,
-)
+interface SearchStateScope {
+    val searchListState: StateFlow<PagingData<Excursion>>
+    val stateView: StateFlow<ExcursionsSearchUIState>
+    val effectFlow: Flow<SnackbarEffect>
+    val snackbarHostState: SnackbarHostState
+    val onEvent : (SearchEvent) -> Unit
+    val sendEffectFlow : KSuspendFunction2<String, String?, Unit>
+    val navigateToExcursion : (Excursion) -> Unit
+}
 
-@Composable
-fun rememberSearchScreenState(
+//@Composable
+fun DefaultSearchStateScope(
     searchListState: StateFlow<PagingData<Excursion>>,
     stateView: StateFlow<ExcursionsSearchUIState>,
     effectFlow: Flow<SnackbarEffect>,
@@ -79,67 +81,105 @@ fun rememberSearchScreenState(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-): SearchScreenState = remember(searchListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion) {
-    SearchScreenState(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion)
+): SearchStateScope {
+    return object : SearchStateScope {
+        override val searchListState: StateFlow<PagingData<Excursion>>
+            get() = searchListState
+        override val stateView: StateFlow<ExcursionsSearchUIState>
+            get() = stateView
+        override val effectFlow: Flow<SnackbarEffect>
+            get() = effectFlow
+        override val snackbarHostState: SnackbarHostState
+            get() = snackbarHostState
+        override val onEvent: (SearchEvent) -> Unit
+            get() = onEvent
+        override val sendEffectFlow: KSuspendFunction2<String, String?, Unit>
+            get() = sendEffectFlow
+        override val navigateToExcursion: (Excursion) -> Unit
+            get() = navigateToExcursion
+
+    }
+}
+
+
+@Composable
+fun rememberDefaultSearchStateScope(
+    searchListState: StateFlow<PagingData<Excursion>>,
+    stateView: StateFlow<ExcursionsSearchUIState>,
+    effectFlow: Flow<SnackbarEffect>,
+    snackbarHostState: SnackbarHostState,
+    onEvent: (SearchEvent) -> Unit,
+    sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
+    navigateToExcursion : (Excursion) -> Unit,
+): SearchStateScope = remember(searchListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion) {
+    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
-                        snackbarHostState: SnackbarHostState,
-                        viewModel: ExcursionSearchViewModel = hiltViewModel(),
-                        navigateToExcursion: (Excursion) -> Unit,
-                        scrollingOn:()->Unit,
-                        scrollingOff:()->Unit,
-                        onActiveChanged: (Boolean) -> Unit,
-                        state: SearchScreenState = rememberSearchScreenState(
-                            searchListState = viewModel.uiPagingState,
+fun SearchScreen(modifier: Modifier = Modifier,
+                 snackbarHostState: SnackbarHostState,
+                 viewModel: SearchViewModel = hiltViewModel(),
+                 navigateToExcursion: (Excursion) -> Unit,
+                 scrollingOn:()->Unit,
+                 scrollingOff:()->Unit,
+                 onActiveChanged: (Boolean) -> Unit,
+                 scopeState:SearchStateScope = rememberDefaultSearchStateScope(searchListState = viewModel.uiPagingState,
                             stateView = viewModel.stateView,
                             effectFlow = viewModel.effectFlow,
                             snackbarHostState = snackbarHostState,
                             onEvent = viewModel::onEvent,
                             sendEffectFlow = viewModel::sendEffectFlow,
-                            navigateToExcursion = navigateToExcursion,
-                        )
+                            navigateToExcursion = navigateToExcursion,),
+                 searchContent: @Composable SearchStateScope.() -> Unit,
 ){
 
     var text by rememberSaveable { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val excursions by rememberUpdatedState(newValue = state.searchListState.collectAsLazyPagingItems())
-    val uiState by state.stateView.collectAsStateWithLifecycle()
+    val uiState by scopeState.stateView.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val coroutineScope = rememberCoroutineScope()
 
-    val effectFlow by state.effectFlow.collectAsStateWithLifecycle(null)
+    val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
     LaunchedEffect(effectFlow) {
         effectFlow?.let {
             when (it) {
                 is SnackbarEffect.ShowSnackbar -> {
-                    state.snackbarHostState.showSnackbar(it.message)
+                    scopeState.snackbarHostState.showSnackbar(it.message)
                 }
             }
         }
     }
 
+    val colorDefault = SearchBarDefaults.colors().containerColor
+
+    var color by rememberSaveable { mutableStateOf(colorDefault.toArgb()) }
+
     SearchBar(
+        colors = colors(
+            containerColor = Color(color),
+            dividerColor = MaterialTheme.colorScheme.primary
+        ),
         inputField = {
             SearchBarDefaults.InputField(
                 query = text,
                 onQueryChange = {
                     text = it
-                    state.onEvent(SearchEvent.SetSearchText(text))
+                    scopeState.onEvent(SearchEvent.SetSearchText(text))
                 },
                 onSearch = { expanded = true
                     coroutineScope.launch { keyboardController?.hide() } },
                 expanded = expanded,
                 onExpandedChange = {
                     onActiveChanged(it)
-                    if(expanded != it)   state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                    if(expanded != it)   scopeState.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
                     expanded = it
 
                     if (expanded) {
+                        color = Color.Transparent.toArgb()
                         scrollingOn()
                     } else {
+                        color = colorDefault.toArgb()
                         scrollingOff()
                     }
                 },
@@ -150,8 +190,8 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                             expanded = false
                             onActiveChanged(expanded)
                             text = ""
-                            state.onEvent(SearchEvent.SetSearchText(text))
-                            state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                            scopeState.onEvent(SearchEvent.SetSearchText(text))
+                            scopeState.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
                             scrollingOff()
                         }) {
                             Icon(
@@ -167,10 +207,10 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                 trailingIcon = {
                     if (expanded){
                         IconButton(onClick = {
-                            state.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
+                            scopeState.onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Idle))
                             if (text.isNotEmpty()) {
                                 text = ""
-                                state.onEvent(SearchEvent.SetSearchText(text))
+                                scopeState.onEvent(SearchEvent.SetSearchText(text))
                             } else {
                                 expanded = false
                                 onActiveChanged(expanded)
@@ -180,17 +220,19 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
                             Icon(Icons.Default.Clear, contentDescription = null,)
                         }
                     }
-                },
+                }
             )},
         expanded = expanded,
         onExpandedChange = {
             onActiveChanged(it)
             expanded = it
             text = ""
-            state.onEvent(SearchEvent.SetSearchText(text))
+            scopeState.onEvent(SearchEvent.SetSearchText(text))
             if (expanded) {
+                color = Color.Transparent.toArgb()
                 scrollingOn()
             } else {
+                color = colorDefault.toArgb()
                 scrollingOff()
             }},
         modifier = if(expanded){
@@ -205,15 +247,12 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
             }
             is ExcursionListSearchUIState.Loading -> {}
             is ExcursionListSearchUIState.Data -> {
-                SearchResult(excursions, state.snackbarHostState,state.sendEffectFlow,
-                    state.onEvent,state.navigateToExcursion)
+                scopeState.searchContent()
             }
             is ExcursionListSearchUIState.Error -> {}
         }
 
     }
-
-
 
 }
 
@@ -221,15 +260,10 @@ fun ExcursionListSearchScreen(modifier: Modifier = Modifier,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResult(
-    excursionPagingItems: LazyPagingItems<Excursion>,
-    snackbarHostState: SnackbarHostState,
-    sendEffectFlow: suspend (String, String?) -> Unit,
-    onEvent: (SearchEvent) -> Unit,
-    navigateToExcursion: (Excursion) -> Unit,
-) {
+fun SearchStateScope.SearchResult() {
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val excursionPagingItems by rememberUpdatedState(newValue = searchListState.collectAsLazyPagingItems())
 
     val scope = rememberCoroutineScope()
 
@@ -273,7 +307,7 @@ fun SearchResult(
                             Row(Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically){
                                 Text(stringResource(id = R.string.failedload),color= Color.Gray)
-                                TextButton({excursionPagingItems.retry()}) {
+                                TextButton({ excursionPagingItems.retry()}) {
                                     Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
                                 }
                             }
@@ -288,33 +322,37 @@ fun SearchResult(
                         }
                     }
 
-                    items(
-                        count = excursionPagingItems.itemCount,
-                        key = excursionPagingItems.itemKey { it.id },
-                    ) { index ->
-                        val excursion = excursionPagingItems[index]
-                        if (excursion != null) {
-                           ExcursionListSearchItem(excursion,onEvent,navigateToExcursion)
+                    excursionPagingItems.let {
+                        items(
+                            count = it.itemCount,
+                            key = it.itemKey { it.id },
+                        ) { index ->
+                            val excursion = it.get(index)
+                            if (excursion != null) {
+                                ExcursionListSearchItem(excursion,onEvent,navigateToExcursion)
+                            }
                         }
-                    }
-                    item {
-                        if (excursionPagingItems.loadState.append is LoadState.Loading) {
-                            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                        }
-                    }
 
-                    item {
-                        if (excursionPagingItems.loadState.append is LoadState.Error) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+                        item {
+                            if (it.loadState.append is LoadState.Loading) {
+                                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                            }
+                        }
+
+                        item {
+                            if (it.loadState.append is LoadState.Error) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
                             }
                         }
                     }
+
                 }
             }
         }

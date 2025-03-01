@@ -45,7 +45,7 @@ sealed interface ExcursionsUiEvent {
 
 
 @HiltViewModel
-class ExcursionsViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getExcursionByFiltersUseCase: GetExcursionByFiltersUseCase,
     val getFiltersBarUseCase: GetFiltersBarUseCase,

@@ -18,15 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
 import com.example.GuideExpert.domain.models.Excursion
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -40,7 +38,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun ImageSlider(modifier: Modifier = Modifier,
                 navigateToExcursion: (Excursion) -> Unit,
-                viewModel: ExcursionsViewModel = hiltViewModel(),
+                viewModel: HomeViewModel = hiltViewModel(),
 ){
 
     val configApp = viewModel.configApp.collectAsStateWithLifecycle()

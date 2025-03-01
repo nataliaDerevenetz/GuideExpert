@@ -43,7 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
 import kotlinx.coroutines.flow.StateFlow
@@ -172,7 +172,7 @@ fun FilterChip(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.small,
     isFilterScreen : Boolean = false,
-    viewModel: ExcursionsViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     state: FilterChipState = rememberFilterChipState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,

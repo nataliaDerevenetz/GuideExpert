@@ -67,7 +67,7 @@ sealed class SnackbarEffect {
 }*/
 
 @HiltViewModel
-class ExcursionSearchViewModel @Inject constructor(
+class SearchViewModel @Inject constructor(
    // private val excursionRepository: ExcursionRepository,
     val getExcursionByQueryUseCase: GetExcursionByQueryUseCase,
     private val state: SavedStateHandle

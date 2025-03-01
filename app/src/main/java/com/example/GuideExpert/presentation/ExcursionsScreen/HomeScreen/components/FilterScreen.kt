@@ -52,7 +52,7 @@ import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.FilterType
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsViewModel
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeViewModel
 import com.example.GuideExpert.ui.theme.Shadow1
 import kotlinx.coroutines.flow.StateFlow
 
@@ -99,7 +99,7 @@ context(SharedTransitionScope, AnimatedVisibilityScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterScreen(
-    viewModel: ExcursionsViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     state: FilterState = rememberFilterState(
         sortState = viewModel.sortState,
         setSortState = viewModel::setSortState,

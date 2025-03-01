@@ -12,3 +12,5 @@ val Pink40 = Color(0xFF7D5260)
 
 val Shadow2 = Color(0xff001787)
 val Shadow1 = Color(0xff7057f5)
+
+val Grey1 = Color(0xFFE6E6E6)

@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -36,6 +37,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,9 +51,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
+import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsSearchUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlin.reflect.KSuspendFunction2
+
+@Stable
+class ExcursionDetailState(
+    val excursionData: Flow<ExcursionData?>,
+    val excursionImages: Flow<List<Image>>,
+    val onNavigateToBack : () -> Boolean,
+    val navigateToExcursion : (Excursion) -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,7 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,11 +55,10 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchStateScope
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ColumnExcursionShimmer
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.shimmerEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.reflect.KFunction1
 
 @Stable
 interface ExcursionDetailScope {
@@ -70,6 +69,7 @@ interface ExcursionDetailScope {
     val stateView: StateFlow<UIState>
     val navigateToAlbum: (Int) -> Unit
     val navigateToImage: (Int,List<Image>,Int) -> Unit
+    val handleEvent : (ExcursionDetailUiEvent) -> Unit
 }
 
 fun DefaultExcursionDetailScope(
@@ -80,6 +80,7 @@ fun DefaultExcursionDetailScope(
     stateView: StateFlow<UIState>,
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
+    handleEvent : (ExcursionDetailUiEvent) -> Unit
 ): ExcursionDetailScope {
     return object : ExcursionDetailScope {
         override val excursionData: Flow<ExcursionData?>
@@ -96,6 +97,8 @@ fun DefaultExcursionDetailScope(
             get() = navigateToAlbum
         override val navigateToImage: (Int,List<Image>,Int) -> Unit
             get() = navigateToImage
+        override val handleEvent: (ExcursionDetailUiEvent) -> Unit
+            get() = handleEvent
     }
 }
 
@@ -108,8 +111,9 @@ fun rememberDefaultExcursionDetailScope(
     stateView: StateFlow<UIState>,
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
-): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage) {
-    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage)
+    handleEvent : KFunction1<ExcursionDetailUiEvent, Unit>
+): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent) {
+    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,7 +130,8 @@ fun ExcursionDetailScreen(
         getFiltersGroups = viewModel.getFiltersGroups(),
         stateView = viewModel.stateView,
         navigateToAlbum = navigateToAlbum,
-        navigateToImage = navigateToImage),
+        navigateToImage = navigateToImage,
+        handleEvent=viewModel::handleEvent),
   //  dataContent: @Composable ExcursionDetailScope.() -> Unit ={},
 ) {
 
@@ -152,10 +157,29 @@ fun ExcursionDetailScreen(
     ) { innerPadding ->
            when(uiState.contentState){
                is ExcursionInfoUIState.Data -> { scopeState.ExcursionDataContent(innerPadding) }
-               is ExcursionInfoUIState.Error -> { scopeState.ExcursionDataContent(innerPadding) }
+               is ExcursionInfoUIState.Error -> { scopeState.ExcursionDataError(innerPadding) }
                is ExcursionInfoUIState.Idle -> {}
                is ExcursionInfoUIState.Loading -> { LoadingExcursionDetail(innerPadding) }
            }
+    }
+}
+
+@Composable
+fun ExcursionDetailScope.ExcursionDataError(innerPadding: PaddingValues) {
+    Column (Modifier.padding(innerPadding).fillMaxSize()){
+        Row(
+            Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(id = R.string.failedload), color = Color.Gray)
+            TextButton({handleEvent(ExcursionDetailUiEvent.OnLoadExcursionInfo) }) {
+                Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+            }
+        }
+        Row {
+            ExcursionDataContent(PaddingValues(0.dp))
+        }
     }
 }
 
@@ -192,12 +216,12 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                     )
                 }
             }
+            TextButton(
+                modifier = Modifier.align(Alignment.End),
+                onClick = { excursionData?.let { navigateToAlbum(it.excursionId) } }) {
+                Text(stringResource(id = R.string.showall), color = Color.Blue)
+            }
         }
-
-        TextButton(modifier = Modifier.align(Alignment.End), onClick = {excursionData?.let { navigateToAlbum(it.excursionId)}}) {
-            Text(stringResource(id = R.string.showall),color= Color.Blue)
-        }
-
         excursionData?.let{
             Column(modifier = Modifier.padding(start = 10.dp, end=10.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -238,7 +262,7 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                                         Text(text = "Increase", fontSize = 25.sp)
                                     }
                                 }*/
-                Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
+               // Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
             }
         }
 

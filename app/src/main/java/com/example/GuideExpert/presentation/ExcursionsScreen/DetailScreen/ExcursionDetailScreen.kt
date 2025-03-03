@@ -255,14 +255,6 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 16.sp
                 )
-                /*
-                                Column {
-                                    Text("Incr :: $count")
-                                    Button(onClick = { onIcr() }) {
-                                        Text(text = "Increase", fontSize = 25.sp)
-                                    }
-                                }*/
-               // Spacer(Modifier.height((820.dp).coerceAtLeast(0.dp)))
             }
         }
 

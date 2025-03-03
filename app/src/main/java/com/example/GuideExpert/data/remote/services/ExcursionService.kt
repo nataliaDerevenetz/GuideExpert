@@ -21,7 +21,7 @@ interface ExcursionService {
     @GET("config.json")
     suspend fun getConfig(): Response<ConfigPOJO>
 
-    @GET("server.php")
+    @GET("excursionsearch.php")
     suspend fun getExcursionsSearchPaging(@Query("offset") offset:Int, @Query("limit") limit:Int,
                                           @Query("query") query:String): Response<ExcursionsPagingPOJO>
 

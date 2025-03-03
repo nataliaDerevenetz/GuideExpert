@@ -48,10 +48,14 @@ fun ExcursionListSearchItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ){
 
-        //  Log.e("TEST","row")
+          Log.e("TEST","EXCURSION PREVIEW SIZE:: ${excursion.images}")
         Row( modifier = Modifier.clickable{
             Log.d("TAG", "clickable :: ${excursion.id}")
-            navigateToExcursion(excursion) }){
+            navigateToExcursion(
+                excursion)
+        //        Excursion(id=excursion.id, title = excursion.title, description = excursion.description, images = listOf()))
+        }
+        ){
             Column ( modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()

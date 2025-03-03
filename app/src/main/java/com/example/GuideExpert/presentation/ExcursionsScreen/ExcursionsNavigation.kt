@@ -37,16 +37,16 @@ data class ImageExcursion(
 ){
     companion object {
         val typeMap = mapOf(typeOf<List<Image>>() to serializableTypeArray<Image>())
-
-        fun from(savedStateHandle: SavedStateHandle) =
-            savedStateHandle.toRoute<ImageExcursion>(typeMap)
-    }
+     }
 }
 
 @Serializable
 class ExcursionDetail(val excursion : Excursion) {
     companion object {
-        val typeMap = mapOf(typeOf<Excursion>() to serializableType<Excursion>())
+        val typeMap = mapOf(typeOf<Excursion>() to serializableType<Excursion>(),
+            //typeOf<List<Image>>() to serializableTypeArray<Image>(),
+          //  typeOf<Image>() to serializableType<Image>()
+        )
 
         fun from(savedStateHandle: SavedStateHandle) =
             savedStateHandle.toRoute<ExcursionDetail>(typeMap)

@@ -90,7 +90,8 @@ fun ImageSlider(modifier: Modifier = Modifier,
                     }
                     .clickable {
                         navigateToExcursion(Excursion(id =configApp.value.banners[page].id,title = "",
-                            description = "", photo = 1))
+                            description = "", images = listOf()
+                        ))
                     }
             ) {
                 NetworkImage(

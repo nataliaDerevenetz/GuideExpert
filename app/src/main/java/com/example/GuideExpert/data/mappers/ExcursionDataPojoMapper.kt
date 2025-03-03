@@ -1,5 +1,6 @@
 package com.example.GuideExpert.data.mappers
 
+import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
 import com.example.GuideExpert.data.remote.pojo.ExcursionDataPOJO
 import com.example.GuideExpert.data.remote.pojo.ImagePOJO
 import com.example.GuideExpert.domain.models.Banner
@@ -11,3 +12,9 @@ fun ExcursionDataPOJO.toExcursionData() = ExcursionData(excursionId = excursionI
     group = group, images = images.map{it.toImage()})
 
 fun ImagePOJO.toImage() = Image(id,excursionId,url)
+
+fun Image.toImagePOJO() = ImagePOJO(id,excursionId,url)
+
+fun ImagePOJO.toImagePreviewSearchEntity() = ImagePreviewSearchEntity(
+    id = id, excursionId = excursionId, url = url
+)

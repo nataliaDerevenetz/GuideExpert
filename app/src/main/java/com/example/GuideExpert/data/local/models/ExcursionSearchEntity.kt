@@ -2,7 +2,9 @@ package com.example.GuideExpert.data.local.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.example.GuideExpert.domain.models.Image
 
 @Entity
 data class ExcursionSearchEntity(
@@ -10,5 +12,7 @@ data class ExcursionSearchEntity(
     val id: Int,
     @ColumnInfo val title: String,
     @ColumnInfo val description: String,
-    @ColumnInfo val photo: Int
-)
+    @Ignore var images: List<Image>
+){
+    constructor(id: Int, title: String, description: String) : this(id, title, description, listOf())
+}

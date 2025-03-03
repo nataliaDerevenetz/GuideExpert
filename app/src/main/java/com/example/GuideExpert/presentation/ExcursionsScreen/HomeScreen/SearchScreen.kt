@@ -326,7 +326,7 @@ fun SearchStateScope.SearchResult() {
                             count = it.itemCount,
                             key = it.itemKey { it.id },
                         ) { index ->
-                            val excursion = it.get(index)
+                            val excursion = it[index]
                             if (excursion != null) {
                                 ExcursionListSearchItem(excursion,onEvent,navigateToExcursion)
                             }

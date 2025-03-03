@@ -29,7 +29,7 @@ class DataPagingRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalPagingApi::class)
     override fun getExcursionByQueryFlow(filterQuery: FilterQuery): Flow<PagingData<Excursion>> {
-        return Pager(
+         return Pager(
             config = PagingConfig(pageSize = PAGE_SIZE, maxSize = 30),
             remoteMediator = ExcursionSearchRemoteMediator(
                 excursionsRoomDatabase = excursionsRoomDatabase,
@@ -41,7 +41,6 @@ class DataPagingRepositoryImpl @Inject constructor(
             },
         ).flow.map { pagingData -> pagingData.map { it.toExcursion() } }
             .flowOn(Dispatchers.IO)
-
     }
 
     @OptIn(ExperimentalPagingApi::class)

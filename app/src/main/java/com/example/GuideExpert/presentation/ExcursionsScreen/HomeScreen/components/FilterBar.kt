@@ -229,9 +229,7 @@ fun FilterChip(
             modifier = Modifier
                 .toggleable(
                     value = selected.value,
-                    onValueChange = {setFilterScreen(filter,it,state.setSortState,state.getFiltersBar,
-                        state.getFiltersDuration,state.getFiltersSort,state.getFiltersGroups,state.getFiltersCategories,
-                        state.sortDefault)
+                    onValueChange = {state.setFilterScreen(filter,it)
                         if(!isFilterScreen) state.handleEvent(ExcursionsUiEvent.OnChangeFilters)},
                     interactionSource = interactionSource,
                     indication = null
@@ -254,10 +252,7 @@ fun FilterChip(
     }
 }
 
-fun setFilterScreen(filter: Filter, enabled: Boolean, setSortState: (Int) -> Unit,
-                    getFiltersBar:() -> List<Filter>,getFiltersDuration: () -> List<Filter>,
-                    getFiltersSort: () -> List<Filter>,getFiltersGroups: () -> List<Filter>,
-                    getFiltersCategories: () -> List<Filter>, sortDefault: Int) {
+fun FilterChipState.setFilterScreen(filter: Filter, enabled: Boolean) {
     getFiltersBar().filter { it.type == filter.type &&  it.id == filter.id }
         .map { it.enabled.value = enabled }
 

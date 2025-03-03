@@ -134,7 +134,6 @@ fun ExcursionDetailScreen(
 
 
    Scaffold(
-       // modifier = Modifier.safeDrawingPadding(),
         topBar = {
             TopAppBar(
                 title = { Text("") },
@@ -176,8 +175,8 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                 preferredItemWidth = 350.dp,
                 itemSpacing = 1.dp,
                 contentPadding = PaddingValues(horizontal = 0.dp)
-            ) { i ->
-                val item = it[i]
+            ) { index ->
+                val item = it[index]
                 Card(
                     modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
                 ) {
@@ -189,7 +188,7 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                         navigateToImage,
                         item.id,
                         excursionImages!!,
-                        i
+                        index
                     )
                 }
             }
@@ -199,7 +198,6 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
             Text(stringResource(id = R.string.showall),color= Color.Blue)
         }
 
-        //   Text("id ${excursionData?.excursionId}")
         excursionData?.let{
             Column(modifier = Modifier.padding(start = 10.dp, end=10.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp)) {

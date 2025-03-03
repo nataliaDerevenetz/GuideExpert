@@ -209,14 +209,14 @@ fun FilterScreen(
 
             }
 
-            SortFiltersSection(
-                sortState = sortState.value,
-                onFilterChange = { filter ->
-                    state.setSortState(filter.id)
-                },
-                getFiltersBar = state.getFiltersBar,
-                getFiltersSort = state.getFiltersSort
-            )
+            with(state) {
+                SortFiltersSection(
+                    sortState = sortState.value,
+                    onFilterChange = { filter ->
+                        state.setSortState(filter.id)
+                    }
+                )
+            }
 
             FilterChipSection(
                 title = stringResource(id = R.string.categories),
@@ -236,16 +236,14 @@ fun FilterScreen(
     }
 }
 
+context(FilterState)
 @Composable
-fun SortFiltersSection(sortState: Int, onFilterChange: (Filter) -> Unit, getFiltersBar: ()-> List<Filter>,
-                       getFiltersSort: ()-> List<Filter>) {
+fun SortFiltersSection(sortState: Int, onFilterChange: (Filter) -> Unit) {
     FilterTitle(text = stringResource(id = R.string.sort))
     Column(Modifier.padding(bottom = 24.dp)) {
         SortFilters(
             sortState = sortState,
-            onChanged = onFilterChange,
-            getFiltersBar = getFiltersBar,
-            getFiltersSort = getFiltersSort
+            onChanged = onFilterChange
         )
     }
 }
@@ -260,12 +258,11 @@ fun FilterTitle(text: String) {
     )
 }
 
+context(FilterState)
 @Composable
 fun SortFilters(
     sortState: Int,
-    onChanged: (Filter) -> Unit,
-    getFiltersBar: () -> List<Filter>,
-    getFiltersSort: () -> List<Filter>
+    onChanged: (Filter) -> Unit
 ) {
 
     getFiltersBar().filter{  it.type == FilterType.Sort }.map{ it.enabled.value = false }

@@ -107,26 +107,26 @@ fun ExcursionListSearchItem(
 private fun ExcursionImageSearch(excursion: Excursion) {
     val pagerState = rememberPagerState(initialPage = 0)
 
-    HorizontalPager(
-        count = excursion.images.size,
-        state = pagerState,
-        contentPadding = PaddingValues(horizontal = 0.dp),
-        modifier = Modifier
-            .heightIn(min=100.dp, max=200.dp)
-            .fillMaxWidth()
-    ) { page ->
-        Box(modifier = Modifier.fillMaxWidth()
-            .graphicsLayer {
-                clip = true
-                shape = RoundedCornerShape(16.dp)
-            }) {
-            NetworkImage(
-                contentDescription = "",
-                url = excursion.images[page].url,
-                width = 350,
-                height = 450
-            )
+    Box(modifier = Modifier.heightIn(min = 100.dp, max = 200.dp)
+        .fillMaxWidth()
+        .graphicsLayer {
+            clip = true
+            shape = RoundedCornerShape(16.dp)
+        }) {
+        HorizontalPager(
+            count = excursion.images.size,
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = 0.dp),
+            modifier = Modifier
+                .heightIn(min = 100.dp, max = 200.dp)
+                .fillMaxWidth()
+        ) { page ->
+                NetworkImage(
+                    contentDescription = "",
+                    url = excursion.images[page].url,
+                    width = 350,
+                    height = 450
+                )
         }
-
     }
 }

@@ -1,20 +1,30 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +39,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -266,6 +277,10 @@ fun SearchStateScope.SearchResult() {
 
     val scope = rememberCoroutineScope()
 
+    val listState = rememberLazyListState()
+    val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
+
+
     if (excursionPagingItems.loadState.append is LoadState.Error) {
         LaunchedEffect(key1 = excursionPagingItems.loadState.append) {
             scope.launch {
@@ -299,6 +314,7 @@ fun SearchStateScope.SearchResult() {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    state = listState
                 ) {
 
                     if (excursionPagingItems.loadState.refresh is LoadState.Error) {
@@ -353,6 +369,7 @@ fun SearchStateScope.SearchResult() {
                     }
 
                 }
+                FloatButtonUp(displayButton, listState)
             }
         }
     }
@@ -375,5 +392,33 @@ private fun SearchScreenEmpty(modifier: Modifier = Modifier) {
 @Composable
 private fun SearchScreenStart(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize()) {
+    }
+}
+
+@Composable
+private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState) {
+    val scope = rememberCoroutineScope()
+    AnimatedVisibility(visible = displayButton,
+        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(400)),
+        exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(400)),
+    ) {
+        Column(
+            modifier = Modifier.padding(bottom = 10.dp, end = 10.dp)
+                .fillMaxSize()
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End
+        ) {
+            FloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                },
+                shape = CircleShape,
+            ) {
+                Icon(Icons.Filled.KeyboardArrowUp, "Floating action button.")
+            }
+        }
     }
 }

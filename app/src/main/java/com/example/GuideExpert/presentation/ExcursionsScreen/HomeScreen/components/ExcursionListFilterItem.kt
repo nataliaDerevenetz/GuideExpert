@@ -1,7 +1,9 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +15,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -66,19 +70,27 @@ fun ExcursionListFilterItem(
             {
                 Box {
                     ExcursionImage(excursion)
-                    Image(
-                        imageVector = Icons.Filled.FavoriteBorder,
-                        contentDescription = "featured",
-                        colorFilter = ColorFilter.tint(Color.White),
-                        modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
-                            .graphicsLayer {
-                                clip = true
-                                shape = RoundedCornerShape(15.dp)
-                            }
-                            .clickable {
-                                onEvent(ExcursionsUiEvent.OnClickFavoriteExcursion(excursion))
-                                Log.d("CLICK","featured") }
-                    )
+                    Box(modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
+                        .graphicsLayer {
+                            clip = true
+                            shape = RoundedCornerShape(15.dp)
+                        }
+                        .clickable {
+                            onEvent(ExcursionsUiEvent.OnClickFavoriteExcursion(excursion))
+                            Log.d("CLICK", "featured")
+                        }
+                    ) {
+                        Image(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "featured",
+                            colorFilter = ColorFilter.tint(Color.Gray.copy(alpha = .3f)),
+                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                        Image(
+                            imageVector = Icons.Filled.FavoriteBorder,
+                            contentDescription = "featured",
+                            colorFilter = ColorFilter.tint(Color.White),
+                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                    }
                 }
                 Text(text = excursion.title, style = typography.headlineSmall,fontWeight= FontWeight.Bold)
                 Text(text = excursion.description,  modifier = Modifier.height(24.dp),

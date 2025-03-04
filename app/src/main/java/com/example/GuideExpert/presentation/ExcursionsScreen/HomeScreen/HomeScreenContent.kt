@@ -1,17 +1,29 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -19,6 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -87,6 +100,7 @@ fun HomeScreenContent(
     onFiltersSelected: () -> Unit,
     isRefreshing: Boolean,
     stopRefreshing:() -> Unit,
+    showTopBar:() -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
     state: HomeScreenContentState = rememberHomeScreenContentState(
         filterListState = viewModel.uiPagingState,
@@ -132,10 +146,15 @@ fun HomeScreenContent(
         stopRefreshing()
     }
 
+    val listState = rememberLazyListState()
+    val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
+
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(top = toolbarHeightDp.dp)
+        contentPadding = PaddingValues(top = toolbarHeightDp.dp),
+        state = listState,
     ) {
         item {
             ImageSlider(navigateToExcursion = state.navigateToExcursion)
@@ -215,6 +234,9 @@ fun HomeScreenContent(
         }
 
     }
+
+    FloatButtonUp(displayButton, listState, showTopBar)
+
 }
 
 @Composable
@@ -227,5 +249,34 @@ private fun HomeScreenEmpty(modifier: Modifier = Modifier) {
             fontSize = 27.sp,
             textAlign = TextAlign.Center,
         )
+    }
+}
+
+@Composable
+private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState, showTopBar: ()->Unit) {
+    val scope = rememberCoroutineScope()
+    AnimatedVisibility(visible = displayButton,
+        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(400)),
+        exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(400)),
+    ) {
+        Column(
+            modifier = Modifier.padding(bottom = 10.dp, end = 10.dp)
+                .fillMaxSize()
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End
+        ) {
+            FloatingActionButton(
+                onClick = {
+                    showTopBar()
+                    scope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                },
+                shape = CircleShape,
+            ) {
+                Icon(Icons.Filled.KeyboardArrowUp, "Floating action button.")
+            }
+        }
     }
 }

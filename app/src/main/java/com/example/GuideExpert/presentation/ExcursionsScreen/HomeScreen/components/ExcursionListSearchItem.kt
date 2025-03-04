@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -70,19 +72,27 @@ fun ExcursionListSearchItem(
             {
                 Box {
                     ExcursionImageSearch(excursion)
-                    Image(
-                        imageVector = Icons.Filled.FavoriteBorder,
-                        contentDescription = "featured",
-                        colorFilter = ColorFilter.tint(Color.White),
-                        modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
-                            .graphicsLayer {
-                                clip = true
-                                shape = RoundedCornerShape(15.dp)
-                            }
-                            .clickable {
-                                onEvent(SearchEvent.OnClickFavoriteExcursion(excursion))
-                                Log.d("CLICK","featured") }
-                    )
+                    Box(modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
+                        .graphicsLayer {
+                            clip = true
+                            shape = RoundedCornerShape(15.dp)
+                        }
+                        .clickable {
+                            onEvent(SearchEvent.OnClickFavoriteExcursion(excursion))
+                            Log.d("CLICK", "featured")
+                        }
+                    ) {
+                        Image(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "featured",
+                            colorFilter = ColorFilter.tint(Color.Gray.copy(alpha = .3f)),
+                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                        Image(
+                            imageVector = Icons.Filled.FavoriteBorder,
+                            contentDescription = "featured",
+                            colorFilter = ColorFilter.tint(Color.White),
+                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                    }
                 }
                 Text(text = excursion.title, style = typography.headlineSmall, fontWeight= FontWeight.Bold )
                 Text(text = excursion.description, modifier = Modifier.height(24.dp),

@@ -98,6 +98,10 @@ fun HomeScreen(
                     coroutineScope.launch {
                           isRefreshing = false
                     }
+                },
+                showTopBar = {
+                    toolbarHeightDp = toolbarHeight
+                    toolbarOffsetHeightPx = 0f
                 }
             )
 

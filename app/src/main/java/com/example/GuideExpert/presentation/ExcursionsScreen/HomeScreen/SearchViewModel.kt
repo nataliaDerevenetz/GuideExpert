@@ -95,7 +95,7 @@ class SearchViewModel @Inject constructor(
     private val currentQueryFlow = savedSearchText
         .debounce(500L)
         .filter { it.isNotEmpty() }
-        .distinctUntilChanged()
+       // .distinctUntilChanged()
         .onEach {
             onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Loading))
         }

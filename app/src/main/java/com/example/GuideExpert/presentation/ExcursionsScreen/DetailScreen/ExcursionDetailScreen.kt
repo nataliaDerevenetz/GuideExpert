@@ -134,9 +134,7 @@ fun ExcursionDetailScreen(
         handleEvent=viewModel::handleEvent),
   //  dataContent: @Composable ExcursionDetailScope.() -> Unit ={},
 ) {
-
     val uiState by scopeState.stateView.collectAsStateWithLifecycle()
-
 
    Scaffold(
         topBar = {

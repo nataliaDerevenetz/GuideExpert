@@ -3,10 +3,14 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.compone
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,12 +29,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import java.util.ArrayList
 
 @Composable
 fun ExcursionListSearchItem(
@@ -47,13 +57,9 @@ fun ExcursionListSearchItem(
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ){
-
-          Log.e("TEST","EXCURSION PREVIEW SIZE:: ${excursion.images}")
         Row( modifier = Modifier.clickable{
             Log.d("TAG", "clickable :: ${excursion.id}")
-            navigateToExcursion(
-                excursion)
-        //        Excursion(id=excursion.id, title = excursion.title, description = excursion.description, images = listOf()))
+            navigateToExcursion(excursion)
         }
         ){
             Column ( modifier = Modifier
@@ -84,17 +90,31 @@ fun ExcursionListSearchItem(
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun ExcursionImageSearch(excursion: Excursion) {
-    Image(
-        painter = painterResource(id = R.drawable.excurs2),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
+    val pagerState = rememberPagerState(initialPage = 0)
+
+    HorizontalPager(
+        count = excursion.images.size,
+        state = pagerState,
+        contentPadding = PaddingValues(horizontal = 0.dp),
         modifier = Modifier
-            //  .padding(8.dp)
-            .fillMaxWidth()
             .heightIn(min=100.dp, max=200.dp)
-            // .size(84.dp)
-            .clip(RoundedCornerShape(corner = CornerSize(16.dp)))
-    )
+            .fillMaxWidth()
+    ) { page ->
+        Box(modifier = Modifier.fillMaxWidth()
+            .graphicsLayer {
+                clip = true
+                shape = RoundedCornerShape(16.dp)
+            }) {
+            NetworkImage(
+                contentDescription = "",
+                url = excursion.images[page].url,
+                width = 350,
+                height = 450
+            )
+        }
+
+    }
 }

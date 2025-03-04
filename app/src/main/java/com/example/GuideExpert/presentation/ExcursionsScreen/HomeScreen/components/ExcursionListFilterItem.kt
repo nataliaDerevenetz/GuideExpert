@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -79,7 +81,8 @@ fun ExcursionListFilterItem(
                     )
                 }
                 Text(text = excursion.title, style = typography.headlineSmall,fontWeight= FontWeight.Bold)
-                Text(text = excursion.description, style = typography.bodyMedium)
+                Text(text = excursion.description,  modifier = Modifier.height(24.dp),
+                    style = typography.titleMedium)
             }
         }
     }

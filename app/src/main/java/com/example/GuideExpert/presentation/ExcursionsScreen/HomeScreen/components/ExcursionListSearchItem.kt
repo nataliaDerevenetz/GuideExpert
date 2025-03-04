@@ -85,7 +85,8 @@ fun ExcursionListSearchItem(
                     )
                 }
                 Text(text = excursion.title, style = typography.headlineSmall, fontWeight= FontWeight.Bold )
-                Text(text = excursion.description, style = typography.bodyMedium)
+                Text(text = excursion.description, modifier = Modifier.height(24.dp),
+                    style = typography.titleMedium)
             }
         }
     }

@@ -6,7 +6,6 @@ import com.example.GuideExpert.data.local.dao.ExcursionDataDao
 import com.example.GuideExpert.data.local.dao.ExcursionFilterDao
 import com.example.GuideExpert.data.local.dao.ExcursionSearchDao
 import com.example.GuideExpert.data.local.dao.ImageDao
-import com.example.GuideExpert.data.local.dao.ImagePreviewSearchDao
 import com.example.GuideExpert.data.local.dao.RemoteKeyDao
 import com.example.GuideExpert.data.local.models.ExcursionDataEntity
 import com.example.GuideExpert.data.local.models.ExcursionSearchEntity
@@ -26,5 +25,4 @@ abstract class ExcursionsRoomDatabase: RoomDatabase() {
     abstract fun remoteKeyDao(): RemoteKeyDao
     abstract fun imageDao(): ImageDao
     abstract fun excursionDataDao(): ExcursionDataDao
-    abstract fun imagePreviewSearchDao(): ImagePreviewSearchDao
 }

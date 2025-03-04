@@ -172,7 +172,7 @@ fun ExcursionDetailScope.ExcursionDataError(innerPadding: PaddingValues) {
         ) {
             Text(stringResource(id = R.string.failedload), color = Color.Gray)
             TextButton({handleEvent(ExcursionDetailUiEvent.OnLoadExcursionInfo) }) {
-                Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+                Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue.copy(alpha =.5f))
             }
         }
         Row {
@@ -191,68 +191,71 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
     Column(Modifier.padding(innerPadding).fillMaxSize()
         .verticalScroll(scrollState)) {
         excursionImages?.let {
-            HorizontalMultiBrowseCarousel(
-                state = rememberCarouselState { excursionImages!!.count() },
-                modifier = Modifier.padding(top = 5.dp).fillMaxWidth().height(250.dp),
-                preferredItemWidth = 350.dp,
-                itemSpacing = 1.dp,
-                contentPadding = PaddingValues(horizontal = 0.dp)
-            ) { index ->
-                val item = it[index]
-                Card(
-                    modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
-                ) {
-                    NetworkImageCarousel(
-                        item.url,
-                        "",
-                        500,
-                        250,
-                        navigateToImage,
-                        item.id,
-                        excursionImages!!,
-                        index
-                    )
+            if (it.isNotEmpty()){
+                HorizontalMultiBrowseCarousel(
+                    state = rememberCarouselState { it.count() },
+                    modifier = Modifier.padding(top = 5.dp).fillMaxWidth().height(250.dp),
+                    preferredItemWidth = 350.dp,
+                    itemSpacing = 1.dp,
+                    contentPadding = PaddingValues(horizontal = 0.dp)
+                ) { index ->
+                    val item = it[index]
+                    Card(
+                        modifier = Modifier.height(250.dp).maskClip(MaterialTheme.shapes.extraLarge)
+                    ) {
+                        NetworkImageCarousel(
+                            item.url,
+                            "",
+                            500,
+                            250,
+                            navigateToImage,
+                            item.id,
+                            it,
+                            index
+                        )
+                    }
                 }
-            }
-            TextButton(
-                modifier = Modifier.align(Alignment.End),
-                onClick = { excursionData?.let { navigateToAlbum(it.excursionId) } }) {
-                Text(stringResource(id = R.string.showall), color = Color.Blue)
-            }
-        }
-        excursionData?.let{
-            Column(modifier = Modifier.padding(start = 10.dp, end=10.dp),
-                verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(
-                    text = it.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 26.sp
-                )
-                Text(
-                    text = it.description,
-                    modifier = Modifier.height(24.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
-                if (getFiltersGroups.isNotEmpty()) {
-                    val group = getFiltersGroups
-                        .filter { idGroup -> it.group == idGroup.id }
-                        .map { it.description }.first()
-                    Text(
-                        text = group,
-                        color =Color.Gray,
-                        modifier = Modifier.height(24.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 16.sp
-                    )
+                TextButton(
+                    modifier = Modifier.align(Alignment.End),
+                    onClick = { excursionData?.let { navigateToAlbum(it.excursionId) } }) {
+                    Text(stringResource(id = R.string.showall), color = Color.Blue)
                 }
-                Text(
-                    text = it.text,
-                    modifier = Modifier.height(24.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontSize = 16.sp
-                )
+
+                excursionData?.let{
+                    Column(modifier = Modifier.padding(start = 10.dp, end=10.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Text(
+                            text = it.title,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 26.sp
+                        )
+                        Text(
+                            text = it.description,
+                            modifier = Modifier.height(24.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
+                        if (getFiltersGroups.isNotEmpty()) {
+                            val group = getFiltersGroups
+                                .filter { idGroup -> it.group == idGroup.id }
+                                .map { it.description }.first()
+                            Text(
+                                text = group,
+                                color =Color.Gray,
+                                modifier = Modifier.height(24.dp),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp
+                            )
+                        }
+                        Text(
+                            text = it.text,
+                            modifier = Modifier.height(24.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
             }
         }
 

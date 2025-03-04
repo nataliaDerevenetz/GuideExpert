@@ -2,6 +2,7 @@ package com.example.GuideExpert.data.mappers
 
 import com.example.GuideExpert.data.local.models.ExcursionSearchEntity
 import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
+import com.example.GuideExpert.data.local.models.ExcursionFilterWithData
 import com.example.GuideExpert.data.local.models.ExcursionSearchWithData
 import com.example.GuideExpert.data.remote.pojo.ExcursionPOJO
 import com.example.GuideExpert.domain.models.Excursion
@@ -18,4 +19,9 @@ fun ExcursionPOJO.toExcursionFilterEntity() = ExcursionFilterEntity(id,title, de
 fun ExcursionPOJO.toExcursionSearchWithData() = ExcursionSearchWithData(
     ExcursionSearchEntity(id,title, description,images.map{it.toImage()}),
     images.map{ it.toImagePreviewSearchEntity() }
+)
+
+fun ExcursionPOJO.toExcursionFilterWithData() = ExcursionFilterWithData(
+    ExcursionFilterEntity(id,title, description,images.map{it.toImage()}),
+    images.map{ it.toImagePreviewFilterEntity() }
 )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -27,10 +28,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 
 @Composable
 fun ExcursionListFilterItem(
@@ -73,24 +78,38 @@ fun ExcursionListFilterItem(
                                 Log.d("CLICK","featured") }
                     )
                 }
-                Text(text = excursion.title, style = typography.headlineSmall)
-                Text(text = "VIEW DETAIL", style = typography.bodyMedium)
+                Text(text = excursion.title, style = typography.headlineSmall,fontWeight= FontWeight.Bold)
+                Text(text = excursion.description, style = typography.bodyMedium)
             }
         }
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun ExcursionImage(excursion: Excursion) {
-    Image(
-        painter = painterResource(id = R.drawable.excurs2),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
+    val pagerState = rememberPagerState(initialPage = 0)
+
+    HorizontalPager(
+        count = excursion.images.size,
+        state = pagerState,
+        contentPadding = PaddingValues(horizontal = 0.dp),
         modifier = Modifier
-            //  .padding(8.dp)
-            .fillMaxWidth()
             .heightIn(min=100.dp, max=200.dp)
-            // .size(84.dp)
-            .clip(RoundedCornerShape(corner = CornerSize(16.dp)))
-    )
+            .fillMaxWidth()
+    ) { page ->
+        Box(modifier = Modifier.fillMaxWidth()
+            .graphicsLayer {
+                clip = true
+                shape = RoundedCornerShape(16.dp)
+            }) {
+            NetworkImage(
+                contentDescription = "",
+                url = excursion.images[page].url,
+                width = 350,
+                height = 450
+            )
+        }
+
+    }
 }

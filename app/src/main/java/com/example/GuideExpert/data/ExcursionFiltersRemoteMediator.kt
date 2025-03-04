@@ -8,8 +8,12 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.GuideExpert.data.local.db.ExcursionsRoomDatabase
 import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
+import com.example.GuideExpert.data.local.models.ExcursionFilterWithData
+import com.example.GuideExpert.data.local.models.ExcursionSearchWithData
 import com.example.GuideExpert.data.local.models.RemoteKeyEntity
 import com.example.GuideExpert.data.mappers.toExcursionFilterEntity
+import com.example.GuideExpert.data.mappers.toExcursionFilterWithData
+import com.example.GuideExpert.data.mappers.toExcursionSearchWithData
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.utils.Constant.REMOTE_KEY_FILTE_ID
@@ -23,10 +27,10 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
     private val excursionService: ExcursionService,
     private val excursionsRoomDatabase: ExcursionsRoomDatabase,
     private val filters: Filters
-) : RemoteMediator<Int, ExcursionFilterEntity>() {
+) : RemoteMediator<Int, ExcursionFilterWithData>() {
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, ExcursionFilterEntity>
+        state: PagingState<Int, ExcursionFilterWithData>
     ): MediatorResult {
         return try {
             val offset = when (loadType) {
@@ -61,7 +65,7 @@ class ExcursionFiltersRemoteMediator @Inject constructor(
             )
 
             val results = apiResponse.body()?.excursions
-                ?.map { it.toExcursionFilterEntity() } ?: listOf<ExcursionFilterEntity>()
+                ?.map { it.toExcursionFilterWithData() } ?: listOf<ExcursionFilterWithData>()
             val nextOffset = apiResponse.body()?.nextOffset ?: 0
 
 

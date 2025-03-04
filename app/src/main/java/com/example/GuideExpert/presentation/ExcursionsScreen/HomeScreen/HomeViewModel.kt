@@ -196,7 +196,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         handleEvent(ExcursionsUiEvent.OnLoadConfig)
-     //   handleEvent(ExcursionsUiEvent.OnLoadExcursionsFilters)
+        handleEvent(ExcursionsUiEvent.OnLoadExcursionsFilters)
     }
 
 

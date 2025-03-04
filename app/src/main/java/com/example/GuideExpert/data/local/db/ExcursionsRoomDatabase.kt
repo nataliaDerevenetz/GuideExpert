@@ -12,12 +12,14 @@ import com.example.GuideExpert.data.local.models.ExcursionDataEntity
 import com.example.GuideExpert.data.local.models.ExcursionSearchEntity
 import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
 import com.example.GuideExpert.data.local.models.ImageEntity
+import com.example.GuideExpert.data.local.models.ImagePreviewFilterEntity
 import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
 import com.example.GuideExpert.data.local.models.RemoteKeyEntity
 
 
 @Database(entities = [ExcursionSearchEntity::class, RemoteKeyEntity::class, ExcursionFilterEntity::class,
-                     ImageEntity::class, ExcursionDataEntity::class, ImagePreviewSearchEntity::class], version = 1,exportSchema = false)
+                     ImageEntity::class, ExcursionDataEntity::class, ImagePreviewSearchEntity::class,
+                    ImagePreviewFilterEntity::class], version = 1,exportSchema = false)
 abstract class ExcursionsRoomDatabase: RoomDatabase() {
     abstract fun excursionSearchDao() : ExcursionSearchDao
     abstract fun excursionFilterDao() : ExcursionFilterDao

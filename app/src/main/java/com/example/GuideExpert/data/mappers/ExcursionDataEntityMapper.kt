@@ -2,6 +2,7 @@ package com.example.GuideExpert.data.mappers
 
 import com.example.GuideExpert.data.local.models.ExcursionDataEntity
 import com.example.GuideExpert.data.local.models.ImageEntity
+import com.example.GuideExpert.data.local.models.ImagePreviewFilterEntity
 import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
@@ -24,5 +25,9 @@ fun ImageEntity.toImage() = Image(
 
 
 fun ImagePreviewSearchEntity.toImage() = Image(
+    id = id, excursionId = excursionId, url = url
+)
+
+fun ImagePreviewFilterEntity.toImage() = Image(
     id = id, excursionId = excursionId, url = url
 )

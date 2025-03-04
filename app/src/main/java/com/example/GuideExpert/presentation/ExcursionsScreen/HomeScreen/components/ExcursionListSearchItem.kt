@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
@@ -83,8 +84,8 @@ fun ExcursionListSearchItem(
                                 Log.d("CLICK","featured") }
                     )
                 }
-                Text(text = excursion.title, style = typography.headlineSmall)
-                Text(text = "VIEW DETAIL", style = typography.bodyMedium)
+                Text(text = excursion.title, style = typography.headlineSmall, fontWeight= FontWeight.Bold )
+                Text(text = excursion.description, style = typography.bodyMedium)
             }
         }
     }

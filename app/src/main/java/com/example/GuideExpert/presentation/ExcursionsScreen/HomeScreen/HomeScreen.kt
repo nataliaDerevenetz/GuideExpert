@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -25,10 +26,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.MainTopBar
@@ -55,14 +57,41 @@ fun HomeScreen(
     var scrolling by rememberSaveable { mutableStateOf(true) }
     var toolbarOffsetHeightPx by rememberSaveable { mutableStateOf(0f) }
     val statusbarHeight =  with(localDensity) { STATUSBAR_HEIGHT.dp.roundToPx().toFloat() }
+
+    var isCantScrollingColumn  by rememberSaveable { mutableStateOf(false) }
+    var scrollingColumn by rememberSaveable { mutableStateOf(true) }
+
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 val newOffset = toolbarOffsetHeightPx + delta
-                if (scrolling) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx+statusbarHeight), 0f)
+                Log.d("TAG3","toolbarOffsetHeightPx ::" + toolbarOffsetHeightPx)
+
+                if(isCantScrollingColumn) {scrollingColumn = false} else {scrollingColumn = true}
+                if (scrolling && scrollingColumn) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx+statusbarHeight), 0f)
                 return Offset.Zero
             }
+            /*override fun  onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                val delta1 = available.y
+                val delta2 = consumed.y
+                Log.d("TAG","consumed ::$delta2 ")
+                Log.d("TAG","available ::$delta1 ")
+                if(delta2.roundToInt() == 0 &&  delta1.roundToInt() != 0) {
+                    Log.d("TAG","scroll NULL ")
+                    toolbarHeightDp = toolbarHeight
+                    toolbarOffsetHeightPx = 0f
+                    scrolling = false
+
+                   return Offset(x= 0F, y=delta1)
+                } else {
+                    scrolling = true
+                  //  return Offset(x= 0F, y=delta2)
+                    //scrolling = true
+                }
+                return Offset.Zero
+            }*/
+
         }
     }
 
@@ -102,7 +131,8 @@ fun HomeScreen(
                 showTopBar = {
                     toolbarHeightDp = toolbarHeight
                     toolbarOffsetHeightPx = 0f
-                }
+                },
+                onScrollingColumn = {isCantScrollingColumn = it}
             )
 
 

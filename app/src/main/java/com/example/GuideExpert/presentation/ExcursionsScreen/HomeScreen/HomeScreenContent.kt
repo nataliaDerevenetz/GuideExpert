@@ -101,6 +101,7 @@ fun HomeScreenContent(
     isRefreshing: Boolean,
     stopRefreshing:() -> Unit,
     showTopBar:() -> Unit,
+    onScrollingColumn: (Boolean) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
     state: HomeScreenContentState = rememberHomeScreenContentState(
         filterListState = viewModel.uiPagingState,
@@ -141,14 +142,22 @@ fun HomeScreenContent(
         }
     }
 
-    if (isRefreshing){
+    if (isRefreshing) {
         excursionPagingItems.refresh()
         stopRefreshing()
     }
 
     val listState = rememberLazyListState()
     val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
+    val isCantScrollForwardColumn by remember { derivedStateOf {!listState.canScrollForward && !listState.canScrollBackward} }
 
+
+    LaunchedEffect (isCantScrollForwardColumn){
+        scope.launch {
+            if (isCantScrollForwardColumn) { showTopBar() }
+            onScrollingColumn(isCantScrollForwardColumn)
+        }
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -207,7 +216,6 @@ fun HomeScreenContent(
             }
             item {
                 if (excursionPagingItems.loadState.append is LoadState.Loading) {
-                   // CircularProgressIndicator(modifier = Modifier.padding(16.dp))
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -260,7 +268,7 @@ private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState, sho
         exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(400)),
     ) {
         Column(
-            modifier = Modifier.padding(bottom = 10.dp, end = 10.dp)
+            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp)
                 .fillMaxSize()
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Bottom,

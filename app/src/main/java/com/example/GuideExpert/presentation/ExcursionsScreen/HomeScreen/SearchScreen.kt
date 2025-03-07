@@ -198,6 +198,7 @@ fun SearchScreen(modifier: Modifier = Modifier,
                     if (expanded){
                         IconButton(onClick = {
                             expanded = false
+                            color = colorDefault.toArgb()
                             onActiveChanged(expanded)
                             text = ""
                             scopeState.onEvent(SearchEvent.SetSearchText(text))
@@ -223,6 +224,7 @@ fun SearchScreen(modifier: Modifier = Modifier,
                                 scopeState.onEvent(SearchEvent.SetSearchText(text))
                             } else {
                                 expanded = false
+                                color = colorDefault.toArgb()
                                 onActiveChanged(expanded)
                                 scrollingOff()
                             }
@@ -403,7 +405,7 @@ private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState) {
         exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(400)),
     ) {
         Column(
-            modifier = Modifier.padding(bottom = 10.dp, end = 10.dp)
+            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp)
                 .fillMaxSize()
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Bottom,

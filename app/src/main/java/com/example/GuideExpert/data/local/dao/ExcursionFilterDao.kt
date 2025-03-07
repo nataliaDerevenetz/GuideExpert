@@ -14,6 +14,7 @@ import com.example.GuideExpert.data.mappers.toExcursionFilterEntity
 @Dao
 interface ExcursionFilterDao {
 
+    @Transaction
     @Query("SELECT * FROM excursionFilterEntity")
     fun pagingSource(): PagingSource<Int, ExcursionFilterWithData>
 

@@ -12,7 +12,8 @@ data class ExcursionFilterEntity(
     val id: Int,
     @ColumnInfo val title: String,
     @ColumnInfo val description: String,
+    @ColumnInfo val idSort: Int,
     @Ignore var images: List<Image>
 ){
-    constructor(id: Int, title: String, description: String) : this(id, title, description, listOf())
+    constructor(id: Int, title: String, description: String, idSort: Int) : this(id, title, description, idSort, listOf())
 }

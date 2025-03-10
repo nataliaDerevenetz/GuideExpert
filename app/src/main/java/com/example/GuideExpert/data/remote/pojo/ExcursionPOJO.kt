@@ -13,5 +13,8 @@ data class ExcursionPOJO (
     val description: String,
 
     @SerializedName("images")
-    val images: List<ImagePOJO>
+    val images: List<ImagePOJO>,
+
+    @SerializedName("idSort")
+    val idSort: Int,
 )

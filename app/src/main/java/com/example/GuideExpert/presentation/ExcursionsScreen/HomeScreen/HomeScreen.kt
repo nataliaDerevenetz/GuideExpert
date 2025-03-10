@@ -66,32 +66,10 @@ fun HomeScreen(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 val newOffset = toolbarOffsetHeightPx + delta
-                Log.d("TAG3","toolbarOffsetHeightPx ::" + toolbarOffsetHeightPx)
-
                 if(isCantScrollingColumn) {scrollingColumn = false} else {scrollingColumn = true}
                 if (scrolling && scrollingColumn) toolbarOffsetHeightPx = newOffset.coerceIn(-(toolbarHeightPx+statusbarHeight), 0f)
                 return Offset.Zero
             }
-            /*override fun  onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                val delta1 = available.y
-                val delta2 = consumed.y
-                Log.d("TAG","consumed ::$delta2 ")
-                Log.d("TAG","available ::$delta1 ")
-                if(delta2.roundToInt() == 0 &&  delta1.roundToInt() != 0) {
-                    Log.d("TAG","scroll NULL ")
-                    toolbarHeightDp = toolbarHeight
-                    toolbarOffsetHeightPx = 0f
-                    scrolling = false
-
-                   return Offset(x= 0F, y=delta1)
-                } else {
-                    scrolling = true
-                  //  return Offset(x= 0F, y=delta2)
-                    //scrolling = true
-                }
-                return Offset.Zero
-            }*/
-
         }
     }
 

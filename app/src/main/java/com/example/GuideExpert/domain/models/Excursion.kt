@@ -11,5 +11,6 @@ data class Excursion (
     val id: Int,
     val title: String,
     val description: String,
-    val images: List<Image>
+    val images: List<Image>,
+    val idSort:Int
 ): Parcelable

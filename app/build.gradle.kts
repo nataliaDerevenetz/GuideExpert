@@ -26,6 +26,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        manifestPlaceholders["YANDEX_CLIENT_ID"] = "fd38e45bf1cb447e84e8c20e17b2646e"
     }
 
     buildTypes {
@@ -38,11 +40,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
         freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
     }
     buildFeatures {
@@ -56,6 +58,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
 
 composeCompiler {
@@ -67,27 +70,30 @@ kapt {
 }
 
 
-
 dependencies {
 
-    implementation("androidx.compose.material:material-icons-extended:1.7.6")
+    implementation ("com.yandex.android:authsdk:3.1.3")
 
-    implementation("androidx.compose.animation:animation:1.7.6")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+    implementation("androidx.compose.animation:animation:1.7.8")
 
     implementation("com.google.accompanist:accompanist-pager:0.28.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
     implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-paging:$room_version")
 
     val paging_version = "3.3.2"
     implementation("androidx.paging:paging-runtime:$paging_version")
-    implementation("androidx.paging:paging-compose:3.3.2")
+    implementation("androidx.paging:paging-compose:3.3.6")
 
 
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.2")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 

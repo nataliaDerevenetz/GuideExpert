@@ -1,12 +1,30 @@
 package com.example.GuideExpert.presentation.ProfileScreen
 
+import android.content.Intent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.GuideExpert.R
+import com.example.GuideExpert.presentation.UserViewModel
 
 @Composable
 fun ProfileScreen(count :Int, onIcr :()->Unit) {
@@ -24,11 +42,28 @@ fun ProfileScreen(count :Int, onIcr :()->Unit) {
 
 
 @Composable
-fun Screen1View(onNavigateToScreen2: () -> Unit) {
-    Column {
+fun Screen1View(onNavigateToScreen2: () -> Unit,
+                viewModel: UserViewModel = hiltViewModel()) {
+
+    var token by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
+
+
+    Column (modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally ){
+        Image(
+            imageVector = ImageVector.vectorResource(R.drawable.button_yandex),
+            contentDescription = "Yandex",
+            modifier = Modifier.clickable { ProfileActivity.newIntent(context) }
+        )
         Text("Screen1")
         Button(onClick = { onNavigateToScreen2() }) {
             Text("To Screen2")
+        }
+
+        Button(onClick = { token = viewModel.getToken() ?: "" }) {
+            Text("AUTH : $token")
         }
     }
 }

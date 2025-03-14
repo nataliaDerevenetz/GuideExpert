@@ -7,9 +7,7 @@ import androidx.compose.runtime.Composable
 @Composable
 fun ExcursionsScreen(
     snackbarHostState: SnackbarHostState,
-    count: Int,
-    onIcr: () -> Unit,
     onChangeVisibleBottomBar: (Boolean) -> Unit
 ) {
-    NavigationHomeScreen(snackbarHostState = snackbarHostState,onChangeVisibleBottomBar =onChangeVisibleBottomBar, count = count,onIcr = onIcr)
+    NavigationHomeScreen(snackbarHostState = snackbarHostState,onChangeVisibleBottomBar =onChangeVisibleBottomBar)
 }

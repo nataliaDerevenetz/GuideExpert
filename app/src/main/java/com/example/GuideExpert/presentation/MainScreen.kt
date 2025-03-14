@@ -75,7 +75,8 @@ val topLevelRoutes = listOf(
 )
 
 @Composable
-fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
+fun MainScreen(//viewModel: UserViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
@@ -87,9 +88,10 @@ fun MainScreen(viewModel: UserViewModel = hiltViewModel()) {
     ) { innerPadding ->
         NavHost(navController, startDestination = Home, Modifier.padding(innerPadding)) {
             composable<Home> { ExcursionsScreen(snackbarHostState = snackbarHostState,
-                onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
-                count = viewModel.count, onIcr = {viewModel.increase()}) }
-            composable<Profile> { ProfileScreen(viewModel.count,onIcr = {viewModel.increase()}) }
+                onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar}) }
+            composable<Profile> { ProfileScreen(snackbarHostState = snackbarHostState,
+            //    viewModel.count,onIcr = {viewModel.increase()}
+            ) }
         }
     }
 }

@@ -43,10 +43,7 @@ data class ImageExcursion(
 @Serializable
 class ExcursionDetail(val excursion : Excursion) {
     companion object {
-        val typeMap = mapOf(typeOf<Excursion>() to serializableType<Excursion>(),
-            //typeOf<List<Image>>() to serializableTypeArray<Image>(),
-          //  typeOf<Image>() to serializableType<Image>()
-        )
+        val typeMap = mapOf(typeOf<Excursion>() to serializableType<Excursion>())
 
         fun from(savedStateHandle: SavedStateHandle) =
             savedStateHandle.toRoute<ExcursionDetail>(typeMap)
@@ -57,8 +54,6 @@ class ExcursionDetail(val excursion : Excursion) {
 fun NavigationHomeScreen(
     snackbarHostState : SnackbarHostState,
     onChangeVisibleBottomBar: (Boolean) -> Unit,
-    count :Int,
-    onIcr :()->Unit
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = ExcursionSearchScreen) {
@@ -67,7 +62,7 @@ fun NavigationHomeScreen(
         val onNavigateToImage = { imageId: Int,excursionImages: List<Image>,indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
         val onNavigateToBack = {navController.popBackStack() }
-        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack,count,onIcr)
+        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack)
     }
 }
 
@@ -76,8 +71,7 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
                                           onNavigateToAlbum: (Int) -> Unit,
                                           onNavigateToImage: (Int,List<Image>,Int) -> Unit,
                                           onChangeVisibleBottomBar: (Boolean) -> Unit,
-                                          onNavigateToBack:() -> Boolean,
-                                          count: Int, onIcr:() -> Unit) {
+                                          onNavigateToBack:() -> Boolean) {
     composable<ExcursionSearchScreen> {
         onChangeVisibleBottomBar(true)
         HomeScreen(snackbarHostState,onNavigateToExcursion)

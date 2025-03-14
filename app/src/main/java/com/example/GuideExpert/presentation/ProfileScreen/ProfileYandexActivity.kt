@@ -5,14 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.GuideExpert.R
+import androidx.lifecycle.lifecycleScope
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.presentation.UserViewModel
@@ -21,12 +15,15 @@ import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthResult
 import com.yandex.authsdk.YandexAuthSdk
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ProfileActivity : ComponentActivity() {
+class ProfileYandexActivity : ComponentActivity() {
     @Inject
     lateinit var sessionManager: SessionManager
+    @Inject
+    lateinit var excursionService: ExcursionService
     val viewmodel: UserViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,20 +37,30 @@ class ProfileActivity : ComponentActivity() {
         when (result) {
             is YandexAuthResult.Success -> {
                 Log.d("YANDEX",result.token.value)
-               // sessionManager.saveAuthToken(result.token.value)
-              //  excursionService.loginYandex(result.token.value)
+                lifecycleScope.launch {
+                    viewmodel.sendEffectFlow("OK", null)
+                }
                 viewmodel.loginYandex(result.token.value)
+                Log.d("YANDEXhash",viewmodel.hashCode().toString())
                 finish()
-            }//onSuccessAuth(result.token)
+            }
             is YandexAuthResult.Failure -> { Log.d("YANDEX","Failure")
+                lifecycleScope.launch {
+                    viewmodel.sendEffectFlow(result.exception.message.toString(), null)
+                }
                 finish()}//onProccessError(result.exception)
-            YandexAuthResult.Cancelled -> { Log.d("YANDEX","Cancelled")
-                finish()}//onCancelled()
+            YandexAuthResult.Cancelled -> {
+                lifecycleScope.launch {
+                    viewmodel.sendEffectFlow("Cancelled", null)
+                }
+                Log.d("YANDEX","Cancelled")
+                finish()
+            }//onCancelled()
         }
     }
     companion object {
         fun newIntent(context: Context) =
-            context.startActivity(Intent(context, ProfileActivity::class.java))
+            context.startActivity(Intent(context, ProfileYandexActivity::class.java))
 
     }
 }

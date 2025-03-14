@@ -1,12 +1,14 @@
 package com.example.GuideExpert.presentation.ProfileScreen
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,35 +20,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.GuideExpert.R
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.presentation.UserViewModel
 
 @Composable
-fun ProfileScreen(count :Int, onIcr :()->Unit) {
-
-    NavigationProfileScreen(count,onIcr)
-    /*
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = Screen1) {
-        val onNavigateToScreen2 = { navController.navigateToScreen2("Ok it Screen2")}
-        profileDestination(onNavigateToScreen2,count,onIcr)
-    }*/
-
+fun ProfileScreen(
+    snackbarHostState: SnackbarHostState,
+) {
+    NavigationProfileScreen(snackbarHostState)
 }
 
 
 @Composable
-fun Screen1View(onNavigateToScreen2: () -> Unit,
-                viewModel: UserViewModel = hiltViewModel()) {
+fun Screen1View(snackbarHostState: SnackbarHostState,
+                onNavigateToYandex: () -> Unit,
+                onNavigateToScreen2: () -> Unit,
+                viewModel: UserViewModel = hiltViewModel()
+) {
 
+    Log.d("MODEL", "000")
     var token by rememberSaveable { mutableStateOf("") }
-    val context = LocalContext.current
+
+    val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
+    LaunchedEffect(effectFlow) {
+        Log.d("MODEL", "888")
+        effectFlow?.let {
+            when (it) {
+                is SnackbarEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(it.message)
+                }
+            }
+        }
+    }
 
 
     Column (modifier = Modifier.fillMaxSize(),
@@ -55,34 +69,49 @@ fun Screen1View(onNavigateToScreen2: () -> Unit,
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.button_yandex),
             contentDescription = "Yandex",
-            modifier = Modifier.clickable { ProfileActivity.newIntent(context) }
+            modifier = Modifier.clickable {
+                onNavigateToYandex()
+                //ProfileActivity.newIntent(context)
+            }
         )
         Text("Screen1")
         Button(onClick = { onNavigateToScreen2() }) {
             Text("To Screen2")
         }
 
-        Button(onClick = { token = viewModel.getToken() ?: "" }) {
-            Text("AUTH : $token")
-        }
-    }
-}
-
-@Composable
-fun Screen2View(count :Int, onIcr :()->Unit) {
-    Column {
-        Text("Screen2")
-        LoadData(count,onIcr)
-    }
-}
-
-@Composable
-fun LoadData(count :Int, onIcr :()->Unit) {
-    Column {
-        //   Text("uuu :: ${vm.nameScreen2}")
-        Text("Incr :: $count")
-        Button(onClick = {onIcr()}) {
+        Text("Incr :: ${viewModel.count}")
+        Button(onClick = {viewModel.increase()}) {
             Text(text = "Increase", fontSize = 25.sp)
         }
+
+      /* Button(onClick = { token = viewModel.getToken() ?: "" }) {
+            Text("AUTH : $token")
+        }*/
+    }
+}
+
+@Composable
+fun Screen2View( onNavigateToYandex: () -> Unit,
+    viewModel: UserViewModel = hiltViewModel()) {
+
+  //  onNavigateToYandex()
+    Column {
+        Text("Screen2")
+        Text("Incr :: ${viewModel.count}")
+        Button(onClick = {viewModel.increase()}) {
+                Text(text = "Increase", fontSize = 25.sp)
+        }
+        LoadData()
+    }
+}
+
+@Composable
+fun LoadData() {
+    Column {
+        //   Text("uuu :: ${vm.nameScreen2}")
+       // Text("Incr :: $count")
+       // Button(onClick = {onIcr()}) {
+       //     Text(text = "Increase", fontSize = 25.sp)
+       // }
     }
 }

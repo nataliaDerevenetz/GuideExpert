@@ -24,14 +24,6 @@ import kotlinx.serialization.Serializable
 import java.io.IOException
 import javax.inject.Inject
 
-@Serializable
-class UserInfo(
-    val userId: String = "32134",
-    val name: String ="Tom",
-    val age: Int = 10,
-    val sex:String = "men"
-)
-
 sealed class UIResources<out T> {
     data class Success<out T>(val data: T) : UIResources<T>()
     data class Error(val message: String) : UIResources<Nothing>()
@@ -42,17 +34,6 @@ class DataSourceRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,
     private val excursionService: ExcursionService,
 ): DataSourceRepository {
-
-    override fun getUserInfo(userId:String): Flow<UserInfo> {
-        return flow{
-            withContext(Dispatchers.IO) {
-                delay(5000)
-            }
-            emit(UserInfo(userId,"Trump",88,"men"))
-        }
-    }
-
-
 
     override suspend fun getExcursionInfo(excursionId:Int): Flow<UIResources<ExcursionData>> = flow {
        try {

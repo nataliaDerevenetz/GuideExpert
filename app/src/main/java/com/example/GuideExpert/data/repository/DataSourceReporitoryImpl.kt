@@ -5,11 +5,13 @@ import androidx.paging.RemoteMediator.MediatorResult
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toConfig
 import com.example.GuideExpert.data.mappers.toExcursionData
+import com.example.GuideExpert.data.mappers.toProfileYandex
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.domain.models.ProfileYandex
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -86,5 +88,16 @@ class DataSourceRepositoryImpl @Inject constructor(
 
     override fun getImageExcursion(imageId:Int): Flow<Image> {
         return dbStorage.getImageExcursion(imageId).flowOn(Dispatchers.IO)
+    }
+
+    override fun getAuthTokenByYandex(oauthToken:String): Flow<UIResources<ProfileYandex>> = flow<UIResources<ProfileYandex>>{
+        emit(UIResources.Loading)
+        val result = excursionService.loginYandex(oauthToken)
+        if (result.isSuccessful) {
+            val profile = result.body()?.toProfileYandex() ?: ProfileYandex()
+            emit(UIResources.Success(profile))
+        }
+    }.catch { e->
+        emit(UIResources.Error(e.localizedMessage ?: "Unknown error"))
     }
 }

@@ -10,6 +10,6 @@ data class ProfileYandexPOJO(
     val auth_token: String,
 
     @SerializedName("time")
-    val time: String,
+    val time: Int,
 
     )

@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.di
 
+import com.example.GuideExpert.domain.GetAuthTokenByYandexUseCase
 import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
@@ -13,6 +14,7 @@ import com.example.GuideExpert.domain.GetFiltersSortUseCase
 import com.example.GuideExpert.domain.GetImageExcursionUseCase
 import com.example.GuideExpert.domain.GetImagesExcursionDataUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
+import com.example.GuideExpert.domain.impl.GetAuthTokenByYandexUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetConfigUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByFiltersUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByQueryUseCaseImpl
@@ -107,5 +109,11 @@ abstract class MainScreenModule {
     abstract fun bindGetImageExcursionUseCase(
         getImageExcursionUseCaseImpl: GetImageExcursionUseCaseImpl
     ) : GetImageExcursionUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindGetAuthTokenByYandexUseCase(
+        getAuthTokenByYandexUseCaseImpl: GetAuthTokenByYandexUseCaseImpl
+    ) : GetAuthTokenByYandexUseCase
 
 }

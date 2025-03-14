@@ -20,11 +20,11 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileYandexActivity : ComponentActivity() {
-    @Inject
-    lateinit var sessionManager: SessionManager
-    @Inject
-    lateinit var excursionService: ExcursionService
-    val viewmodel: UserViewModel by viewModels()
+   // @Inject
+   // lateinit var sessionManager: SessionManager
+   // @Inject
+   // lateinit var excursionService: ExcursionService
+    val viewmodel: ProfileYandexViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sdk = YandexAuthSdk.create(YandexAuthOptions(applicationContext))
@@ -37,30 +37,19 @@ class ProfileYandexActivity : ComponentActivity() {
         when (result) {
             is YandexAuthResult.Success -> {
                 Log.d("YANDEX",result.token.value)
-                lifecycleScope.launch {
-                    viewmodel.sendEffectFlow("OK", null)
-                }
+
                 viewmodel.loginYandex(result.token.value)
                 Log.d("YANDEXhash",viewmodel.hashCode().toString())
                 finish()
             }
             is YandexAuthResult.Failure -> { Log.d("YANDEX","Failure")
-                lifecycleScope.launch {
-                    viewmodel.sendEffectFlow(result.exception.message.toString(), null)
-                }
+
                 finish()}//onProccessError(result.exception)
             YandexAuthResult.Cancelled -> {
-                lifecycleScope.launch {
-                    viewmodel.sendEffectFlow("Cancelled", null)
-                }
+
                 Log.d("YANDEX","Cancelled")
                 finish()
             }//onCancelled()
         }
-    }
-    companion object {
-        fun newIntent(context: Context) =
-            context.startActivity(Intent(context, ProfileYandexActivity::class.java))
-
     }
 }

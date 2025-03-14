@@ -5,6 +5,7 @@ import com.example.GuideExpert.data.repository.UserInfo
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.domain.models.ProfileYandex
 import kotlinx.coroutines.flow.Flow
 
 interface DataSourceRepository {
@@ -20,5 +21,7 @@ interface DataSourceRepository {
     fun getImagesExcursion(excursionId:Int): Flow<List<Image>>
 
     fun getImageExcursion(imageId:Int): Flow<Image>
+
+    fun getAuthTokenByYandex(oauthToken:String): Flow<UIResources<ProfileYandex>>
 
 }

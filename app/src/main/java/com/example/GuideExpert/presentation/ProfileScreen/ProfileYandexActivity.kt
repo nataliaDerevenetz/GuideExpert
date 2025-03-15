@@ -20,8 +20,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileYandexActivity : ComponentActivity() {
-   // @Inject
-   // lateinit var sessionManager: SessionManager
+  // @Inject
+  // lateinit var sessionManager: SessionManager
    // @Inject
    // lateinit var excursionService: ExcursionService
     val viewmodel: ProfileYandexViewModel by viewModels()

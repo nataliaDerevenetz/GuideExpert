@@ -50,6 +50,17 @@ fun Screen1View(snackbarHostState: SnackbarHostState,
     Log.d("MODEL", "000")
     var token by rememberSaveable { mutableStateOf("") }
 
+    var profileId = viewModel.profileId.collectAsStateWithLifecycle(0)
+
+    var profileTime = viewModel.profileTime.collectAsStateWithLifecycle(0)
+
+    var authToken = viewModel.authToken.collectAsStateWithLifecycle("")
+
+    Log.d("TAG","profileId :: " + profileId.value.toString())
+    Log.d("TAG","profileTime ::" + profileTime.value.toString())
+    Log.d("TAG","authToken :: " + authToken.value.toString())
+
+
     val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
     LaunchedEffect(effectFlow) {
         Log.d("MODEL", "888")
@@ -76,7 +87,7 @@ fun Screen1View(snackbarHostState: SnackbarHostState,
         )
         Text("Screen1")
         Button(onClick = { onNavigateToScreen2() }) {
-            Text("To Screen2")
+            Text(profileId.value.toString())
         }
 
         Text("Incr :: ${viewModel.count}")

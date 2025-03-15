@@ -7,6 +7,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -75,9 +78,13 @@ object NetworkModule {
 
         okHttpClient.addInterceptor { chain ->
             val newRequest = chain.request().newBuilder()
-            sessionManager.fetchAuthToken()?.let {
+         /*   sessionManager.fetchAuthToken()?.let {
                 newRequest.addHeader("Authorization", "Bearer $it")
+            }*/
+            val token = runBlocking {
+                sessionManager.getAuthToken().first()
             }
+            newRequest.addHeader("Authorization", "Bearer $token")
             newRequest.addHeader("User-Agent","GuideExpert")
             chain.proceed(newRequest.build())
         }

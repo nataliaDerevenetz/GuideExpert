@@ -49,9 +49,7 @@ fun NavGraphBuilder.profileDestination(snackbarHostState :SnackbarHostState,
 {
     composable<Screen1> { Screen1View(snackbarHostState,onNavigateToYandex,onNavigateToScreen2, viewModel = hiltViewModel(viewModelStoreOwner)) }
     composable<Screen2> { Screen2View(onNavigateToYandex,viewModel = hiltViewModel(viewModelStoreOwner)) }
-    activity("loginYandex") {
-        activityClass = ProfileYandexActivity::class
-    }
+    activity("loginYandex") { activityClass = ProfileYandexActivity::class }
 }
 
 fun NavController.navigateToScreen2(str: String) {

@@ -72,6 +72,8 @@ kapt {
 
 dependencies {
 
+    implementation ("androidx.datastore:datastore-preferences:1.1.3")
+
     implementation ("com.yandex.android:authsdk:3.1.3")
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")

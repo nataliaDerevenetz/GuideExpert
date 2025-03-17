@@ -50,14 +50,12 @@ fun Screen1View(snackbarHostState: SnackbarHostState,
     Log.d("MODEL", "000")
     var token by rememberSaveable { mutableStateOf("") }
 
-    var profileId = viewModel.profileId.collectAsStateWithLifecycle(0)
+    var profileId = viewModel.profileId.collectAsStateWithLifecycle()
+    var authToken = viewModel.authToken.collectAsStateWithLifecycle()
 
-    var profileTime = viewModel.profileTime.collectAsStateWithLifecycle(0)
-
-    var authToken = viewModel.authToken.collectAsStateWithLifecycle("")
+    val profile = viewModel.profileFlow.collectAsStateWithLifecycle()
 
     Log.d("TAG","profileId :: " + profileId.value.toString())
-    Log.d("TAG","profileTime ::" + profileTime.value.toString())
     Log.d("TAG","authToken :: " + authToken.value.toString())
 
 
@@ -73,7 +71,6 @@ fun Screen1View(snackbarHostState: SnackbarHostState,
         }
     }
 
-
     Column (modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally ){
@@ -87,7 +84,7 @@ fun Screen1View(snackbarHostState: SnackbarHostState,
         )
         Text("Screen1")
         Button(onClick = { onNavigateToScreen2() }) {
-            Text(profileId.value.toString())
+            Text(profile.value?.realName ?: "")
         }
 
         Text("Incr :: ${viewModel.count}")

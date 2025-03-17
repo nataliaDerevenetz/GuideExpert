@@ -1,43 +1,27 @@
 package com.example.GuideExpert.data.local
 
-import android.util.Log
-import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
-import com.example.GuideExpert.data.local.dao.ExcursionSearchDao
 import com.example.GuideExpert.data.local.dao.ImageDao
-import com.example.GuideExpert.data.local.models.ExcursionDataEntity
-import com.example.GuideExpert.data.local.models.ImageEntity
+import com.example.GuideExpert.data.local.dao.ProfileDao
 import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionDataEntity
 import com.example.GuideExpert.data.mappers.toImage
 import com.example.GuideExpert.data.mappers.toImageEntity
-import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.data.mappers.toProfile
+import com.example.GuideExpert.data.mappers.toProfileEntity
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.domain.models.Profile
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 class DBStorageImpl @Inject constructor(
-    private val excursionSearchDao: ExcursionSearchDao,
     private val excursionDataDao: ExcursionDataDao,
-    private val imageDao: ImageDao
+    private val imageDao: ImageDao,
+    private val profileDao: ProfileDao
 ): DBStorage{
-
-   /* override fun getExcursionInfo(excursionId: Int): Flow<ExcursionData> {
-        Log.d("TAG","excursionId::   ${excursionId.toString()}")
-        return flow{
-            /*   withContext(Dispatchers.IO) {
-                   delay(5000)
-               }
-
-             */
-            emit(ExcursionData(excursionId = excursionId))
-        }
-    }*/
-
 
     override suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>) {
        excursionDataDao.insertExcursionAndImages(excursion.toExcursionDataEntity(),
@@ -59,4 +43,13 @@ class DBStorageImpl @Inject constructor(
                  it.toImage()
         }
     }
+
+    override fun getProfile(profileId: Int): Flow<Profile?> {
+        return profileDao.getById(profileId).map { it?.toProfile() }
+    }
+
+    override suspend fun insertProfile(profile: Profile) {
+        profileDao.insert(profile.toProfileEntity())
+    }
+
 }

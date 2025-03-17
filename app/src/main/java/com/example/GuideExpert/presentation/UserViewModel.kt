@@ -9,9 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.remote.services.ExcursionService
+import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ProfileAuthYandexData
 import com.example.GuideExpert.domain.repository.DataSourceRepository
+import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionListSearchUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -45,47 +48,51 @@ class UserViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     private val userInfoRepository: DataSourceRepository,
     private val sessionManager: SessionManager,
-    private val excursionService: ExcursionService
+    private val profileService: ProfileService,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    val profileId: SharedFlow<Int> = sessionManager.getProfileId()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), replay = 1)
+    val profileId: StateFlow<Int> = sessionManager.getProfileId()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    val authToken: StateFlow<String> = sessionManager.getAuthToken()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
 
-    val profileTime: SharedFlow<Int> = sessionManager.getProfileTime()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), replay = 1)
-
-
-    val authToken: SharedFlow<String> = sessionManager.getAuthToken()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), replay = 1)
-
+    val profileFlow = profileRepository.profileFlow
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun getProfileInfo() {
         Log.d("MODEL","getProfilemmm ")
         Log.d("MODEL0",profileId.toString())
-        Log.d("MODEL0",profileTime.toString())
         Log.d("MODEL0",authToken.toString())
 
         combine(
             profileId,
             authToken,
-            profileTime
-        ) { (profileId, authToken,profileTime) ->
+        ) { (profileId, authToken) ->
             Log.d("SERVER111", "1111 ::")
-            ProfileAuthYandexData(profileId, authToken,profileTime)
-        }.filter{it.id !=0 && it.authToken !="" && it.time != 0}
-            .flowOn(Dispatchers.IO)
+            Log.d("SERVER111","profileId: $profileId")
+            Log.d("SERVER111", "authToken: $authToken")
+            ProfileAuthYandexData(profileId, authToken)
+        }.filter{it.id !=0 && it.authToken !=""}
+            .distinctUntilChanged()
             .flatMapLatest {
                 Log.d("SERVER", "222 ::${it.authToken}")
+                // state LOAD!!!
+               profileRepository.fetchProfile()
+               // profileService.getProfile(it.id as Int)
                 flowOf(it)
                 //  Log.d("TAG", "get list ::${it.query}")
                 //   getExcursionByQueryUseCase(it)
                 //excursionRepository.getExcursionList()
             }
+            .flowOn(Dispatchers.IO)
             .collect {
-            println(it) // Will print "1a 2a 2b 2c"
+                // state DATA!!!
+              //  profileRepository.fetchProfile()
+           // println(it) // Will print "1a 2a 2b 2c"
         }
 
     }

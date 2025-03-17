@@ -16,9 +16,7 @@ interface ImageDao {
     @Query("SELECT * FROM imageEntity WHERE id = :id")
     fun getById(id: Int) : Flow<ImageEntity>
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(users: List<ImageEntity>)
-
 
 }

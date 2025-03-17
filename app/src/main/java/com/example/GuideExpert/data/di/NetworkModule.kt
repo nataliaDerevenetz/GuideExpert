@@ -2,6 +2,7 @@ package com.example.GuideExpert.data.di
 
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.remote.services.ExcursionService
+import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.utils.Constant
 import dagger.Module
 import dagger.Provides
@@ -78,9 +79,6 @@ object NetworkModule {
 
         okHttpClient.addInterceptor { chain ->
             val newRequest = chain.request().newBuilder()
-         /*   sessionManager.fetchAuthToken()?.let {
-                newRequest.addHeader("Authorization", "Bearer $it")
-            }*/
             val token = runBlocking {
                 sessionManager.getAuthToken().first()
             }
@@ -104,9 +102,9 @@ object NetworkModule {
             .build()
     }
 
-    /* @Provides
+     @Provides
      @Singleton
-     fun provideUserService(@Auth retrofit: Retrofit): UserService {
-         return retrofit.create(UserService::class.java)
-     }*/
+     fun provideUserService(@Auth retrofit: Retrofit): ProfileService {
+         return retrofit.create(ProfileService::class.java)
+     }
 }

@@ -3,6 +3,7 @@ package com.example.GuideExpert.data.remote.services
 import com.example.GuideExpert.data.remote.pojo.ConfigPOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionDataPOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionsPagingPOJO
+import com.example.GuideExpert.data.remote.pojo.ProfilePOJO
 import com.example.GuideExpert.data.remote.pojo.ProfileYandexPOJO
 import retrofit2.Response
 import retrofit2.http.Field

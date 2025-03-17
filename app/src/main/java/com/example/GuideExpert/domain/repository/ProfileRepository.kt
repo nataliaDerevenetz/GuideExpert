@@ -1,10 +1,12 @@
 package com.example.GuideExpert.domain.repository
 
+import com.example.GuideExpert.data.repository.ProfileResources
 import com.example.GuideExpert.domain.models.Profile
 import kotlinx.coroutines.flow.StateFlow
 
 interface ProfileRepository {
     val profileFlow: StateFlow<Profile?>
+    val profileStateFlow: StateFlow<ProfileResources>
     suspend fun fetchProfile()
     suspend fun updateProfile(newProfile: Profile)
 }

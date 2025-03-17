@@ -8,33 +8,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.SessionManager
-import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.data.remote.services.ProfileService
-import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ProfileAuthYandexData
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionListSearchUIState
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -61,6 +52,8 @@ class UserViewModel @Inject constructor(
 
     val profileFlow = profileRepository.profileFlow
 
+    val profileStateFlow = profileRepository.profileStateFlow
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun getProfileInfo() {
@@ -78,12 +71,12 @@ class UserViewModel @Inject constructor(
             ProfileAuthYandexData(profileId, authToken)
         }.filter{it.id !=0 && it.authToken !=""}
             .distinctUntilChanged()
-            .flatMapLatest {
+            .onEach {
                 Log.d("SERVER", "222 ::${it.authToken}")
                 // state LOAD!!!
                profileRepository.fetchProfile()
                // profileService.getProfile(it.id as Int)
-                flowOf(it)
+                //flowOf(it)
                 //  Log.d("TAG", "get list ::${it.query}")
                 //   getExcursionByQueryUseCase(it)
                 //excursionRepository.getExcursionList()

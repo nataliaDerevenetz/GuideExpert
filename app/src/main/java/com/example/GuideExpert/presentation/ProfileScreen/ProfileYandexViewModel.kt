@@ -25,7 +25,7 @@ class ProfileYandexViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getAuthTokenByYandexUseCase: GetAuthTokenByYandexUseCase,
     val sessionManager: SessionManager,
-    val profileRepository: ProfileRepository
+ //   val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     fun loginYandex(oauthToken : String) {

@@ -29,6 +29,9 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.GuideExpert.R
+import com.example.GuideExpert.data.repository.ProfileResources
+import com.example.GuideExpert.data.repository.UIResources
+import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.presentation.UserViewModel
 
@@ -50,13 +53,27 @@ fun Screen1View(snackbarHostState: SnackbarHostState,
     Log.d("MODEL", "000")
     var token by rememberSaveable { mutableStateOf("") }
 
-    var profileId = viewModel.profileId.collectAsStateWithLifecycle()
-    var authToken = viewModel.authToken.collectAsStateWithLifecycle()
+   // var profileId = viewModel.profileId.collectAsStateWithLifecycle()
+   // var authToken = viewModel.authToken.collectAsStateWithLifecycle()
 
     val profile = viewModel.profileFlow.collectAsStateWithLifecycle()
 
-    Log.d("TAG","profileId :: " + profileId.value.toString())
-    Log.d("TAG","authToken :: " + authToken.value.toString())
+    val profileState = viewModel.profileStateFlow.collectAsStateWithLifecycle()
+
+    when(profileState.value) {
+        is ProfileResources.Error -> {
+            Log.d("PROFILESTATE","Error")
+        }
+        is ProfileResources.Idle -> {  Log.d("PROFILESTATE","IDLE")}
+        is ProfileResources.Loading -> {  Log.d("PROFILESTATE","LOADING")}
+        is ProfileResources.Success -> {  Log.d("PROFILESTATE","Success")
+            //(profileState.value as ProfileResources.Success).data?.let { Log.d("PROFILESTATE", it.login) }
+        }
+    }
+
+
+   // Log.d("TAG","profileId :: " + profileId.value.toString())
+   // Log.d("TAG","authToken :: " + authToken.value.toString())
 
 
     val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)

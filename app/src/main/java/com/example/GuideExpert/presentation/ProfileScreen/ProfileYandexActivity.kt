@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,7 +45,7 @@ class ProfileYandexActivity : ComponentActivity() {
             is YandexAuthResult.Success -> {
                 Log.d("YANDEX",result.token.value)
                 viewmodel.loginYandex(result.token.value)
-                Log.d("YANDEX","FINISH")
+                Log.d("YANDEX", "FINISH")
                 finish()
 
             }

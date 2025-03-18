@@ -9,16 +9,15 @@ import kotlinx.coroutines.flow.Flow
 
 interface DataSourceRepository {
 
-    suspend fun getExcursionInfo(excursionId:Int): Flow<UIResources<ExcursionData>>
+    suspend fun getExcursionInfo(excursionId: Int): Flow<UIResources<ExcursionData>>
 
     suspend fun getConfigInfo(): Flow<UIResources<Config>>
 
-    fun getExcursionData(excursionId:Int): Flow<ExcursionData?>
+    fun getExcursionData(excursionId: Int): Flow<ExcursionData?>
 
-    fun getImagesExcursion(excursionId:Int): Flow<List<Image>>
+    fun getImagesExcursion(excursionId: Int): Flow<List<Image>>
 
-    fun getImageExcursion(imageId:Int): Flow<Image>
+    fun getImageExcursion(imageId: Int): Flow<Image>
 
-    fun getAuthTokenByYandex(oauthToken:String): Flow<UIResources<ProfileYandex>>
-
+    fun getAuthTokenByYandex(oauthToken: String): Flow<UIResources<ProfileYandex>>
 }

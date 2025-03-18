@@ -5,7 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.GuideExpert.data.SessionManager
@@ -38,6 +44,23 @@ class ProfileYandexActivity : ComponentActivity() {
             registerForActivityResult(sdk.contract) { result -> handleResult(result) }
         val loginOptions = YandexAuthLoginOptions()
         launcher.launch(loginOptions)
+        lifecycleScope.launch {
+            viewmodel.isClosed.collectLatest {
+                if (it) {
+                    Log.d("YANDEX", "FINISH")
+                    Log.d("ACTIVITY", "CLOSED")
+                    finish()
+                }
+            }
+        }
+
+        setContent {
+            Box (contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()){
+                CircularProgressIndicator()
+            }
+        }
+
     }
 
     private  fun handleResult(result: YandexAuthResult) {
@@ -45,9 +68,6 @@ class ProfileYandexActivity : ComponentActivity() {
             is YandexAuthResult.Success -> {
                 Log.d("YANDEX",result.token.value)
                 viewmodel.loginYandex(result.token.value)
-                Log.d("YANDEX", "FINISH")
-                finish()
-
             }
             is YandexAuthResult.Failure -> { Log.d("YANDEX","Failure")
 

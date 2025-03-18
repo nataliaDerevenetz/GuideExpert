@@ -55,7 +55,6 @@ class UserViewModel @Inject constructor(
     val profileStateFlow = profileRepository.profileStateFlow
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun getProfileInfo() {
         Log.d("MODEL","getProfilemmm ")
         Log.d("MODEL0",profileId.toString())

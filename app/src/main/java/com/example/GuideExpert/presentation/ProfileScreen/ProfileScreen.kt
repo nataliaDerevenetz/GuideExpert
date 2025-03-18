@@ -64,7 +64,7 @@ fun Screen1View(snackbarHostState: SnackbarHostState,
         is ProfileResources.Error -> {
             Log.d("PROFILESTATE","Error")
         }
-        is ProfileResources.Idle -> {  Log.d("PROFILESTATE","IDLE")}
+       // is ProfileResources.Idle -> {  Log.d("PROFILESTATE","IDLE")}
         is ProfileResources.Loading -> {  Log.d("PROFILESTATE","LOADING")}
         is ProfileResources.Success -> {  Log.d("PROFILESTATE","Success")
             //(profileState.value as ProfileResources.Success).data?.let { Log.d("PROFILESTATE", it.login) }

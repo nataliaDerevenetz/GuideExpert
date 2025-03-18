@@ -21,10 +21,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ProfileYandexActivity : ComponentActivity() {
-  // @Inject
-  // lateinit var sessionManager: SessionManager
-   // @Inject
-   // lateinit var excursionService: ExcursionService
     val viewmodel: ProfileYandexViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +38,6 @@ class ProfileYandexActivity : ComponentActivity() {
                 }
             }
         }
-
         setContent {
             Box (contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize()){
@@ -58,14 +53,14 @@ class ProfileYandexActivity : ComponentActivity() {
                 Log.d("YANDEX",result.token.value)
                 viewmodel.loginYandex(result.token.value)
             }
-            is YandexAuthResult.Failure -> { Log.d("YANDEX","Failure")
-
-                finish()}//onProccessError(result.exception)
+            is YandexAuthResult.Failure -> {
+                Log.d("YANDEX","Failure :: ${result.exception.localizedMessage}")
+                finish()
+            }
             YandexAuthResult.Cancelled -> {
-
                 Log.d("YANDEX","Cancelled")
                 finish()
-            }//onCancelled()
+            }
         }
     }
 }

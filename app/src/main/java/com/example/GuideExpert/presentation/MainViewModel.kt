@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.remote.services.ProfileService
+import com.example.GuideExpert.domain.GetProfileUseCase
 import com.example.GuideExpert.domain.models.ProfileAuthYandexData
 import com.example.GuideExpert.domain.repository.DataSourceRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
@@ -30,8 +31,8 @@ sealed interface ProfileEvent {
 class MainViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     private val sessionManager: SessionManager,
-    private val profileRepository: ProfileRepository
-) : ViewModel() {
+    private val getProfileUseCase: GetProfileUseCase
+    ) : ViewModel() {
     val profileId: StateFlow<Int> = sessionManager.getProfileId()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
@@ -55,21 +56,10 @@ class MainViewModel @Inject constructor(
             .distinctUntilChanged()
             .onEach {
                 Log.d("SERVER", "222 ::${it.authToken}")
-                // state LOAD!!!
-                profileRepository.fetchProfile()
-                // profileService.getProfile(it.id as Int)
-                //flowOf(it)
-                //  Log.d("TAG", "get list ::${it.query}")
-                //   getExcursionByQueryUseCase(it)
-                //excursionRepository.getExcursionList()
+                getProfileUseCase()
             }
             .flowOn(Dispatchers.IO)
-            .collect {
-                // state DATA!!!
-                //  profileRepository.fetchProfile()
-                // println(it) // Will print "1a 2a 2b 2c"
-            }
-
+            .collect {}
     }
 
 

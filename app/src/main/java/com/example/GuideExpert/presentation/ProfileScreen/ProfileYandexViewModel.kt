@@ -7,21 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetAuthTokenByYandexUseCase
-import com.example.GuideExpert.domain.models.Filters
-import com.example.GuideExpert.domain.repository.DataSourceRepository
-import com.example.GuideExpert.domain.repository.ProfileRepository
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsSearchUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,7 +41,6 @@ class ProfileYandexViewModel @Inject constructor(
                             resource.data.id?.let { sessionManager.setProfileId(it) }
                             resource.data.time?.let { sessionManager.setProfileTime(it) }
                             Log.d("VIEW", "222")
-                           // profileRepository.fetchProfile()
                             _isClosed.update { true }
                         }
                     }

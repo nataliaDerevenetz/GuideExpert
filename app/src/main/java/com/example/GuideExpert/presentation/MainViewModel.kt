@@ -23,8 +23,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface ProfileEvent {
-    object GetProfileInfo : ProfileEvent
+sealed interface MainEvent {
+    object GetProfileInfo : MainEvent
 }
 
 @HiltViewModel
@@ -63,10 +63,10 @@ class MainViewModel @Inject constructor(
     }
 
 
-    fun handleEvent(event: ProfileEvent) {
+    fun handleEvent(event: MainEvent) {
         viewModelScope.launch {
             when (event) {
-                is ProfileEvent.GetProfileInfo -> {
+                is MainEvent.GetProfileInfo -> {
                     getProfileInfo()
                 }
             }
@@ -75,7 +75,7 @@ class MainViewModel @Inject constructor(
 
     init {
         Log.d("MODEL","ProfileEvent :: ")
-        handleEvent(ProfileEvent.GetProfileInfo)
+        handleEvent(MainEvent.GetProfileInfo)
     }
 }
 

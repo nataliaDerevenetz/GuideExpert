@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation
 
+import android.app.Person
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -50,7 +51,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionsScreen
+import com.example.GuideExpert.presentation.ProfileScreen.ProfileInfoScreen
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileScreen
 import com.example.GuideExpert.ui.theme.Purple80
 import kotlinx.serialization.Serializable
@@ -79,6 +82,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
@@ -92,7 +96,20 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             }
             composable<Profile> {
                 ProfileScreen(snackbarHostState = snackbarHostState,
-                    onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar})
+                    onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
+                    onNavigateToHome = {
+                        navController.graph.findStartDestination().route?.let { it1 ->
+                            navController.navigate(
+                                it1
+                            ){
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    })
             }
         }
     }

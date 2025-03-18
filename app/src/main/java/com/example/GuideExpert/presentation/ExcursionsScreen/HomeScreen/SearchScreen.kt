@@ -121,7 +121,7 @@ fun rememberDefaultSearchStateScope(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-): SearchStateScope = remember(searchListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion) {
+): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion) {
     DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion)
 }
 

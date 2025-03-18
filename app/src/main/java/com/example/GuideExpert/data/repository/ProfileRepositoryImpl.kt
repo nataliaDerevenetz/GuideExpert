@@ -19,7 +19,7 @@ sealed class ProfileResources {
     data object Success : ProfileResources()
     data class Error(val message: String) : ProfileResources()
     data object Loading : ProfileResources()
-   // data object Idle : ProfileResources()
+    data object Idle : ProfileResources()
 }
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -30,7 +30,7 @@ class ProfileRepositoryImpl @Inject constructor(
     private val _profileFlow = MutableStateFlow<Profile?>(null)
     override val profileFlow: StateFlow<Profile?> get() = _profileFlow
 
-    private val _profileStateFlow = MutableStateFlow<ProfileResources>(ProfileResources.Loading)
+    private val _profileStateFlow = MutableStateFlow<ProfileResources>(ProfileResources.Idle)
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
 
 

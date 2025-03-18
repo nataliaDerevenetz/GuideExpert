@@ -75,8 +75,7 @@ val topLevelRoutes = listOf(
 )
 
 @Composable
-fun MainScreen(//viewModel: UserViewModel = hiltViewModel()
-) {
+fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }

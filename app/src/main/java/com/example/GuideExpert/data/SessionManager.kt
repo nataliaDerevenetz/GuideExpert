@@ -14,30 +14,7 @@ import kotlinx.coroutines.flow.map
 
 
 class SessionManager (val context: Context) {
-   // private var prefs: SharedPreferences = context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
-   /* companion object {
-        const val USER_TOKEN = "user_token"
-    }
-*/
-    /**
-     * Function to save auth token
-     */
- /*   fun saveAuthToken(token: String) {
-        val editor = prefs.edit()
-        editor.putString(USER_TOKEN, token)
-        editor.apply()
-    }
-*/
-    /**
-     * Function to fetch auth token
-     */
-/*    fun fetchAuthToken(): String? {
-        return prefs.getString(USER_TOKEN, null)
-    }
-*/
-//----------
 
     private suspend fun <T> save(key: Preferences.Key<T>, value: T) {
         context.dataStore.edit { settings ->

@@ -36,8 +36,8 @@ class ProfileYandexViewModel @Inject constructor(
 
     fun loginYandex(oauthToken : String) {
         Log.d("VIEW", "111")
-        viewModelScope.launch {
-            getAuthTokenByYandexUseCase(oauthToken).flowOn(Dispatchers.IO)
+        viewModelScope.launch((Dispatchers.IO)) {
+            getAuthTokenByYandexUseCase(oauthToken)
                 .collectLatest { resource ->
                     when (resource) {
                         is UIResources.Error -> { _isClosed.update { true }

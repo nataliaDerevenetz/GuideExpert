@@ -23,7 +23,8 @@ data class Screen2(
 
 
 @Composable
-fun NavigationProfileScreen(snackbarHostState: SnackbarHostState)  {
+fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,
+                            onChangeVisibleBottomBar: (Boolean) -> Unit,)  {
     val navController = rememberNavController()
 
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
@@ -33,22 +34,24 @@ fun NavigationProfileScreen(snackbarHostState: SnackbarHostState)  {
     NavHost(navController = navController, startDestination = Screen1) {
         val onNavigateToScreen2 = { navController.navigateToScreen2("Ok it Screen2")}
         val onNavigateToYandex = { navController.navigateToYandex()}
-        profileDestination(snackbarHostState,onNavigateToScreen2,onNavigateToYandex,
-            viewModelStoreOwner
-        )
+        profileDestination(snackbarHostState,onNavigateToScreen2,onNavigateToYandex, viewModelStoreOwner,onChangeVisibleBottomBar)
     }
 
 }
 
-
 fun NavGraphBuilder.profileDestination(snackbarHostState :SnackbarHostState,
                                        onNavigateToScreen2: () -> Unit,
                                        onNavigateToYandex: () -> Unit,
-                                       viewModelStoreOwner: ViewModelStoreOwner
+                                       viewModelStoreOwner: ViewModelStoreOwner,
+                                       onChangeVisibleBottomBar: (Boolean) -> Unit,
 )
 {
-    composable<Screen1> { Screen1View(snackbarHostState,onNavigateToYandex,onNavigateToScreen2, viewModel = hiltViewModel(viewModelStoreOwner)) }
-    composable<Screen2> { Screen2View(onNavigateToYandex,viewModel = hiltViewModel(viewModelStoreOwner)) }
+    composable<Screen1> {
+        onChangeVisibleBottomBar(false)
+        Screen1View(snackbarHostState,onNavigateToYandex,onNavigateToScreen2, viewModel = hiltViewModel(viewModelStoreOwner)) }
+    composable<Screen2> {
+        onChangeVisibleBottomBar(false)
+        Screen2View(onNavigateToYandex,viewModel = hiltViewModel(viewModelStoreOwner)) }
     activity("loginYandex") { activityClass = ProfileYandexActivity::class }
 }
 

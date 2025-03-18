@@ -29,8 +29,9 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.Snackbar
 @Composable
 fun ProfileScreen(
     snackbarHostState: SnackbarHostState,
+    onChangeVisibleBottomBar: (Boolean) -> Unit
 ) {
-    NavigationProfileScreen(snackbarHostState)
+    NavigationProfileScreen(snackbarHostState,onChangeVisibleBottomBar =onChangeVisibleBottomBar)
 }
 
 

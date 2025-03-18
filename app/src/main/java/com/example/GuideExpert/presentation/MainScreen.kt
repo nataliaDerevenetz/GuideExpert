@@ -88,11 +88,12 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         NavHost(navController, startDestination = Home, Modifier.padding(innerPadding)) {
             composable<Home> {
                 ExcursionsScreen(snackbarHostState = snackbarHostState,
-                onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar}) }
+                onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar})
+            }
             composable<Profile> {
                 ProfileScreen(snackbarHostState = snackbarHostState,
-            //    viewModel.count,onIcr = {viewModel.increase()}
-            ) }
+                    onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar})
+            }
         }
     }
 }

@@ -1,9 +1,7 @@
 package com.example.GuideExpert.presentation.ProfileScreen
 
-import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -13,7 +11,8 @@ import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionSearchScreen
+import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileInfo
+import com.example.GuideExpert.presentation.ProfileScreen.YandexActivity.ProfileYandexActivity
 import kotlinx.serialization.Serializable
 
 @Serializable

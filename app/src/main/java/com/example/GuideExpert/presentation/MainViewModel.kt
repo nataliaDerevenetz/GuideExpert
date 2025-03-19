@@ -5,11 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.SessionManager
-import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.GetProfileUseCase
 import com.example.GuideExpert.domain.models.ProfileAuthYandexData
-import com.example.GuideExpert.domain.repository.DataSourceRepository
-import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted

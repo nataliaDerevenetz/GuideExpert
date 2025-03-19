@@ -1,4 +1,4 @@
-package com.example.GuideExpert.presentation.ProfileScreen
+package com.example.GuideExpert.presentation.ProfileScreen.YandexActivity
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle

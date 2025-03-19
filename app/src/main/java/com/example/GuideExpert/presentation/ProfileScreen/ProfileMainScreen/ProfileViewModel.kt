@@ -1,11 +1,8 @@
-package com.example.GuideExpert.presentation.ProfileScreen
+package com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.GuideExpert.data.SessionManager
-import com.example.GuideExpert.data.remote.services.ProfileService
-import com.example.GuideExpert.domain.repository.DataSourceRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,11 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-/*
-sealed interface ProfileEvent {
-    object GetProfileInfo : ProfileEvent
-}
- */
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(

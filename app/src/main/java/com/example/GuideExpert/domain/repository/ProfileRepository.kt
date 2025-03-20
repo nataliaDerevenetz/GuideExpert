@@ -9,4 +9,5 @@ interface ProfileRepository {
     val profileStateFlow: StateFlow<ProfileResources>
     suspend fun fetchProfile()
     suspend fun updateProfile(newProfile: Profile)
+    suspend fun removeProfile()
 }

@@ -70,5 +70,12 @@ class ProfileRepositoryImpl @Inject constructor(
         dbStorage.insertProfile(newProfile)
     }
 
+    override suspend fun removeProfile() {
+        sessionManager.setAuthToken("")
+        sessionManager.setProfileId(0)
+        sessionManager.setProfileTime(0)
+        _profileFlow.update {null}
+        _profileStateFlow.update { ProfileResources.Idle }
+    }
 
 }

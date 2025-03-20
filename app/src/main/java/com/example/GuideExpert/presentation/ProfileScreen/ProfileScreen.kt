@@ -18,26 +18,3 @@ fun ProfileScreen(
         onNavigateToHome = onNavigateToHome)
 }
 
-
-
-@Composable
-fun Screen2View( onNavigateToYandex: () -> Unit,
-    viewModel: ProfileViewModel = hiltViewModel()) {
-
-  //  onNavigateToYandex()
-    Column {
-        Text("Screen2")
-        LoadData()
-    }
-}
-
-@Composable
-fun LoadData() {
-    Column {
-        //   Text("uuu :: ${vm.nameScreen2}")
-       // Text("Incr :: $count")
-       // Button(onClick = {onIcr()}) {
-       //     Text(text = "Increase", fontSize = 25.sp)
-       // }
-    }
-}

@@ -64,6 +64,7 @@ interface ProfileStateScope {
     val navigateToEditorProfile : () -> Unit
     val navigateToYandex : () -> Unit
     val navigateToBack : () -> Unit
+    val logout : () -> Unit
 }
 
 fun DefaultProfileStateScope(
@@ -74,7 +75,8 @@ fun DefaultProfileStateScope(
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToEditorProfile : () -> Unit,
     navigateToYandex : () -> Unit,
-    navigateToBack : () -> Unit
+    navigateToBack : () -> Unit,
+    logout : () -> Unit
 ): ProfileStateScope {
     return object : ProfileStateScope {
         override val profile: StateFlow<Profile?>
@@ -93,6 +95,8 @@ fun DefaultProfileStateScope(
             get() = navigateToYandex
         override val navigateToBack: () -> Unit
             get() = navigateToBack
+        override val logout: () -> Unit
+            get() = logout
     }
 }
 
@@ -106,8 +110,9 @@ fun rememberDefaultProfileStateScope(
     navigateToEditorProfile : () -> Unit,
     navigateToYandex : () -> Unit,
     navigateToBack : () -> Unit,
-): ProfileStateScope = remember(profile,profileStateFlow,snackbarHostState,sendEffectFlow,navigateToEditorProfile,navigateToYandex,navigateToBack) {
-    DefaultProfileStateScope(profile,profileStateFlow,effectFlow,snackbarHostState,sendEffectFlow,navigateToEditorProfile,navigateToYandex,navigateToBack)
+    logout: () -> Unit
+): ProfileStateScope = remember(profile,profileStateFlow,snackbarHostState,sendEffectFlow,navigateToEditorProfile,navigateToYandex,navigateToBack,logout) {
+    DefaultProfileStateScope(profile,profileStateFlow,effectFlow,snackbarHostState,sendEffectFlow,navigateToEditorProfile,navigateToYandex,navigateToBack,logout)
 }
 
 
@@ -125,7 +130,8 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
                     sendEffectFlow = viewModel::sendEffectFlow,
                     navigateToYandex = onNavigateToYandex,
                     navigateToEditorProfile = onNavigateToEditorProfile,
-                    navigateToBack = onNavigateToBack),
+                    navigateToBack = onNavigateToBack,
+                    logout = viewModel::logout),
 ) {
 
     Log.d("MODEL", "000")
@@ -155,17 +161,20 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
                 navigationIcon={ IconButton({
                     Log.d("CLICK","BACK")
                     scopeState.navigateToBack()}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") } },
-                actions={
-                    IconButton({
-                        expandedDropdownMenu = true
-                    }) { Icon(Icons.Filled.MoreVert, contentDescription = "featured") }
-                    DropdownMenu(expanded = expandedDropdownMenu, onDismissRequest = { expandedDropdownMenu = false }) {
-                        DropdownMenuItem(text = { Text("Редактировать") }, onClick = {
-                            expandedDropdownMenu = false
-                            scopeState.navigateToEditorProfile()
-                        })
-                    }
-                },
+                actions = {
+                    if (profileState.value is ProfileResources.Success) {
+                        IconButton({
+                            expandedDropdownMenu = true
+                        }) { Icon(Icons.Filled.MoreVert, contentDescription = "featured") }
+                        DropdownMenu(
+                            expanded = expandedDropdownMenu,
+                            onDismissRequest = { expandedDropdownMenu = false }) {
+                            DropdownMenuItem(text = { Text("Редактировать") }, onClick = {
+                                expandedDropdownMenu = false
+                                scopeState.navigateToEditorProfile()
+                            })
+                        }
+                    }},
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -178,6 +187,7 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
         when(profileState.value) {
             is ProfileResources.Error -> {
                 Log.d("PROFILESTATE","Error")
+                scopeState.ProfileContent(innerPadding)
             }
             is ProfileResources.Loading -> {  Log.d("PROFILESTATE","LOADING")}
             is ProfileResources.Success -> {  Log.d("PROFILESTATE","Success")
@@ -238,10 +248,10 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
             Text(birthday.toString())
             Text(profile?.email ?: "")
             Text(profile?.phone ?: "")
-            Button(onClick = { navigateToEditorProfile() }) {
+           /* Button(onClick = { navigateToEditorProfile() }) {
                 Text("EDIT")
-            }
-            Button(onClick = { }) {
+            }*/
+            Button(onClick = {logout()}) {
                 Text("EXIT")
             }
 

@@ -6,6 +6,10 @@ import java.util.Date
 class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
+        if (value != null) {
+            if (value < -2202202619) {
+                return Date(6786181)}
+        }
         return value?.let { Date(it) }
     }
 

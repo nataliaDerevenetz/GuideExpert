@@ -11,17 +11,17 @@ import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.EditorProfileScreen
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileInfo
 import com.example.GuideExpert.presentation.ProfileScreen.YandexActivity.ProfileYandexActivity
 import kotlinx.serialization.Serializable
 
 @Serializable
-object ProfileInfoScreen
+object ProfileInfo
 
 @Serializable
-data class Screen2(
-    var name : String = "test"
-)
+object EditorProfile
+
 
 
 @Composable
@@ -34,8 +34,8 @@ fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
     }
 
-    NavHost(navController = navController, startDestination = ProfileInfoScreen) {
-        val onNavigateEditorProfile = { navController.navigateEditorProfile("Ok it Screen2")}
+    NavHost(navController = navController, startDestination = ProfileInfo) {
+        val onNavigateEditorProfile = { navController.navigateToEditorProfile()}
         val onNavigateToYandex = { navController.navigateToYandex()}
         val onNavigateToBack = { onNavigateToHome() }
         profileDestination(snackbarHostState,onNavigateEditorProfile,onNavigateToYandex,onNavigateToBack, viewModelStoreOwner,onChangeVisibleBottomBar)
@@ -50,17 +50,17 @@ fun NavGraphBuilder.profileDestination(snackbarHostState :SnackbarHostState,
                                        onChangeVisibleBottomBar: (Boolean) -> Unit,
 )
 {
-    composable<ProfileInfoScreen> {
+    composable<ProfileInfo> {
         onChangeVisibleBottomBar(true)
         ProfileInfo(snackbarHostState,onNavigateToYandex,onNavigateToEditorProfile, onNavigateToBack,viewModel = hiltViewModel(viewModelStoreOwner)) }
-    composable<Screen2> {
+    composable<EditorProfile> {
         onChangeVisibleBottomBar(false)
-        Screen2View(onNavigateToYandex,viewModel = hiltViewModel(viewModelStoreOwner)) }
+        EditorProfileScreen(onNavigateToYandex,viewModel = hiltViewModel(viewModelStoreOwner)) }
     activity("loginYandex") { activityClass = ProfileYandexActivity::class }
 }
 
-fun NavController.navigateEditorProfile(str: String) {
-    navigate(route = Screen2(str)){
+fun NavController.navigateToEditorProfile() {
+    navigate(route = EditorProfile){
         launchSingleTop=true
     }
 }

@@ -1,7 +1,14 @@
 package com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen
 
+import android.Manifest
+import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.util.Patterns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -17,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,6 +46,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,8 +56,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -59,6 +71,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+data class EditorViewState(
+    val tempFileUrl: Uri? = null,
+    val selectedPictures: List<ImageBitmap> = emptyList(),
+)
+
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
@@ -88,11 +106,14 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
 }
 
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> Unit ={},
-                         viewModel: ProfileViewModel = hiltViewModel()
+                         viewModel: ProfileViewModel = hiltViewModel(),
+                         editorViewModel: EditorProfileViewModel = hiltViewModel(),
 ) {
 
+    val viewState: EditorViewState by editorViewModel.viewStateFlow.collectAsState()
 
     val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
 
@@ -111,6 +132,44 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
     val scrollState = rememberScrollState()
     var isErrorEmail by rememberSaveable { mutableStateOf(false) }
 
+    ///-----
+    val currentContext = LocalContext.current
+
+    // launches photo picker
+    val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(2)) { urls ->
+        editorViewModel.onReceive(Intent.OnFinishPickingImagesWith(currentContext, urls))
+    }
+
+    // launches camera
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
+        if (isImageSaved) {
+            editorViewModel.onReceive(Intent.OnImageSavedWith(currentContext))
+        } else {
+            // handle image saving error or cancellation
+            editorViewModel.onReceive(Intent.OnImageSavingCanceled)
+        }
+    }
+
+    // launches camera permissions
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+        if (permissionGranted) {
+            editorViewModel.onReceive(Intent.OnPermissionGrantedWith(currentContext))
+        } else {
+            // handle permission denied such as:
+            editorViewModel.onReceive(Intent.OnPermissionDenied)
+        }
+    }
+
+    LaunchedEffect(key1 = viewState.tempFileUrl) {
+        viewState.tempFileUrl?.let {
+            cameraLauncher.launch(it)
+        }
+    }
+
+    ///-----
+
+
+
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
 
         Column(
@@ -126,8 +185,24 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
                 //ProfileActivity.newIntent(context)
             }
         )*/
+
             Row {
                 Column {
+
+                    Button(onClick = {
+                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                    }) {
+                        Text(text = "Take a photo")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(onClick = {
+                        val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        pickImageFromAlbumLauncher.launch(mediaRequest)
+                    }) {
+                        Text(text = "Pick a picture")
+                    }
+
+
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(profile?.firstName ?: "",fontWeight= FontWeight.Bold)
                         Spacer(Modifier.size(5.dp))

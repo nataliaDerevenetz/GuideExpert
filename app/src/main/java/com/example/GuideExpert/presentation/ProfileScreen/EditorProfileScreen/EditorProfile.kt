@@ -8,8 +8,10 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
@@ -25,10 +28,14 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -51,9 +59,38 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
                         viewModel: ProfileViewModel = hiltViewModel()
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("") },
+                navigationIcon={ IconButton({
+                    Log.d("CLICK","BACK")
+                //    scopeState.navigateToBack()
+                    }
+                ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.height(56.dp).shadow(6.dp),
+                windowInsets = WindowInsets(0)
+            )
+        }
+    ) { innerPadding -> EditorProfileContent(innerPadding)
+
+    }
+
+}
+
+
+@Composable
+fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> Unit ={},
+                         viewModel: ProfileViewModel = hiltViewModel()
 ) {
 
 
@@ -74,10 +111,10 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
     val scrollState = rememberScrollState()
     var isErrorEmail by rememberSaveable { mutableStateOf(false) }
 
-    Box(modifier = Modifier.padding(start = 15.dp,end = 15.dp).fillMaxSize()) {
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
 
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
+            modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp ).fillMaxSize().verticalScroll(scrollState),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.Start
         ) {

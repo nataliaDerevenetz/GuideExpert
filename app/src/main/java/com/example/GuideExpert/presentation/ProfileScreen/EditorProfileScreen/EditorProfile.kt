@@ -59,14 +59,14 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
 
     val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
 
-
+/*
     if (profile?.birthday == null) {
         Log.d("TAG", "birthday null")
     } else {
         Log.d("TAG", profile?.birthday.toString())
     }
-    val birthday = profile?.birthday?.let { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(it) }
-
+   // val birthday = profile?.birthday?.let { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(it) }
+*/
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
     var lastName by rememberSaveable{mutableStateOf(profile?.lastName)}
@@ -89,8 +89,8 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
                 //ProfileActivity.newIntent(context)
             }
         )*/
-            Row() {
-                Column() {
+            Row {
+                Column {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(profile?.firstName ?: "",fontWeight= FontWeight.Bold)
                         Spacer(Modifier.size(5.dp))
@@ -119,26 +119,7 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
                         modifier = Modifier.padding(top = 10.dp)
                     )
 
-                   // DatePickerDocked(profile?.birthday)
                     DatePickerFieldToModal(profile?.birthday)
-
-                   /* OutlinedTextField(
-                        birthday.toString(),
-                        {},
-                        enabled = false,
-                        textStyle = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.height(50.dp).fillMaxWidth()
-                            .clickable { Log.d("TAG", "BIRTHDAY") },
-                        colors = OutlinedTextFieldDefaults.colors().copy(
-                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                            disabledIndicatorColor = MaterialTheme.colorScheme.outline,
-                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        singleLine = true,
-                    )*/
 
                     Text("Почта", color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
                     OutlinedTextField(
@@ -188,19 +169,12 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
 @Composable
 fun DatePickerFieldToModal(birthday: Date?,modifier: Modifier = Modifier) {
     var selectedDate by rememberSaveable  { mutableStateOf(birthday?.time) }
-//
-//    birthday?.let {it.time}
-  //   var selectedDate2 =  birthday?.let { SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(it) } ?: ""
-
     var isErrorBirthday by rememberSaveable { mutableStateOf(false) }
-
-
     var showModal by rememberSaveable { mutableStateOf(false) }
 
     OutlinedTextField(
         value = selectedDate?.let { convertMillisToDate(it) } ?: "",
         onValueChange = { },
-      //  label = { Text("DOB") },
         placeholder = { Text("DD/MM/YYYY") },
         trailingIcon = {
             Icon(Icons.Default.DateRange, contentDescription = "Select date")
@@ -211,9 +185,6 @@ fun DatePickerFieldToModal(birthday: Date?,modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .pointerInput(selectedDate) {
                 awaitEachGesture {
-                    // Modifier.clickable doesn't work for text fields, so we use Modifier.pointerInput
-                    // in the Initial pass to observe events before the text field consumes them
-                    // in the Main pass.
                     awaitFirstDown(pass = PointerEventPass.Initial)
                     val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
                     if (upEvent != null) {
@@ -222,10 +193,6 @@ fun DatePickerFieldToModal(birthday: Date?,modifier: Modifier = Modifier) {
                 }
             },
         isError = isErrorBirthday,
-      /*  trailingIcon = {
-            if (isErrorBirthday)
-                Icon(Icons.Filled.Error,"error", tint = MaterialTheme.colorScheme.error)
-        },*/
     )
     if (isErrorBirthday) {
         Text(

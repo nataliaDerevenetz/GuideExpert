@@ -2,8 +2,9 @@ package com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen
 
 import android.util.Log
 import android.util.Patterns
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,25 +18,29 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileViewModel
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -62,9 +68,9 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
     val birthday = profile?.birthday?.let { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(it) }
 
 
-    var firstName by remember{mutableStateOf(profile?.firstName)}
-    var lastName by remember{mutableStateOf(profile?.lastName)}
-    var email by remember{mutableStateOf(profile?.email)}
+    var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
+    var lastName by rememberSaveable{mutableStateOf(profile?.lastName)}
+    var email by rememberSaveable{mutableStateOf(profile?.email)}
     val scrollState = rememberScrollState()
     var isErrorEmail by rememberSaveable { mutableStateOf(false) }
 
@@ -112,7 +118,11 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
                         color = Color.Gray,
                         modifier = Modifier.padding(top = 10.dp)
                     )
-                    OutlinedTextField(
+
+                   // DatePickerDocked(profile?.birthday)
+                    DatePickerFieldToModal(profile?.birthday)
+
+                   /* OutlinedTextField(
                         birthday.toString(),
                         {},
                         enabled = false,
@@ -128,7 +138,7 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
                             disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         singleLine = true,
-                    )
+                    )*/
 
                     Text("Почта", color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
                     OutlinedTextField(
@@ -174,14 +184,103 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
     }
 }
 
+
 @Composable
-fun LoadData() {
-    Column {
-        //   Text("uuu :: ${vm.nameScreen2}")
-        // Text("Incr :: $count")
-        // Button(onClick = {onIcr()}) {
-        //     Text(text = "Increase", fontSize = 25.sp)
-        // }
+fun DatePickerFieldToModal(birthday: Date?,modifier: Modifier = Modifier) {
+    var selectedDate by rememberSaveable  { mutableStateOf(birthday?.time) }
+//
+//    birthday?.let {it.time}
+  //   var selectedDate2 =  birthday?.let { SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(it) } ?: ""
+
+    var isErrorBirthday by rememberSaveable { mutableStateOf(false) }
+
+
+    var showModal by rememberSaveable { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = selectedDate?.let { convertMillisToDate(it) } ?: "",
+        onValueChange = { },
+      //  label = { Text("DOB") },
+        placeholder = { Text("DD/MM/YYYY") },
+        trailingIcon = {
+            Icon(Icons.Default.DateRange, contentDescription = "Select date")
+        },
+        textStyle = TextStyle(fontSize = 16.sp),
+        modifier = modifier
+            .height(50.dp)
+            .fillMaxWidth()
+            .pointerInput(selectedDate) {
+                awaitEachGesture {
+                    // Modifier.clickable doesn't work for text fields, so we use Modifier.pointerInput
+                    // in the Initial pass to observe events before the text field consumes them
+                    // in the Main pass.
+                    awaitFirstDown(pass = PointerEventPass.Initial)
+                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                    if (upEvent != null) {
+                        showModal = true
+                    }
+                }
+            },
+        isError = isErrorBirthday,
+      /*  trailingIcon = {
+            if (isErrorBirthday)
+                Icon(Icons.Filled.Error,"error", tint = MaterialTheme.colorScheme.error)
+        },*/
+    )
+    if (isErrorBirthday) {
+        Text(
+            text = "Error Birthday",
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
+
+    if (showModal) {
+        DatePickerModal(
+            onDateSelected = { selectedDate = it
+                showModal = false
+                isErrorBirthday = !selectedDate.isValidBirthday()
+                             },
+            onDismiss = { showModal = false }
+        )
     }
 }
+
+
+fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return formatter.format(Date(millis))
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                onDateSelected(datePickerState.selectedDateMillis)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
 fun CharSequence?.isValidEmail() = !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
+fun Long?.isValidBirthday() =  this !== null && this < Date().time

@@ -9,6 +9,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -23,15 +25,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +46,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -54,11 +61,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -66,15 +75,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileViewModel
+import okhttp3.internal.UTC
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
 data class EditorViewState(
     val tempFileUrl: Uri? = null,
-    val selectedPictures: List<ImageBitmap> = emptyList(),
+    val selectedPictures: ImageBitmap? = null,
 )
+
+
+fun convertLocalDateToTimestampUTC(localDate: LocalDate): Long {
+    val zonedDateTime = localDate.atStartOfDay(UTC.toZoneId())
+    val instant = zonedDateTime.toInstant()
+    return instant.toEpochMilli()
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+object PastOrPresentSelectableDates: SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+       // val aa = LocalDate.parse("2025-01-11")
+       // if (utcTimeMillis == convertLocalDateToTimestampUTC(aa) ) { return false}
+        return utcTimeMillis <= System.currentTimeMillis()
+    }
+
+    override fun isSelectableYear(year: Int): Boolean {
+        return year <= LocalDate.now().year
+    }
+}
+
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -136,8 +170,9 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
     val currentContext = LocalContext.current
 
     // launches photo picker
-    val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(2)) { urls ->
-        editorViewModel.onReceive(Intent.OnFinishPickingImagesWith(currentContext, urls))
+    val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
+        url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
+            ?.let { editorViewModel.onReceive(it) }
     }
 
     // launches camera
@@ -186,6 +221,29 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
             }
         )*/
 
+            Log.d("URI", viewState.tempFileUrl.toString())
+        /*  SubcomposeAsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(viewState.tempFileUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(16.dp) ) .clickable {  },
+                loading = {
+                    CircularProgressIndicator(
+                        color = Color.Gray,
+                        modifier = Modifier.requiredSize(48.dp)
+                    )
+                },
+                error = {
+                  //  Log.d("TAG", url)
+                    Log.d("TAG", "image load: Error!")
+                    Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
+                }
+            )*/
+
+
             Row {
                 Column {
 
@@ -204,6 +262,18 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
 
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        viewState.selectedPictures?.let {
+                            Image(
+                                bitmap = it,
+                                contentDescription = "avatar",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
+                            )
+                        }
+
+                    }
+
+                    Row(Modifier.padding(10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(profile?.firstName ?: "",fontWeight= FontWeight.Bold)
                         Spacer(Modifier.size(5.dp))
                         Text(profile?.lastName ?: "",fontWeight= FontWeight.Bold)
@@ -338,7 +408,9 @@ fun DatePickerModal(
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState  = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,

@@ -12,4 +12,13 @@
     <string name="failedload">Ошибка загрузки</string>
     <string name="update">Обновить</string>
     <string name="showall">Показать все</string>
+    <string name="cancel">Отменить</string>
+    <string name="save">Сохранить</string>
+    <string name="error_birthday">Неверно введен день рождения</string>
+    <string name="phone">Телефон</string>
+    <string name="error_email">Неверно введена почта</string>
+    <string name="email">Почта</string>
+    <string name="birthday">День рождения</string>
+    <string name="last_name">Фамилия</string>
+    <string name="first_name">Имя</string>
 </resources>

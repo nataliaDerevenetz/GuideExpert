@@ -61,7 +61,7 @@ fun NavGraphBuilder.profileDestination(snackbarHostState :SnackbarHostState,
         ProfileInfo(snackbarHostState,onNavigateToYandex,onNavigateToEditorProfile, onNavigateToBack,viewModel = hiltViewModel(viewModelStoreOwner)) }
     composable<EditorProfile> {
         onChangeVisibleBottomBar(false)
-        EditorProfileScreen(onNavigateToProfile,viewModel = hiltViewModel(viewModelStoreOwner)) }
+        EditorProfileScreen(onNavigateToProfile) }
     activity("loginYandex") { activityClass = ProfileYandexActivity::class }
 }
 

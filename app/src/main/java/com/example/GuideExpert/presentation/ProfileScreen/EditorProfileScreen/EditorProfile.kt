@@ -2,7 +2,6 @@ package com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen
 
 import android.Manifest
 import android.os.Build
-import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -50,9 +49,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -64,13 +65,17 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileViewModel
+import com.example.GuideExpert.R
+import com.example.GuideExpert.domain.models.Profile
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
 import okhttp3.internal.UTC
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -121,13 +126,48 @@ fun EditorProfileScreen(onNavigateToProfile: () -> Boolean) {
 }
 
 
+@Stable
+interface EditorProfileStateScope {
+    val profile: StateFlow<Profile?>
+    val viewStateFlow: StateFlow<EditorViewState>
+    val onReceive: (Intent) -> Job
+}
+
+
+fun DefaultEditorProfileStateScope(
+    profile: StateFlow<Profile?>,
+    viewStateFlow: StateFlow<EditorViewState>,
+    onReceive : (Intent) -> Job
+): EditorProfileStateScope {
+    return object : EditorProfileStateScope {
+        override val profile: StateFlow<Profile?>
+            get() = profile
+        override val viewStateFlow: StateFlow<EditorViewState>
+            get() = viewStateFlow
+        override val onReceive: (Intent) -> Job
+            get() = onReceive
+
+    }
+}
+
+@Composable
+fun rememberDefaultEditorProfileStateScope(
+    profile: StateFlow<Profile?>,
+    viewStateFlow: StateFlow<EditorViewState>,
+    onReceive: (Intent) -> Job
+): EditorProfileStateScope = remember(profile,viewStateFlow,onReceive) {
+    DefaultEditorProfileStateScope(profile,viewStateFlow,onReceive)
+}
+
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun EditorProfileContent(innerPadding: PaddingValues,
                          viewModel: EditorProfileViewModel = hiltViewModel(),
+                         scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
+                             viewStateFlow = viewModel.viewStateFlow,
+                             onReceive = viewModel::onReceive),
 ) {
 
-    val viewState: EditorViewState by viewModel.viewStateFlow.collectAsState()
     val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
@@ -145,7 +185,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
             Row {
                 Column {
 
-                    LoadAvatar(viewModel,viewState)
+                    scopeState.LoadAvatar()
 
                     Row(Modifier.padding(10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(profile?.firstName ?: "",fontWeight= FontWeight.Bold)
@@ -153,7 +193,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         Text(profile?.lastName ?: "",fontWeight= FontWeight.Bold)
                     }
 
-                    Text("Имя", color = Color.Gray,modifier = Modifier.padding(top = 10.dp))
+                    Text(stringResource(id = R.string.first_name), color = Color.Gray,modifier = Modifier.padding(top = 10.dp))
                     OutlinedTextField(
                         firstName ?: "",
                         { firstName = it },
@@ -161,7 +201,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         modifier = Modifier.height(50.dp).fillMaxWidth(),
                         singleLine = true,
                     )
-                    Text("Фамилия", color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
+                    Text(stringResource(id = R.string.last_name), color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
                     OutlinedTextField(
                         lastName ?: "",
                         { lastName = it },
@@ -170,14 +210,14 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         singleLine = true,
                     )
                     Text(
-                        "Дата рождения",
+                        stringResource(id = R.string.birthday),
                         color = Color.Gray,
                         modifier = Modifier.padding(top = 10.dp)
                     )
 
-                    DatePickerFieldToModal(profile?.birthday)
+                    scopeState.DatePickerFieldToModal()
 
-                    Text("Почта", color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
+                    Text(stringResource(id = R.string.email), color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
                     OutlinedTextField(
                         email ?: "",
                         { email = it },
@@ -192,14 +232,14 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     )
                     if (isErrorEmail) {
                         Text(
-                            text = "Error email",
+                            text = stringResource(id = R.string.error_email),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
 
-                    Text("Телефон", color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
+                    Text(stringResource(id = R.string.phone), color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
                     OutlinedTextField(
                         profile?.phone ?: "",
                         {},
@@ -214,7 +254,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
             Button(onClick = {
                isErrorEmail = !email.isValidEmail()
             },modifier = Modifier.padding(top = 10.dp).height(50.dp).fillMaxWidth()) {
-                 Text("Сохранить")
+                 Text(stringResource(id = R.string.save))
              }
 
         }
@@ -224,32 +264,34 @@ fun EditorProfileContent(innerPadding: PaddingValues,
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun LoadAvatar(viewModel: EditorProfileViewModel = hiltViewModel(),viewState: EditorViewState) {
+fun EditorProfileStateScope.LoadAvatar() {
+     val viewState: EditorViewState by viewStateFlow.collectAsState()
+
     val currentContext = LocalContext.current
 
     // launches photo picker
     val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
         url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
-            ?.let { viewModel.onReceive(it) }
+            ?.let { onReceive(it) }
     }
 
     // launches camera
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
         if (isImageSaved) {
-            viewModel.onReceive(Intent.OnImageSavedWith(currentContext))
+            onReceive(Intent.OnImageSavedWith(currentContext))
         } else {
             // handle image saving error or cancellation
-            viewModel.onReceive(Intent.OnImageSavingCanceled)
+            onReceive(Intent.OnImageSavingCanceled)
         }
     }
 
     // launches camera permissions
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
-            viewModel.onReceive(Intent.OnPermissionGrantedWith(currentContext))
+            onReceive(Intent.OnPermissionGrantedWith(currentContext))
         } else {
             // handle permission denied such as:
-            viewModel.onReceive(Intent.OnPermissionDenied)
+            onReceive(Intent.OnPermissionDenied)
         }
     }
 
@@ -283,12 +325,14 @@ fun LoadAvatar(viewModel: EditorProfileViewModel = hiltViewModel(),viewState: Ed
         }
 
     }
-    
+
 }
 
 @Composable
-fun DatePickerFieldToModal(birthday: Date?,modifier: Modifier = Modifier) {
-    var selectedDate by rememberSaveable  { mutableStateOf(birthday?.time) }
+fun EditorProfileStateScope.DatePickerFieldToModal(modifier: Modifier = Modifier) {
+    val profile by profile.collectAsStateWithLifecycle()
+
+    var selectedDate by rememberSaveable  { mutableStateOf(profile?.birthday?.time) }
     var isErrorBirthday by rememberSaveable { mutableStateOf(false) }
     var showModal by rememberSaveable { mutableStateOf(false) }
 
@@ -316,7 +360,7 @@ fun DatePickerFieldToModal(birthday: Date?,modifier: Modifier = Modifier) {
     )
     if (isErrorBirthday) {
         Text(
-            text = "Error Birthday",
+            text = stringResource(id = R.string.error_birthday),
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(start = 16.dp)
@@ -362,7 +406,7 @@ fun DatePickerModal(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     ) {

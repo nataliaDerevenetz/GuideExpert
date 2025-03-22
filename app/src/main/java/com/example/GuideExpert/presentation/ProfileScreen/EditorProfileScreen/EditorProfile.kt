@@ -1,7 +1,6 @@
 package com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen
 
 import android.Manifest
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.util.Patterns
@@ -25,19 +24,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,7 +60,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -75,19 +70,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileViewModel
 import okhttp3.internal.UTC
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
-
-data class EditorViewState(
-    val tempFileUrl: Uri? = null,
-    val selectedPictures: ImageBitmap? = null,
-)
 
 
 fun convertLocalDateToTimestampUTC(localDate: LocalDate): Long {
@@ -143,65 +131,18 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> Unit ={},
-                         viewModel: ProfileViewModel = hiltViewModel(),
-                         editorViewModel: EditorProfileViewModel = hiltViewModel(),
+                         viewModel: EditorProfileViewModel = hiltViewModel(),
 ) {
 
-    val viewState: EditorViewState by editorViewModel.viewStateFlow.collectAsState()
+    val viewState: EditorViewState by viewModel.viewStateFlow.collectAsState()
 
     val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
-
-/*
-    if (profile?.birthday == null) {
-        Log.d("TAG", "birthday null")
-    } else {
-        Log.d("TAG", profile?.birthday.toString())
-    }
-   // val birthday = profile?.birthday?.let { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(it) }
-*/
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
     var lastName by rememberSaveable{mutableStateOf(profile?.lastName)}
     var email by rememberSaveable{mutableStateOf(profile?.email)}
     val scrollState = rememberScrollState()
     var isErrorEmail by rememberSaveable { mutableStateOf(false) }
-
-    ///-----
-    val currentContext = LocalContext.current
-
-    // launches photo picker
-    val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
-        url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
-            ?.let { editorViewModel.onReceive(it) }
-    }
-
-    // launches camera
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
-        if (isImageSaved) {
-            editorViewModel.onReceive(Intent.OnImageSavedWith(currentContext))
-        } else {
-            // handle image saving error or cancellation
-            editorViewModel.onReceive(Intent.OnImageSavingCanceled)
-        }
-    }
-
-    // launches camera permissions
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
-        if (permissionGranted) {
-            editorViewModel.onReceive(Intent.OnPermissionGrantedWith(currentContext))
-        } else {
-            // handle permission denied such as:
-            editorViewModel.onReceive(Intent.OnPermissionDenied)
-        }
-    }
-
-    LaunchedEffect(key1 = viewState.tempFileUrl) {
-        viewState.tempFileUrl?.let {
-            cameraLauncher.launch(it)
-        }
-    }
-
-    ///-----
 
 
 
@@ -212,66 +153,10 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.Start
         ) {
-            /* Image(
-            imageVector = ImageVector.vectorResource(R.drawable.button_yandex),
-            contentDescription = "Yandex",
-            modifier = Modifier.clickable {
-                onNavigateToYandex()
-                //ProfileActivity.newIntent(context)
-            }
-        )*/
-
-            Log.d("URI", viewState.tempFileUrl.toString())
-        /*  SubcomposeAsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(viewState.tempFileUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(16.dp) ) .clickable {  },
-                loading = {
-                    CircularProgressIndicator(
-                        color = Color.Gray,
-                        modifier = Modifier.requiredSize(48.dp)
-                    )
-                },
-                error = {
-                  //  Log.d("TAG", url)
-                    Log.d("TAG", "image load: Error!")
-                    Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
-                }
-            )*/
-
-
             Row {
                 Column {
 
-                    Button(onClick = {
-                        permissionLauncher.launch(Manifest.permission.CAMERA)
-                    }) {
-                        Text(text = "Take a photo")
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(onClick = {
-                        val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        pickImageFromAlbumLauncher.launch(mediaRequest)
-                    }) {
-                        Text(text = "Pick a picture")
-                    }
-
-
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        viewState.selectedPictures?.let {
-                            Image(
-                                bitmap = it,
-                                contentDescription = "avatar",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
-                            )
-                        }
-
-                    }
+                    LoadAvatar(viewModel,viewState)
 
                     Row(Modifier.padding(10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(profile?.firstName ?: "",fontWeight= FontWeight.Bold)
@@ -347,6 +232,71 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
     }
 }
 
+
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun LoadAvatar(viewModel: EditorProfileViewModel = hiltViewModel(),viewState: EditorViewState) {
+    val currentContext = LocalContext.current
+
+    // launches photo picker
+    val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
+        url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
+            ?.let { viewModel.onReceive(it) }
+    }
+
+    // launches camera
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
+        if (isImageSaved) {
+            viewModel.onReceive(Intent.OnImageSavedWith(currentContext))
+        } else {
+            // handle image saving error or cancellation
+            viewModel.onReceive(Intent.OnImageSavingCanceled)
+        }
+    }
+
+    // launches camera permissions
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+        if (permissionGranted) {
+            viewModel.onReceive(Intent.OnPermissionGrantedWith(currentContext))
+        } else {
+            // handle permission denied such as:
+            viewModel.onReceive(Intent.OnPermissionDenied)
+        }
+    }
+
+    LaunchedEffect(key1 = viewState.tempFileUrl) {
+        viewState.tempFileUrl?.let {
+            cameraLauncher.launch(it)
+        }
+    }
+
+    Button(onClick = {
+        permissionLauncher.launch(Manifest.permission.CAMERA)
+    }) {
+        Text(text = "Take a photo")
+    }
+    Spacer(modifier = Modifier.width(16.dp))
+    Button(onClick = {
+        val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        pickImageFromAlbumLauncher.launch(mediaRequest)
+    }) {
+        Text(text = "Pick a picture")
+    }
+
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        viewState.selectedPictures?.let {
+            Image(
+                bitmap = it,
+                contentDescription = "avatar",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
+            )
+        }
+
+    }
+
+
+}
 
 @Composable
 fun DatePickerFieldToModal(birthday: Date?,modifier: Modifier = Modifier) {

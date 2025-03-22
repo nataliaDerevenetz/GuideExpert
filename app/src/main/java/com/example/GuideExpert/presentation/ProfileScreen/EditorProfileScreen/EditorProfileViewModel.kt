@@ -14,7 +14,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yandex.authsdk.BuildConfig
+import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,16 +31,24 @@ sealed class Intent {
     data class OnFinishPickingImagesWith(val compositionContext: Context, val imageUrls: Uri): Intent()
 }
 
+data class EditorViewState(
+    val tempFileUrl: Uri? = null,
+    val selectedPictures: ImageBitmap? = null,
+)
+
 @HiltViewModel
 class EditorProfileViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
+    private val profileRepository: ProfileRepository,
     @ApplicationContext val application: Context,
 ) : ViewModel() {
 
-    private val _albumViewState: MutableStateFlow<EditorViewState> = MutableStateFlow(EditorViewState())
+    val profileFlow = profileRepository.profileFlow
+
+    private val _editorViewState: MutableStateFlow<EditorViewState> = MutableStateFlow(EditorViewState())
     // exposes the ViewState to the composable view
     val viewStateFlow: StateFlow<EditorViewState>
-        get() = _albumViewState
+        get() = _editorViewState
     // endregion
 
     // region Intents
@@ -55,23 +63,12 @@ class EditorProfileViewModel @Inject constructor(
                     ".jpg", /* suffix */
                     intent.compositionContext.cacheDir  /* cache directory */
                 )
-
-
-               // Log.d("YYY", "${BuildConfig.LIBRARY_PACKAGE_NAME}")
-
-                Log.d("YYY", "${this@EditorProfileViewModel.application.packageName}")
-
-
-
                 // Create sandboxed url for this temp file - needed for the camera API
                 val uri = FileProvider.getUriForFile(intent.compositionContext,
-                  //  "${BuildConfig.LIBRARY_PACKAGE_NAME}.provider", /* needs to match the provider information in the manifest */
-                   // "com.example.GuideExpert.provider",
                      "${this@EditorProfileViewModel.application.packageName}.provider", /* needs to match the provider information in the manifest */
-
                     tempFile
                 )
-                _albumViewState.value = _albumViewState.value.copy(tempFileUrl = uri)
+                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = uri)
             }
 
             is Intent.OnPermissionDenied -> {
@@ -81,57 +78,40 @@ class EditorProfileViewModel @Inject constructor(
 
 
             is Intent.OnFinishPickingImagesWith -> {
-               // if (intent.imageUrls != null) {
-                    // Handle picked images
-                    var newImages: ImageBitmap? = null
-                   // for (eachImageUrl in intent.imageUrls) {
-                        val inputStream = intent.compositionContext.contentResolver.openInputStream(intent.imageUrls)
-                        val bytes = inputStream?.readBytes()
-                        inputStream?.close()
-
-                        if (bytes != null) {
-                            val bitmapOptions = BitmapFactory.Options()
-                            bitmapOptions.inMutable = true
-                            val bitmap: Bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bitmapOptions)
-                            newImages = bitmap.asImageBitmap()
-                        } else {
-                            // error reading the bytes from the image url
-                            println("The image that was picked could not be read from the device at this url: ${intent.imageUrls}")
-                        }
-                   // }
-
-                    val currentViewState = _albumViewState.value
-                    val newCopy = currentViewState.copy(
-                        selectedPictures =  newImages,
-                        tempFileUrl = null
-                    )
-                    _albumViewState.value = newCopy
-              //  } else {
-              //      // user did not pick anything
-              //  }
+                var newImages: ImageBitmap? = null
+                val inputStream = intent.compositionContext.contentResolver.openInputStream(intent.imageUrls)
+                val bytes = inputStream?.readBytes()
+                inputStream?.close()
+                if (bytes != null) {
+                    val bitmapOptions = BitmapFactory.Options()
+                    bitmapOptions.inMutable = true
+                    val bitmap: Bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bitmapOptions)
+                    newImages = bitmap.asImageBitmap()
+                } else {
+                    // error reading the bytes from the image url
+                    println("The image that was picked could not be read from the device at this url: ${intent.imageUrls}")
+                }
+                val currentViewState = _editorViewState.value
+                val newCopy = currentViewState.copy(
+                    selectedPictures =  newImages,
+                    tempFileUrl = null
+                )
+                _editorViewState.value = newCopy
             }
 
             is Intent.OnImageSavedWith -> {
-                val tempImageUrl = _albumViewState.value.tempFileUrl
+                val tempImageUrl = _editorViewState.value.tempFileUrl
                 if (tempImageUrl != null) {
                     val source = ImageDecoder.createSource(intent.compositionContext.contentResolver, tempImageUrl)
-
-                //    var currentPictures = _albumViewState.value.selectedPictures//.toMutableList()
                     val currentPictures = ImageDecoder.decodeBitmap(source).asImageBitmap()
-
-                    _albumViewState.value = _albumViewState.value.copy(//tempFileUrl = null,
+                    _editorViewState.value = _editorViewState.value.copy(//tempFileUrl = null,
                         selectedPictures = currentPictures)
                 }
             }
 
             is Intent.OnImageSavingCanceled -> {
-                _albumViewState.value = _albumViewState.value.copy(tempFileUrl = null)
+                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = null)
             }
-
-
         }
-
-
-
     }
 }

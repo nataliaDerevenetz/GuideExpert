@@ -12,5 +12,5 @@ data class Profile(
     val email: String,
     val birthday: Date,
     val phone: String,
-    val avatarId: Int
+    val avatar: Avatar?
 )

@@ -2,6 +2,7 @@ package com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen
 
 import android.Manifest
 import android.os.Build
+import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +35,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Profile
 import kotlinx.coroutines.Job
@@ -266,6 +270,8 @@ fun EditorProfileContent(innerPadding: PaddingValues,
 @Composable
 fun EditorProfileStateScope.LoadAvatar() {
      val viewState: EditorViewState by viewStateFlow.collectAsState()
+    val profile by profile.collectAsStateWithLifecycle()
+
 
     val currentContext = LocalContext.current
 
@@ -321,6 +327,24 @@ fun EditorProfileStateScope.LoadAvatar() {
                 contentDescription = "avatar",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
+            )
+        }
+        if (viewState.selectedPictures == null) {
+            SubcomposeAsyncImage(
+                model = profile?.avatar?.url,
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
+                loading = {
+                    CircularProgressIndicator(
+                        color = Color.Gray,
+                        modifier = Modifier.requiredSize(48.dp)
+                    )
+                },
+                error = {
+                    Log.d("TAG", "image load: Error!")
+                    Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
+                }
             )
         }
 

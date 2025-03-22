@@ -31,6 +31,6 @@ data class ProfilePOJO(
     @SerializedName("phone")
     val phone: String,
 
-    @SerializedName("avatarId")
-    val avatarId: Int
+    @SerializedName("avatar")
+    val avatar: AvatarPOJO
 )

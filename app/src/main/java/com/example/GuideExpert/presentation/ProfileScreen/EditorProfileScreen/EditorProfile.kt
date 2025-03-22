@@ -101,18 +101,12 @@ object PastOrPresentSelectableDates: SelectableDates {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
-                        viewModel: ProfileViewModel = hiltViewModel()
-) {
+fun EditorProfileScreen(onNavigateToProfile: () -> Boolean) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("") },
-                navigationIcon={ IconButton({
-                    Log.d("CLICK","BACK")
-                //    scopeState.navigateToBack()
-                    }
-                ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") } },
+                navigationIcon={ IconButton({ onNavigateToProfile() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -121,21 +115,19 @@ fun EditorProfileScreen(onNavigateToYandex: () -> Unit,
                 windowInsets = WindowInsets(0)
             )
         }
-    ) { innerPadding -> EditorProfileContent(innerPadding)
-
+    ) {
+        innerPadding -> EditorProfileContent(innerPadding)
     }
-
 }
 
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> Unit ={},
+fun EditorProfileContent(innerPadding: PaddingValues,
                          viewModel: EditorProfileViewModel = hiltViewModel(),
 ) {
 
     val viewState: EditorViewState by viewModel.viewStateFlow.collectAsState()
-
     val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
@@ -144,10 +136,7 @@ fun EditorProfileContent(innerPadding: PaddingValues, onNavigateToYandex: () -> 
     val scrollState = rememberScrollState()
     var isErrorEmail by rememberSaveable { mutableStateOf(false) }
 
-
-
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-
         Column(
             modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp ).fillMaxSize().verticalScroll(scrollState),
             verticalArrangement = Arrangement.SpaceBetween,
@@ -294,8 +283,7 @@ fun LoadAvatar(viewModel: EditorProfileViewModel = hiltViewModel(),viewState: Ed
         }
 
     }
-
-
+    
 }
 
 @Composable

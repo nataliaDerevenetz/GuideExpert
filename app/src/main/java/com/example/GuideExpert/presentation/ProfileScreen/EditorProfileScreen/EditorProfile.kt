@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,6 +43,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
@@ -50,6 +52,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -163,6 +166,7 @@ fun rememberDefaultEditorProfileStateScope(
     DefaultEditorProfileStateScope(profile,viewStateFlow,onReceive)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun EditorProfileContent(innerPadding: PaddingValues,
@@ -179,6 +183,11 @@ fun EditorProfileContent(innerPadding: PaddingValues,
     var email by rememberSaveable{mutableStateOf(profile?.email)}
     val scrollState = rememberScrollState()
     var isErrorEmail by rememberSaveable { mutableStateOf(false) }
+
+    var showBottomSheet by rememberSaveable { mutableStateOf(true) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
 
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
         Column(
@@ -262,30 +271,65 @@ fun EditorProfileContent(innerPadding: PaddingValues,
              }
 
         }
+
+/*
+        ModalBottomSheet(
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.5f),
+            sheetState = sheetState,
+            onDismissRequest = { showBottomSheet = false }
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(onClick = {
+                    //   permissionLauncher.launch(Manifest.permission.CAMERA)
+                }) {
+                    Text(text = "Take a photo")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(onClick = {
+                    val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    // pickImageFromAlbumLauncher.launch(mediaRequest)
+                }) {
+                    Text(text = "Pick a picture")
+                }
+            }
+        }*/
     }
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun EditorProfileStateScope.LoadAvatar() {
-     val viewState: EditorViewState by viewStateFlow.collectAsState()
+    val viewState: EditorViewState by viewStateFlow.collectAsState()
     val profile by profile.collectAsStateWithLifecycle()
 
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
 
     val currentContext = LocalContext.current
 
     // launches photo picker
     val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
         url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
-            ?.let { onReceive(it) }
+            ?.let {
+                showBottomSheet = false
+                onReceive(it) }
     }
 
     // launches camera
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
         if (isImageSaved) {
+            showBottomSheet = false
             onReceive(Intent.OnImageSavedWith(currentContext))
         } else {
+            showBottomSheet = false
             // handle image saving error or cancellation
             onReceive(Intent.OnImageSavingCanceled)
         }
@@ -307,18 +351,6 @@ fun EditorProfileStateScope.LoadAvatar() {
         }
     }
 
-    Button(onClick = {
-        permissionLauncher.launch(Manifest.permission.CAMERA)
-    }) {
-        Text(text = "Take a photo")
-    }
-    Spacer(modifier = Modifier.width(16.dp))
-    Button(onClick = {
-        val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-        pickImageFromAlbumLauncher.launch(mediaRequest)
-    }) {
-        Text(text = "Pick a picture")
-    }
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         viewState.selectedPictures?.let {
@@ -326,7 +358,7 @@ fun EditorProfileStateScope.LoadAvatar() {
                 bitmap = it,
                 contentDescription = "avatar",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
+                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  showBottomSheet = true},
             )
         }
         if (viewState.selectedPictures == null) {
@@ -334,7 +366,7 @@ fun EditorProfileStateScope.LoadAvatar() {
                 model = profile?.avatar?.url,
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
+                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable { showBottomSheet = true },
                 loading = {
                     CircularProgressIndicator(
                         color = Color.Gray,
@@ -350,7 +382,35 @@ fun EditorProfileStateScope.LoadAvatar() {
 
     }
 
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            modifier = Modifier.fillMaxHeight(0.5f),
+            sheetState = sheetState,
+            onDismissRequest = { showBottomSheet = false }
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(onClick = {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                }) {
+                    Text(text = "Take a photo")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(onClick = {
+                    val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    pickImageFromAlbumLauncher.launch(mediaRequest)
+                }) {
+                    Text(text = "Pick a picture")
+                }
+            }
+        }
+    }
+
 }
+
 
 @Composable
 fun EditorProfileStateScope.DatePickerFieldToModal(modifier: Modifier = Modifier) {

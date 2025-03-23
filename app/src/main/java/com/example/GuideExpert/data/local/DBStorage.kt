@@ -7,7 +7,6 @@ import com.example.GuideExpert.domain.models.Profile
 import kotlinx.coroutines.flow.Flow
 
 interface DBStorage {
-  //  fun getExcursionInfo(excursionId:Int): Flow<ExcursionData>
     fun getExcursionData(excursionId:Int): Flow<ExcursionData?>
     fun getImagesExcursion(excursionId:Int): Flow<List<Image>>
     fun getImageExcursion(excursionId:Int): Flow<Image>

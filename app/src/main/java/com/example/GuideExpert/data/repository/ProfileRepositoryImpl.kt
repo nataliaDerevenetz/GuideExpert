@@ -51,6 +51,9 @@ class ProfileRepositoryImpl @Inject constructor(
                 }
                 val result = profileService.getProfile(profileId)
                 Log.d("VIEW999", "4")
+                if (result.code() == 403) {
+                    removeProfile()
+                }
                 if (result.isSuccessful) {
                     val profile = result.body()?.toProfile()
                     _profileFlow.update { profile }

@@ -50,10 +50,7 @@ class DBStorageImpl @Inject constructor(
     }
 
     override suspend fun insertProfile(profile: Profile) {
-
         profile.toProfileWithAvatar()?.let { profileDao.insertAll(it) }
-
-//        profileDao.insert(profile.toProfileEntity())
     }
 
 }

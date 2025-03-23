@@ -184,29 +184,59 @@ fun EditorProfileContent(innerPadding: PaddingValues,
     val scrollState = rememberScrollState()
     var isErrorEmail by rememberSaveable { mutableStateOf(false) }
 
-    var showBottomSheet by rememberSaveable { mutableStateOf(true) }
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false,
+        skipPartiallyExpanded = true,
     )
+
+    val currentContext = LocalContext.current
+
+   // launches camera permissions
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+        if (permissionGranted) {
+            scopeState.onReceive(Intent.OnPermissionGrantedWith(currentContext))
+        } else {
+            // handle permission denied such as:
+            scopeState.onReceive(Intent.OnPermissionDenied)
+        }
+    }
+
+    // launches photo picker
+    val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
+        url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
+            ?.let {
+                showBottomSheet = false
+                scopeState.onReceive(it) }
+    }
 
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
         Column(
-            modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp ).fillMaxSize().verticalScroll(scrollState),
+            modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp).fillMaxSize()
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.Start
         ) {
             Row {
                 Column {
 
-                    scopeState.LoadAvatar()
+                    scopeState.LoadAvatar(onChangeShowBottomSheet = { it: Boolean ->
+                        showBottomSheet = it
+                    })
 
-                    Row(Modifier.padding(10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        Text(profile?.firstName ?: "",fontWeight= FontWeight.Bold)
+                    Row(
+                        Modifier.padding(10.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(profile?.firstName ?: "", fontWeight = FontWeight.Bold)
                         Spacer(Modifier.size(5.dp))
-                        Text(profile?.lastName ?: "",fontWeight= FontWeight.Bold)
+                        Text(profile?.lastName ?: "", fontWeight = FontWeight.Bold)
                     }
 
-                    Text(stringResource(id = R.string.first_name), color = Color.Gray,modifier = Modifier.padding(top = 10.dp))
+                    Text(
+                        stringResource(id = R.string.first_name),
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
                     OutlinedTextField(
                         firstName ?: "",
                         { firstName = it },
@@ -214,7 +244,11 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         modifier = Modifier.height(50.dp).fillMaxWidth(),
                         singleLine = true,
                     )
-                    Text(stringResource(id = R.string.last_name), color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
+                    Text(
+                        stringResource(id = R.string.last_name),
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
                     OutlinedTextField(
                         lastName ?: "",
                         { lastName = it },
@@ -230,7 +264,11 @@ fun EditorProfileContent(innerPadding: PaddingValues,
 
                     scopeState.DatePickerFieldToModal()
 
-                    Text(stringResource(id = R.string.email), color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
+                    Text(
+                        stringResource(id = R.string.email),
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
                     OutlinedTextField(
                         email ?: "",
                         { email = it },
@@ -239,7 +277,11 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         isError = isErrorEmail,
                         trailingIcon = {
                             if (isErrorEmail)
-                                Icon(Icons.Filled.Error,"error", tint = MaterialTheme.colorScheme.error)
+                                Icon(
+                                    Icons.Filled.Error,
+                                    "error",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
                         },
                         singleLine = true,
                     )
@@ -252,7 +294,11 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         )
                     }
 
-                    Text(stringResource(id = R.string.phone), color = Color.Gray, modifier = Modifier.padding(top = 10.dp))
+                    Text(
+                        stringResource(id = R.string.phone),
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
                     OutlinedTextField(
                         profile?.phone ?: "",
                         {},
@@ -265,83 +311,62 @@ fun EditorProfileContent(innerPadding: PaddingValues,
 
             }
             Button(onClick = {
-               isErrorEmail = !email.isValidEmail()
-            },modifier = Modifier.padding(top = 10.dp).height(50.dp).fillMaxWidth()) {
-                 Text(stringResource(id = R.string.save))
-             }
+                isErrorEmail = !email.isValidEmail()
+            }, modifier = Modifier.padding(top = 10.dp).height(50.dp).fillMaxWidth()) {
+                Text(stringResource(id = R.string.save))
+            }
 
         }
 
-/*
-        ModalBottomSheet(
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.5f),
-            sheetState = sheetState,
-            onDismissRequest = { showBottomSheet = false }
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.3f),
+                sheetState = sheetState,
+                onDismissRequest = { showBottomSheet = false }
             ) {
-                Button(onClick = {
-                    //   permissionLauncher.launch(Manifest.permission.CAMERA)
-                }) {
-                    Text(text = "Take a photo")
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Button(onClick = {
-                    val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    // pickImageFromAlbumLauncher.launch(mediaRequest)
-                }) {
-                    Text(text = "Pick a picture")
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Button(onClick = {
+                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                    }) {
+                        Text(text = "Take a photo")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(onClick = {
+                        val mediaRequest =
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        pickImageFromAlbumLauncher.launch(mediaRequest)
+                    }) {
+                        Text(text = "Pick a picture")
+                    }
                 }
             }
-        }*/
+        }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun EditorProfileStateScope.LoadAvatar() {
+fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit) {
     val viewState: EditorViewState by viewStateFlow.collectAsState()
     val profile by profile.collectAsStateWithLifecycle()
 
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false,
-    )
-
     val currentContext = LocalContext.current
-
-    // launches photo picker
-    val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
-        url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
-            ?.let {
-                showBottomSheet = false
-                onReceive(it) }
-    }
 
     // launches camera
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
         if (isImageSaved) {
-            showBottomSheet = false
+            onChangeShowBottomSheet(false)
             onReceive(Intent.OnImageSavedWith(currentContext))
         } else {
-            showBottomSheet = false
+            onChangeShowBottomSheet(false)
             // handle image saving error or cancellation
             onReceive(Intent.OnImageSavingCanceled)
-        }
-    }
-
-    // launches camera permissions
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
-        if (permissionGranted) {
-            onReceive(Intent.OnPermissionGrantedWith(currentContext))
-        } else {
-            // handle permission denied such as:
-            onReceive(Intent.OnPermissionDenied)
         }
     }
 
@@ -358,7 +383,7 @@ fun EditorProfileStateScope.LoadAvatar() {
                 bitmap = it,
                 contentDescription = "avatar",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  showBottomSheet = true},
+                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable { onChangeShowBottomSheet(true) },
             )
         }
         if (viewState.selectedPictures == null) {
@@ -366,7 +391,7 @@ fun EditorProfileStateScope.LoadAvatar() {
                 model = profile?.avatar?.url,
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable { showBottomSheet = true },
+                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable { onChangeShowBottomSheet(true) },
                 loading = {
                     CircularProgressIndicator(
                         color = Color.Gray,
@@ -379,36 +404,7 @@ fun EditorProfileStateScope.LoadAvatar() {
                 }
             )
         }
-
     }
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            modifier = Modifier.fillMaxHeight(0.5f),
-            sheetState = sheetState,
-            onDismissRequest = { showBottomSheet = false }
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(onClick = {
-                    permissionLauncher.launch(Manifest.permission.CAMERA)
-                }) {
-                    Text(text = "Take a photo")
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Button(onClick = {
-                    val mediaRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    pickImageFromAlbumLauncher.launch(mediaRequest)
-                }) {
-                    Text(text = "Pick a picture")
-                }
-            }
-        }
-    }
-
 }
 
 

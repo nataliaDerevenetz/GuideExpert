@@ -197,6 +197,14 @@ fun EditorProfileContent(innerPadding: PaddingValues,
 
     val currentContext = LocalContext.current
 
+
+    profile?.let{
+        scopeState.handleEvent(EditorProfileUiEvent.OnLoadProfile(
+            EditorViewState(firstName = it.firstName, lastName = it.lastName,sex = it.sex,
+                email = it.email, birthday = it.birthday)
+        ))
+    }
+
    // launches camera permissions
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
@@ -327,6 +335,13 @@ fun EditorProfileContent(innerPadding: PaddingValues,
             }
             Button(onClick = {
                 isErrorEmail = !email.isValidEmail()
+                if (email.isValidEmail() && scopeState.viewStateFlow.value.birthday?.time.isValidBirthday()) {
+                    //SAVE!!!!!
+                    Log.d("SAVE", "OK")
+                } else {
+                    Log.d("SAVE", "ERROR")
+                }
+
             }, modifier = Modifier.padding(top = 10.dp).height(50.dp).fillMaxWidth()) {
                 Text(stringResource(id = R.string.save))
             }
@@ -590,7 +605,10 @@ fun EditorProfileStateScope.DatePickerFieldToModal(modifier: Modifier = Modifier
         DatePickerModal(
             onDateSelected = { selectedDate = it
                 showModal = false
-                handleEvent(EditorProfileUiEvent.OnBirthdayChanged(Date(it!!)))
+                it?.let{
+                    handleEvent(EditorProfileUiEvent.OnBirthdayChanged(Date(it)))
+                }
+
                 isErrorBirthday = !selectedDate.isValidBirthday()
                              },
             onDismiss = { showModal = false }

@@ -17,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -36,6 +37,7 @@ sealed class EditorProfileUiEvent {
     data class OnSexChanged(val sex: String): EditorProfileUiEvent()
     data class OnEmailChanged(val email: String): EditorProfileUiEvent()
     data class OnBirthdayChanged(val birthday: Date): EditorProfileUiEvent()
+    data class OnLoadProfile(val editorViewState: EditorViewState): EditorProfileUiEvent()
 }
 
 data class EditorViewState(
@@ -45,7 +47,7 @@ data class EditorViewState(
     val lastName: String = "",
     val email: String = "",
     val sex: String = "",
-    val birthday: Date = Date(), )
+    val birthday: Date? = null, )
 
 @HiltViewModel
 class EditorProfileViewModel @Inject constructor(
@@ -60,6 +62,8 @@ class EditorProfileViewModel @Inject constructor(
     // exposes the ViewState to the composable view
     val viewStateFlow: StateFlow<EditorViewState>
         get() = _editorViewState
+
+    private val _editorOldViewState: MutableStateFlow<EditorViewState> = MutableStateFlow(EditorViewState())
 
 
     // receives user generated events and processes them in the provided coroutine context
@@ -142,6 +146,10 @@ class EditorProfileViewModel @Inject constructor(
             is EditorProfileUiEvent.OnBirthdayChanged -> {
                 setBirthday(event.birthday)
             }
+
+            is EditorProfileUiEvent.OnLoadProfile -> {
+                loadProfile(event.editorViewState)
+            }
         }
     }
 
@@ -177,6 +185,13 @@ class EditorProfileViewModel @Inject constructor(
         _editorViewState.update {
             Log.d("EDIT", birthday.toString())
             it.copy(birthday = birthday)
+        }
+    }
+
+    private fun loadProfile(editorViewState: EditorViewState) {
+        viewModelScope.launch {
+            _editorOldViewState.update {  editorViewState}
+            _editorViewState.update { editorViewState }
         }
     }
 

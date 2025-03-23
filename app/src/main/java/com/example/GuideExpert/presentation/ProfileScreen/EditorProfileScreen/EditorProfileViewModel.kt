@@ -37,7 +37,8 @@ sealed class EditorProfileUiEvent {
     data class OnSexChanged(val sex: String): EditorProfileUiEvent()
     data class OnEmailChanged(val email: String): EditorProfileUiEvent()
     data class OnBirthdayChanged(val birthday: Date): EditorProfileUiEvent()
-    data class OnLoadProfile(val editorViewState: EditorViewState): EditorProfileUiEvent()
+    data object OnLoadProfile: EditorProfileUiEvent()
+    data object OnSaveProfile: EditorProfileUiEvent()
 }
 
 data class EditorViewState(
@@ -49,6 +50,8 @@ data class EditorViewState(
     val sex: String = "",
     val birthday: Date? = null, )
 
+
+@RequiresApi(Build.VERSION_CODES.P)
 @HiltViewModel
 class EditorProfileViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
@@ -148,7 +151,11 @@ class EditorProfileViewModel @Inject constructor(
             }
 
             is EditorProfileUiEvent.OnLoadProfile -> {
-                loadProfile(event.editorViewState)
+                loadProfile()
+            }
+
+            is EditorProfileUiEvent.OnSaveProfile -> {
+                saveProfile()
             }
         }
     }
@@ -158,6 +165,9 @@ class EditorProfileViewModel @Inject constructor(
             Log.d("EDIT", firstName)
            it.copy(firstName = firstName)
         }
+
+        Log.d("EDIT",_editorViewState.value.toString())
+
     }
 
     private fun setLastName(lastName: String) {
@@ -188,11 +198,34 @@ class EditorProfileViewModel @Inject constructor(
         }
     }
 
-    private fun loadProfile(editorViewState: EditorViewState) {
+    private fun loadProfile() {
+        Log.d("LOAD","loadProfile")
         viewModelScope.launch {
-            _editorOldViewState.update {  editorViewState}
-            _editorViewState.update { editorViewState }
+            _editorOldViewState.update {
+                EditorViewState(
+                    firstName = profileFlow.value!!.firstName, lastName = profileFlow.value!!.lastName, sex = profileFlow.value!!.sex,
+                    email = profileFlow.value!!.email, birthday = profileFlow.value!!.birthday
+                )
+            }
+            _editorViewState.update {
+                EditorViewState(
+                    firstName = profileFlow.value!!.firstName, lastName = profileFlow.value!!.lastName, sex = profileFlow.value!!.sex,
+                    email = profileFlow.value!!.email, birthday = profileFlow.value!!.birthday
+                )
+            }
         }
     }
 
+    private fun saveProfile() {
+
+        if (_editorOldViewState.value == _editorViewState.value) {
+             Log.d("SAVE","NOT SEND")
+        } else
+          Log.d("SAVE","SEND")
+
+    }
+
+    init{
+       handleEvent(EditorProfileUiEvent.OnLoadProfile)
+    }
 }

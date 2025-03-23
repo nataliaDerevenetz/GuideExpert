@@ -182,7 +182,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                              handleEvent = viewModel::handleEvent),
 ) {
 
-    val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
+    val profile by scopeState.profile.collectAsStateWithLifecycle()
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
     var lastName by rememberSaveable{mutableStateOf(profile?.lastName)}
@@ -197,13 +197,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
 
     val currentContext = LocalContext.current
 
-
-    profile?.let{
-        scopeState.handleEvent(EditorProfileUiEvent.OnLoadProfile(
-            EditorViewState(firstName = it.firstName, lastName = it.lastName,sex = it.sex,
-                email = it.email, birthday = it.birthday)
-        ))
-    }
+    val selectedDate = rememberSaveable  { mutableStateOf(profile?.birthday?.time) }
 
    // launches camera permissions
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
@@ -283,7 +277,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         modifier = Modifier.padding(top = 10.dp)
                     )
 
-                    scopeState.DatePickerFieldToModal()
+                    scopeState.DatePickerFieldToModal(selectedDate)
 
                     Text(
                         stringResource(id = R.string.email),
@@ -335,9 +329,10 @@ fun EditorProfileContent(innerPadding: PaddingValues,
             }
             Button(onClick = {
                 isErrorEmail = !email.isValidEmail()
-                if (email.isValidEmail() && scopeState.viewStateFlow.value.birthday?.time.isValidBirthday()) {
+                if (email.isValidEmail() && selectedDate.value.isValidBirthday()) {
                     //SAVE!!!!!
                     Log.d("SAVE", "OK")
+                    scopeState.handleEvent(EditorProfileUiEvent.OnSaveProfile)
                 } else {
                     Log.d("SAVE", "ERROR")
                 }
@@ -563,22 +558,22 @@ fun EditorProfileStateScope.SingleChoiceView(sex: MutableState<String?>) {
 
 
 @Composable
-fun EditorProfileStateScope.DatePickerFieldToModal(modifier: Modifier = Modifier) {
-    val profile by profile.collectAsStateWithLifecycle()
+fun EditorProfileStateScope.DatePickerFieldToModal(selectedDate: MutableState<Long?>) {
+   // val profile by profile.collectAsStateWithLifecycle()
 
-    var selectedDate by rememberSaveable  { mutableStateOf(profile?.birthday?.time) }
+  //  var selectedDate by rememberSaveable  { mutableStateOf(profile?.birthday?.time) }
     var isErrorBirthday by rememberSaveable { mutableStateOf(false) }
     var showModal by rememberSaveable { mutableStateOf(false) }
 
     OutlinedTextField(
-        value = selectedDate?.let { convertMillisToDate(it) } ?: "",
+        value = selectedDate.let { it.value?.let { it1 -> convertMillisToDate(it1) } } ?: "",
         onValueChange = { },
         placeholder = { Text("DD/MM/YYYY") },
         trailingIcon = {
             Icon(Icons.Default.DateRange, contentDescription = "Select date")
         },
         textStyle = TextStyle(fontSize = 16.sp),
-        modifier = modifier
+        modifier = Modifier
             .height(50.dp)
             .fillMaxWidth()
             .pointerInput(selectedDate) {
@@ -603,13 +598,13 @@ fun EditorProfileStateScope.DatePickerFieldToModal(modifier: Modifier = Modifier
 
     if (showModal) {
         DatePickerModal(
-            onDateSelected = { selectedDate = it
+            onDateSelected = { selectedDate.value = it
                 showModal = false
                 it?.let{
                     handleEvent(EditorProfileUiEvent.OnBirthdayChanged(Date(it)))
                 }
 
-                isErrorBirthday = !selectedDate.isValidBirthday()
+                isErrorBirthday = !selectedDate.value.isValidBirthday()
                              },
             onDismiss = { showModal = false }
         )

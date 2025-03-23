@@ -6,10 +6,12 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -22,6 +24,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.util.Date
 import javax.inject.Inject
@@ -31,7 +38,7 @@ sealed class EditorProfileUiEvent {
     data object OnPermissionDenied: EditorProfileUiEvent()
     data class OnImageSavedWith (val compositionContext: Context): EditorProfileUiEvent()
     data object OnImageSavingCanceled: EditorProfileUiEvent()
-    data class OnFinishPickingImagesWith(val compositionContext: Context, val imageUrls: Uri): EditorProfileUiEvent()
+    data class OnFinishPickingImagesWith(val compositionContext: Context, val imageUrl: Uri): EditorProfileUiEvent()
     data class OnFirstNameChanged(val firstName: String): EditorProfileUiEvent()
     data class OnLastNameChanged(val lastName: String): EditorProfileUiEvent()
     data class OnSexChanged(val sex: String): EditorProfileUiEvent()
@@ -44,6 +51,7 @@ sealed class EditorProfileUiEvent {
 data class EditorViewState(
     val tempFileUrl: Uri? = null,
     val selectedPictures: ImageBitmap? = null,
+    val tempFileGalleryUrl: Uri? = null,
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
@@ -85,7 +93,7 @@ class EditorProfileViewModel @Inject constructor(
                      "${this@EditorProfileViewModel.application.packageName}.provider", /* needs to match the provider information in the manifest */
                     tempFile
                 )
-                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = uri)
+                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = uri,tempFileGalleryUrl=null)
             }
 
             is EditorProfileUiEvent.OnPermissionDenied -> {
@@ -96,7 +104,9 @@ class EditorProfileViewModel @Inject constructor(
 
             is EditorProfileUiEvent.OnFinishPickingImagesWith -> {
                 var newImages: ImageBitmap? = null
-                val inputStream = event.compositionContext.contentResolver.openInputStream(event.imageUrls)
+
+                Log.d("URI333",event.imageUrl.toString())
+                val inputStream = event.compositionContext.contentResolver.openInputStream(event.imageUrl)
                 val bytes = inputStream?.readBytes()
                 inputStream?.close()
                 if (bytes != null) {
@@ -106,11 +116,12 @@ class EditorProfileViewModel @Inject constructor(
                     newImages = bitmap.asImageBitmap()
                 } else {
                     // error reading the bytes from the image url
-                    println("The image that was picked could not be read from the device at this url: ${event.imageUrls}")
+                    println("The image that was picked could not be read from the device at this url: ${event.imageUrl}")
                 }
                 val currentViewState = _editorViewState.value
                 val newCopy = currentViewState.copy(
                     selectedPictures =  newImages,
+                    tempFileGalleryUrl = event.imageUrl,
                     tempFileUrl = null
                 )
                 _editorViewState.value = newCopy
@@ -217,15 +228,45 @@ class EditorProfileViewModel @Inject constructor(
     }
 
     private fun saveProfile() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_editorOldViewState.value == _editorViewState.value) {
+                Log.d("SAVE", "NOT SEND")
+            } else {
+                if (viewStateFlow.value.tempFileGalleryUrl != null) {
+                    val imagePart =
+                        createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
+                    imagePart?.let {
+                        profileRepository.saveProfile(it)
+                    }
 
-        if (_editorOldViewState.value == _editorViewState.value) {
-             Log.d("SAVE","NOT SEND")
-        } else
-          Log.d("SAVE","SEND")
-
+                }
+                Log.d("SAVE", "SEND")
+            }
+        }
     }
 
     init{
        handleEvent(EditorProfileUiEvent.OnLoadProfile)
+    }
+
+
+    private fun createImageRequestBody(imageUri: Uri, fileName: String): MultipartBody.Part? {
+        application.contentResolver?.query(imageUri, null, null, null, null)?.use {
+            if (it.moveToFirst()) {
+                val index = it.getColumnIndex(MediaStore.MediaColumns.DATA)
+                if(index >=0) {
+                    val picturePath = it.getString(index)
+
+                    val requestBody =
+                        File(picturePath).asRequestBody("image/jpeg".toMediaTypeOrNull())
+                    return MultipartBody.Part.createFormData(
+                        fileName,
+                        "${fileName}.jpeg",
+                        requestBody
+                    )
+                }
+            }
+        }
+        return null
     }
 }

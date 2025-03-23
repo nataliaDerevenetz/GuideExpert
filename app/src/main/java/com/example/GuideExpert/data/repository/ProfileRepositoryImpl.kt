@@ -1,6 +1,10 @@
 package com.example.GuideExpert.data.repository
 
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toProfile
@@ -13,6 +17,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import javax.inject.Inject
 
 sealed class ProfileResources {
@@ -33,6 +43,19 @@ class ProfileRepositoryImpl @Inject constructor(
     private val _profileStateFlow = MutableStateFlow<ProfileResources>(ProfileResources.Idle)
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
 
+
+    override suspend fun saveProfile(imagePart: MultipartBody.Part) {
+        try {
+            val result = profileService.saveProfile(profileFlow.value?.id.toString().toRequestBody("text/plain".toMediaTypeOrNull()),imagePart)
+            if (result.code() == 403) {
+                removeProfile()
+            }
+        } catch (e:Exception) {
+            Log.d("TAG", "ERROR")
+            _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
+        }
+
+    }
 
     override suspend fun fetchProfile() {
         try {

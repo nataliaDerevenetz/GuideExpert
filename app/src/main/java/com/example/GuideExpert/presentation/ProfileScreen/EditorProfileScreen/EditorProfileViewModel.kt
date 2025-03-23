@@ -19,22 +19,33 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.Date
 import javax.inject.Inject
 
-sealed class Intent {
-    data class OnPermissionGrantedWith(val compositionContext: Context): Intent()
-    data object OnPermissionDenied: Intent()
-    data class OnImageSavedWith (val compositionContext: Context): Intent()
-    data object OnImageSavingCanceled: Intent()
-    data class OnFinishPickingImagesWith(val compositionContext: Context, val imageUrls: Uri): Intent()
+sealed class EditorProfileUiEvent {
+    data class OnPermissionGrantedWith(val compositionContext: Context): EditorProfileUiEvent()
+    data object OnPermissionDenied: EditorProfileUiEvent()
+    data class OnImageSavedWith (val compositionContext: Context): EditorProfileUiEvent()
+    data object OnImageSavingCanceled: EditorProfileUiEvent()
+    data class OnFinishPickingImagesWith(val compositionContext: Context, val imageUrls: Uri): EditorProfileUiEvent()
+    data class OnFirstNameChanged(val firstName: String): EditorProfileUiEvent()
+    data class OnLastNameChanged(val lastName: String): EditorProfileUiEvent()
+    data class OnSexChanged(val sex: String): EditorProfileUiEvent()
+    data class OnEmailChanged(val email: String): EditorProfileUiEvent()
+    data class OnBirthdayChanged(val birthday: Date): EditorProfileUiEvent()
 }
 
 data class EditorViewState(
     val tempFileUrl: Uri? = null,
     val selectedPictures: ImageBitmap? = null,
-)
+    val firstName: String = "",
+    val lastName: String = "",
+    val email: String = "",
+    val sex: String = "",
+    val birthday: Date = Date(), )
 
 @HiltViewModel
 class EditorProfileViewModel @Inject constructor(
@@ -49,37 +60,36 @@ class EditorProfileViewModel @Inject constructor(
     // exposes the ViewState to the composable view
     val viewStateFlow: StateFlow<EditorViewState>
         get() = _editorViewState
-    // endregion
 
-    // region Intents
+
     // receives user generated events and processes them in the provided coroutine context
     @RequiresApi(Build.VERSION_CODES.P)
-    fun onReceive(intent: Intent) = viewModelScope.launch {
-        when(intent) {
-            is Intent.OnPermissionGrantedWith -> {
+    fun handleEvent(event: EditorProfileUiEvent) = viewModelScope.launch {
+        when(event) {
+            is EditorProfileUiEvent.OnPermissionGrantedWith -> {
                 // Create an empty image file in the app's cache directory
                 val tempFile = File.createTempFile(
                     "temp_image_file_", /* prefix */
                     ".jpg", /* suffix */
-                    intent.compositionContext.cacheDir  /* cache directory */
+                    event.compositionContext.cacheDir  /* cache directory */
                 )
                 // Create sandboxed url for this temp file - needed for the camera API
-                val uri = FileProvider.getUriForFile(intent.compositionContext,
+                val uri = FileProvider.getUriForFile(event.compositionContext,
                      "${this@EditorProfileViewModel.application.packageName}.provider", /* needs to match the provider information in the manifest */
                     tempFile
                 )
                 _editorViewState.value = _editorViewState.value.copy(tempFileUrl = uri)
             }
 
-            is Intent.OnPermissionDenied -> {
+            is EditorProfileUiEvent.OnPermissionDenied -> {
                 // maybe log the permission denial event
                 println("User did not grant permission to use the camera")
             }
 
 
-            is Intent.OnFinishPickingImagesWith -> {
+            is EditorProfileUiEvent.OnFinishPickingImagesWith -> {
                 var newImages: ImageBitmap? = null
-                val inputStream = intent.compositionContext.contentResolver.openInputStream(intent.imageUrls)
+                val inputStream = event.compositionContext.contentResolver.openInputStream(event.imageUrls)
                 val bytes = inputStream?.readBytes()
                 inputStream?.close()
                 if (bytes != null) {
@@ -89,7 +99,7 @@ class EditorProfileViewModel @Inject constructor(
                     newImages = bitmap.asImageBitmap()
                 } else {
                     // error reading the bytes from the image url
-                    println("The image that was picked could not be read from the device at this url: ${intent.imageUrls}")
+                    println("The image that was picked could not be read from the device at this url: ${event.imageUrls}")
                 }
                 val currentViewState = _editorViewState.value
                 val newCopy = currentViewState.copy(
@@ -99,19 +109,75 @@ class EditorProfileViewModel @Inject constructor(
                 _editorViewState.value = newCopy
             }
 
-            is Intent.OnImageSavedWith -> {
+            is EditorProfileUiEvent.OnImageSavedWith -> {
                 val tempImageUrl = _editorViewState.value.tempFileUrl
                 if (tempImageUrl != null) {
-                    val source = ImageDecoder.createSource(intent.compositionContext.contentResolver, tempImageUrl)
+                    val source = ImageDecoder.createSource(event.compositionContext.contentResolver, tempImageUrl)
                     val currentPictures = ImageDecoder.decodeBitmap(source).asImageBitmap()
                     _editorViewState.value = _editorViewState.value.copy(//tempFileUrl = null,
                         selectedPictures = currentPictures)
                 }
             }
 
-            is Intent.OnImageSavingCanceled -> {
+            is EditorProfileUiEvent.OnImageSavingCanceled -> {
                 _editorViewState.value = _editorViewState.value.copy(tempFileUrl = null)
+            }
+
+            is EditorProfileUiEvent.OnFirstNameChanged -> {
+                setFirstName(event.firstName)
+            }
+
+            is EditorProfileUiEvent.OnLastNameChanged -> {
+                setLastName(event.lastName)
+            }
+
+            is EditorProfileUiEvent.OnSexChanged -> {
+                setSex(event.sex)
+            }
+
+            is EditorProfileUiEvent.OnEmailChanged -> {
+                setEmail(event.email)
+            }
+
+            is EditorProfileUiEvent.OnBirthdayChanged -> {
+                setBirthday(event.birthday)
             }
         }
     }
+
+    private fun setFirstName(firstName: String) {
+        _editorViewState.update {
+            Log.d("EDIT", firstName)
+           it.copy(firstName = firstName)
+        }
+    }
+
+    private fun setLastName(lastName: String) {
+        _editorViewState.update {
+            Log.d("EDIT", lastName)
+            it.copy(lastName = lastName)
+        }
+    }
+
+    private fun setSex(sex: String) {
+        _editorViewState.update {
+            Log.d("EDIT", sex)
+            it.copy(sex = sex)
+        }
+    }
+
+    private fun setEmail(email: String) {
+        _editorViewState.update {
+            Log.d("EDIT", email)
+            it.copy(email = email)
+        }
+    }
+
+    private fun setBirthday(birthday: Date) {
+        _editorViewState.update {
+            Log.d("EDIT", birthday.toString())
+            it.copy(birthday = birthday)
+        }
+    }
+
 }

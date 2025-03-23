@@ -143,22 +143,22 @@ fun EditorProfileScreen(onNavigateToProfile: () -> Boolean) {
 interface EditorProfileStateScope {
     val profile: StateFlow<Profile?>
     val viewStateFlow: StateFlow<EditorViewState>
-    val onReceive: (Intent) -> Job
+    val handleEvent: (EditorProfileUiEvent) -> Job
 }
 
 
 fun DefaultEditorProfileStateScope(
     profile: StateFlow<Profile?>,
     viewStateFlow: StateFlow<EditorViewState>,
-    onReceive : (Intent) -> Job
+    handleEvent : (EditorProfileUiEvent) -> Job
 ): EditorProfileStateScope {
     return object : EditorProfileStateScope {
         override val profile: StateFlow<Profile?>
             get() = profile
         override val viewStateFlow: StateFlow<EditorViewState>
             get() = viewStateFlow
-        override val onReceive: (Intent) -> Job
-            get() = onReceive
+        override val handleEvent: (EditorProfileUiEvent) -> Job
+            get() = handleEvent
 
     }
 }
@@ -167,9 +167,9 @@ fun DefaultEditorProfileStateScope(
 fun rememberDefaultEditorProfileStateScope(
     profile: StateFlow<Profile?>,
     viewStateFlow: StateFlow<EditorViewState>,
-    onReceive: (Intent) -> Job
-): EditorProfileStateScope = remember(profile,viewStateFlow,onReceive) {
-    DefaultEditorProfileStateScope(profile,viewStateFlow,onReceive)
+    handleEvent: (EditorProfileUiEvent) -> Job
+): EditorProfileStateScope = remember(profile,viewStateFlow,handleEvent) {
+    DefaultEditorProfileStateScope(profile,viewStateFlow,handleEvent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -179,7 +179,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                          viewModel: EditorProfileViewModel = hiltViewModel(),
                          scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
                              viewStateFlow = viewModel.viewStateFlow,
-                             onReceive = viewModel::onReceive),
+                             handleEvent = viewModel::handleEvent),
 ) {
 
     val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
@@ -200,19 +200,19 @@ fun EditorProfileContent(innerPadding: PaddingValues,
    // launches camera permissions
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
-            scopeState.onReceive(Intent.OnPermissionGrantedWith(currentContext))
+            scopeState.handleEvent(EditorProfileUiEvent.OnPermissionGrantedWith(currentContext))
         } else {
             // handle permission denied such as:
-            scopeState.onReceive(Intent.OnPermissionDenied)
+            scopeState.handleEvent(EditorProfileUiEvent.OnPermissionDenied)
         }
     }
 
     // launches photo picker
     val pickImageFromAlbumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { url ->
-        url?.let { Intent.OnFinishPickingImagesWith(currentContext, it) }
+        url?.let { EditorProfileUiEvent.OnFinishPickingImagesWith(currentContext, it) }
             ?.let {
                 showBottomSheet = false
-                scopeState.onReceive(it) }
+                scopeState.handleEvent(it) }
     }
 
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
@@ -245,7 +245,9 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     )
                     OutlinedTextField(
                         firstName ?: "",
-                        { firstName = it },
+                        {   firstName = it
+                            scopeState.handleEvent(EditorProfileUiEvent.OnFirstNameChanged(it))
+                        },
                         textStyle = TextStyle(fontSize = 16.sp),
                         modifier = Modifier.height(50.dp).fillMaxWidth(),
                         singleLine = true,
@@ -257,7 +259,9 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     )
                     OutlinedTextField(
                         lastName ?: "",
-                        { lastName = it },
+                        {   lastName = it
+                            scopeState.handleEvent(EditorProfileUiEvent.OnLastNameChanged(it))
+                        },
                         textStyle = TextStyle(fontSize = 16.sp),
                         modifier = Modifier.height(50.dp).fillMaxWidth(),
                         singleLine = true,
@@ -280,7 +284,9 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     )
                     OutlinedTextField(
                         email ?: "",
-                        { email = it },
+                        {   email = it
+                            scopeState.handleEvent(EditorProfileUiEvent.OnEmailChanged(it))
+                        },
                         textStyle = TextStyle(fontSize = 16.sp),
                         modifier = Modifier.height(50.dp).fillMaxWidth(),
                         isError = isErrorEmail,
@@ -371,11 +377,11 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
         if (isImageSaved) {
             onChangeShowBottomSheet(false)
-            onReceive(Intent.OnImageSavedWith(currentContext))
+            handleEvent(EditorProfileUiEvent.OnImageSavedWith(currentContext))
         } else {
             onChangeShowBottomSheet(false)
             // handle image saving error or cancellation
-            onReceive(Intent.OnImageSavingCanceled)
+            handleEvent(EditorProfileUiEvent.OnImageSavingCanceled)
         }
     }
 
@@ -469,7 +475,7 @@ fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun CommonDialog(
+fun EditorProfileStateScope.CommonDialog(
     title: String?,
     state: MutableState<Boolean>,
     content: @Composable (() -> Unit)? = null
@@ -498,7 +504,7 @@ fun CommonDialog(
 }
 
 @Composable
-fun SingleChoiceView(sex: MutableState<String?>) {
+fun EditorProfileStateScope.SingleChoiceView(sex: MutableState<String?>) {
     val radioOptions = listOf(stringResource(id = R.string.male),
         stringResource(id = R.string.women)
     )
@@ -515,6 +521,7 @@ fun SingleChoiceView(sex: MutableState<String?>) {
                         selected = (text == selectedOption),
                         onClick = {
                             sex.value = if (index == 0) "male" else "women"
+                            handleEvent(EditorProfileUiEvent.OnSexChanged(sex.value!!))
                             onOptionSelected(text)
                         }
                     )
@@ -525,6 +532,7 @@ fun SingleChoiceView(sex: MutableState<String?>) {
                     selected = (text == selectedOption),
                     onClick = {
                         sex.value = if (index == 0) "male" else "women"
+                        handleEvent(EditorProfileUiEvent.OnSexChanged(sex.value!!))
                         onOptionSelected(text)
                     }
                 )
@@ -582,6 +590,7 @@ fun EditorProfileStateScope.DatePickerFieldToModal(modifier: Modifier = Modifier
         DatePickerModal(
             onDateSelected = { selectedDate = it
                 showModal = false
+                handleEvent(EditorProfileUiEvent.OnBirthdayChanged(Date(it!!)))
                 isErrorBirthday = !selectedDate.isValidBirthday()
                              },
             onDismiss = { showModal = false }

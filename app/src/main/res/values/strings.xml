@@ -21,4 +21,7 @@
     <string name="birthday">День рождения</string>
     <string name="last_name">Фамилия</string>
     <string name="first_name">Имя</string>
+    <string name="sex">Пол</string>
+    <string name="male">Мужской</string>
+    <string name="women">Женский</string>
 </resources>

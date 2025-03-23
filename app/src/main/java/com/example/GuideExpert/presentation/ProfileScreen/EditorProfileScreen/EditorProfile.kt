@@ -29,12 +29,15 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -45,6 +48,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
@@ -55,8 +59,10 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -256,6 +262,9 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                         modifier = Modifier.height(50.dp).fillMaxWidth(),
                         singleLine = true,
                     )
+
+                    scopeState.SelectSexToModal()
+
                     Text(
                         stringResource(id = R.string.birthday),
                         color = Color.Gray,
@@ -406,6 +415,128 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
         }
     }
 }
+
+
+@Composable
+fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
+    val profile by profile.collectAsStateWithLifecycle()
+
+    val sex = rememberSaveable{mutableStateOf(profile?.sex)}
+    val male = stringResource(id = R.string.male)
+    val women = stringResource(id = R.string.women)
+
+    val sexLocal by remember{derivedStateOf { if (sex.value == "male") male else women }}
+    var showModal = rememberSaveable { mutableStateOf(false) }
+
+
+    Text(
+        stringResource(id = R.string.sex),
+        color = Color.Gray,
+        modifier = Modifier.padding(top = 10.dp)
+    )
+    OutlinedTextField(
+        sexLocal ?: "",
+        {  },
+        readOnly = true,
+        textStyle = TextStyle(fontSize = 16.sp),
+        modifier = Modifier.height(50.dp).fillMaxWidth().pointerInput(sexLocal) {
+            awaitEachGesture {
+                awaitFirstDown(pass = PointerEventPass.Initial)
+                val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                if (upEvent != null) {
+                    showModal.value = true
+                }
+            }
+        },
+        singleLine = true,
+        trailingIcon = {
+            Icon(
+                Icons.Filled.ArrowDropDown,
+                "",
+                // tint = MaterialTheme.colorScheme.error
+            )
+        }
+    )
+
+
+    if (showModal.value) {
+        CommonDialog(title = stringResource(id = R.string.sex), state = showModal) {
+            SingleChoiceView(sex)
+        }
+
+    }
+}
+
+
+@Composable
+fun CommonDialog(
+    title: String?,
+    state: MutableState<Boolean>,
+    content: @Composable (() -> Unit)? = null
+) {
+    AlertDialog(
+        onDismissRequest = {
+            state.value = false
+        },
+        title = title?.let {
+            {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Text(text = title)
+                }
+            }
+        },
+        text = content,
+        confirmButton = {
+            TextButton(onClick = { state.value = false }) {
+                Text(stringResource(id = R.string.save))
+            }
+        }, modifier = Modifier.padding(vertical = 5.dp)
+    )
+}
+
+@Composable
+fun SingleChoiceView(sex: MutableState<String?>) {
+    val radioOptions = listOf(stringResource(id = R.string.male),
+        stringResource(id = R.string.women)
+    )
+    val index = if (sex.value == "male") 0 else 1
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[index]) }
+    Column(
+        Modifier.fillMaxWidth()
+    ) {
+        radioOptions.forEachIndexed { index, text ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .selectable(
+                        selected = (text == selectedOption),
+                        onClick = {
+                            sex.value = if (index == 0) "male" else "women"
+                            onOptionSelected(text)
+                        }
+                    )
+                    .padding(vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = (text == selectedOption),
+                    onClick = {
+                        sex.value = if (index == 0) "male" else "women"
+                        onOptionSelected(text)
+                    }
+                )
+                Text(
+                    text = text
+                )
+            }
+        }
+    }
+}
+
+
 
 
 @Composable

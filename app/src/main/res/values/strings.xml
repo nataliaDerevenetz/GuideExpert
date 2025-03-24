@@ -24,4 +24,8 @@
     <string name="sex">Пол</string>
     <string name="male">Мужской</string>
     <string name="women">Женский</string>
+    <string name="sex_selected">Выберите пол:</string>
+    <string name="take_photo">Сделать снимок</string>
+    <string name="pick_picture">Загрузить с устройства</string>
+    <string name="deleted">Удалить</string>
 </resources>

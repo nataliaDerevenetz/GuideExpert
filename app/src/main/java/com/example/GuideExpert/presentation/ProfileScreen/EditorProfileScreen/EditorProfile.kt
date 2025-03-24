@@ -219,131 +219,137 @@ fun EditorProfileContent(innerPadding: PaddingValues,
 
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
         Column(
-            modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp).fillMaxSize()
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.Start
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Row {
-                Column {
+           Column(
+                modifier = Modifier.padding(top = 0.dp, start = 15.dp, end = 15.dp).fillMaxSize()
+                    .verticalScroll(scrollState).weight(1f, false),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.Start
+            ) {
 
-                    scopeState.LoadAvatar(onChangeShowBottomSheet = { it: Boolean ->
-                        showBottomSheet = it
-                    })
+                scopeState.LoadAvatar(onChangeShowBottomSheet = { it: Boolean ->
+                    showBottomSheet = it
+                })
 
-                    Row(
-                        Modifier.padding(10.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(profile?.firstName ?: "", fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.size(5.dp))
-                        Text(profile?.lastName ?: "", fontWeight = FontWeight.Bold)
-                    }
+                Row(
+                    Modifier.padding(10.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(profile?.firstName ?: "", fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.size(5.dp))
+                    Text(profile?.lastName ?: "", fontWeight = FontWeight.Bold)
+                }
 
+                Text(
+                    stringResource(id = R.string.first_name),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+                OutlinedTextField(
+                    firstName ?: "",
+                    {
+                        firstName = it
+                        scopeState.handleEvent(EditorProfileUiEvent.OnFirstNameChanged(it))
+                    },
+                    textStyle = TextStyle(fontSize = 16.sp),
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    singleLine = true,
+                )
+                Text(
+                    stringResource(id = R.string.last_name),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+                OutlinedTextField(
+                    lastName ?: "",
+                    {
+                        lastName = it
+                        scopeState.handleEvent(EditorProfileUiEvent.OnLastNameChanged(it))
+                    },
+                    textStyle = TextStyle(fontSize = 16.sp),
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    singleLine = true,
+                )
+
+                scopeState.SelectSexToModal()
+
+                Text(
+                    stringResource(id = R.string.birthday),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+
+                scopeState.DatePickerFieldToModal(selectedDate)
+
+                Text(
+                    stringResource(id = R.string.email),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+                OutlinedTextField(
+                    email ?: "",
+                    {
+                        email = it
+                        scopeState.handleEvent(EditorProfileUiEvent.OnEmailChanged(it))
+                    },
+                    textStyle = TextStyle(fontSize = 16.sp),
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    isError = isErrorEmail,
+                    trailingIcon = {
+                        if (isErrorEmail)
+                            Icon(
+                                Icons.Filled.Error,
+                                "error",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                    },
+                    singleLine = true,
+                )
+                if (isErrorEmail) {
                     Text(
-                        stringResource(id = R.string.first_name),
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                    OutlinedTextField(
-                        firstName ?: "",
-                        {   firstName = it
-                            scopeState.handleEvent(EditorProfileUiEvent.OnFirstNameChanged(it))
-                        },
-                        textStyle = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.height(50.dp).fillMaxWidth(),
-                        singleLine = true,
-                    )
-                    Text(
-                        stringResource(id = R.string.last_name),
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                    OutlinedTextField(
-                        lastName ?: "",
-                        {   lastName = it
-                            scopeState.handleEvent(EditorProfileUiEvent.OnLastNameChanged(it))
-                        },
-                        textStyle = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.height(50.dp).fillMaxWidth(),
-                        singleLine = true,
-                    )
-
-                    scopeState.SelectSexToModal()
-
-                    Text(
-                        stringResource(id = R.string.birthday),
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-
-                    scopeState.DatePickerFieldToModal(selectedDate)
-
-                    Text(
-                        stringResource(id = R.string.email),
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                    OutlinedTextField(
-                        email ?: "",
-                        {   email = it
-                            scopeState.handleEvent(EditorProfileUiEvent.OnEmailChanged(it))
-                        },
-                        textStyle = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.height(50.dp).fillMaxWidth(),
-                        isError = isErrorEmail,
-                        trailingIcon = {
-                            if (isErrorEmail)
-                                Icon(
-                                    Icons.Filled.Error,
-                                    "error",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                        },
-                        singleLine = true,
-                    )
-                    if (isErrorEmail) {
-                        Text(
-                            text = stringResource(id = R.string.error_email),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.titleSmall,
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    }
-
-                    Text(
-                        stringResource(id = R.string.phone),
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                    OutlinedTextField(
-                        profile?.phone ?: "",
-                        {},
-                        enabled = false,
-                        textStyle = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.height(50.dp).fillMaxWidth(),
-                        singleLine = true,
+                        text = stringResource(id = R.string.error_email),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                 }
 
+                Text(
+                    stringResource(id = R.string.phone),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+                OutlinedTextField(
+                    profile?.phone ?: "",
+                    {},
+                    enabled = false,
+                    textStyle = TextStyle(fontSize = 16.sp),
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    singleLine = true,
+                )
             }
-            Button(onClick = {
-                isErrorEmail = !email.isValidEmail()
-                if (email.isValidEmail() && selectedDate.value.isValidBirthday()) {
-                    //SAVE!!!!!
-                    Log.d("SAVE", "OK")
-                    scopeState.handleEvent(EditorProfileUiEvent.OnSaveProfile)
-                } else {
-                    Log.d("SAVE", "ERROR")
-                }
 
-            }, modifier = Modifier.padding(top = 10.dp).height(50.dp).fillMaxWidth()) {
+            Button(
+                onClick = {
+                    isErrorEmail = !email.isValidEmail()
+                    if (email.isValidEmail() && selectedDate.value.isValidBirthday()) {
+                        //SAVE!!!!!
+                        Log.d("SAVE", "OK")
+                        scopeState.handleEvent(EditorProfileUiEvent.OnSaveProfile)
+                    } else {
+                        Log.d("SAVE", "ERROR")
+                    }
+
+                },
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp).height(50.dp).fillMaxWidth()
+
+            ) {
                 Text(stringResource(id = R.string.save))
             }
 
         }
-
-
         if (showBottomSheet) {
             ModalBottomSheet(
                 modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.3f),
@@ -358,7 +364,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     Button(onClick = {
                         permissionLauncher.launch(Manifest.permission.CAMERA)
                     }) {
-                        Text(text = "Take a photo")
+                        Text(text = stringResource(id = R.string.take_photo))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(onClick = {
@@ -366,7 +372,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         pickImageFromAlbumLauncher.launch(mediaRequest)
                     }) {
-                        Text(text = "Pick a picture")
+                        Text(text = stringResource(id = R.string.pick_picture))
                     }
                 }
             }
@@ -476,7 +482,7 @@ fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
 
 
     if (showModal.value) {
-        CommonDialog(title = stringResource(id = R.string.sex), state = showModal) {
+        CommonDialog(title = stringResource(id = R.string.sex_selected), state = showModal) {
             SingleChoiceView(sex)
         }
 
@@ -507,7 +513,7 @@ fun EditorProfileStateScope.CommonDialog(
         text = content,
         confirmButton = {
             TextButton(onClick = { state.value = false }) {
-                Text(stringResource(id = R.string.save))
+                Text("OK")
             }
         }, modifier = Modifier.padding(vertical = 5.dp)
     )
@@ -566,6 +572,7 @@ fun EditorProfileStateScope.DatePickerFieldToModal(selectedDate: MutableState<Lo
     var showModal by rememberSaveable { mutableStateOf(false) }
 
     OutlinedTextField(
+        readOnly = true,
         value = selectedDate.let { it.value?.let { it1 -> convertMillisToDate(it1) } } ?: "",
         onValueChange = { },
         placeholder = { Text("DD/MM/YYYY") },

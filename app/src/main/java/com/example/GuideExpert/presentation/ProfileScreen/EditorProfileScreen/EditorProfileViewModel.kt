@@ -77,6 +77,11 @@ class EditorProfileViewModel @Inject constructor(
     private val _editorOldViewState: MutableStateFlow<EditorViewState> = MutableStateFlow(EditorViewState())
 
 
+    private val _stateProgressIndicator: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val stateProgressIndicator: StateFlow<Boolean>
+        get() = _stateProgressIndicator
+
+
     // receives user generated events and processes them in the provided coroutine context
     @RequiresApi(Build.VERSION_CODES.P)
     fun handleEvent(event: EditorProfileUiEvent) = viewModelScope.launch {
@@ -233,12 +238,14 @@ class EditorProfileViewModel @Inject constructor(
                 Log.d("SAVE", "NOT SEND")
             } else {
                 if (viewStateFlow.value.tempFileGalleryUrl != null) {
+
+                    _stateProgressIndicator.update { true }
                     val imagePart =
                         createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
                     imagePart?.let {
                         profileRepository.saveProfile(it)
                     }
-
+                    _stateProgressIndicator.update { false }
                 }
                 Log.d("SAVE", "SEND")
             }

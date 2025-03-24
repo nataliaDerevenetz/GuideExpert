@@ -9,6 +9,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -119,7 +120,17 @@ object PastOrPresentSelectableDates: SelectableDates {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorProfileScreen(onNavigateToProfile: () -> Boolean) {
+fun EditorProfileScreen(onNavigateToProfile: () -> Boolean,) {
+
+   /* Box {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .pointerInput(Unit) {}
+        )
+        CircularProgressIndicator(Modifier.align(Alignment.Center))
+    }*/
     Scaffold(
         topBar = {
             TopAppBar(
@@ -181,8 +192,9 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                              viewStateFlow = viewModel.viewStateFlow,
                              handleEvent = viewModel::handleEvent),
 ) {
-
     val profile by scopeState.profile.collectAsStateWithLifecycle()
+
+    val stateProgressIndicator by viewModel.stateProgressIndicator.collectAsStateWithLifecycle()
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
     var lastName by rememberSaveable{mutableStateOf(profile?.lastName)}
@@ -218,6 +230,15 @@ fun EditorProfileContent(innerPadding: PaddingValues,
     }
 
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        if (stateProgressIndicator) {//CircularProgressIndicator(Modifier.align(Alignment.Center))
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .pointerInput(Unit) {}
+            )
+            CircularProgressIndicator(Modifier.align(Alignment.Center))
+        }
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween

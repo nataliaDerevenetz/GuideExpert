@@ -9,6 +9,7 @@ import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.remote.services.ProfileService
+import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,9 +51,25 @@ class ProfileRepositoryImpl @Inject constructor(
             if (result.code() == 403) {
                 removeProfile()
             }
+            val response = result.body()
+
+            if ( response?.idAvatar != null && response.imageUrl != null) {
+                profileFlow.value?.let {
+                    updateProfile(
+                        it.copy(
+                            avatar = Avatar(
+                                id = response.idAvatar, profileId = it.id,
+                                url = response.imageUrl
+                            )
+                        )
+                    )
+                }
+            }
+
+
         } catch (e:Exception) {
             Log.d("TAG", "ERROR")
-            _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
+         //   _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
         }
 
     }

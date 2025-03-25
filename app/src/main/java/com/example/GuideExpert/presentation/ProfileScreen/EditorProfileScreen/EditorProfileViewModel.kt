@@ -187,44 +187,35 @@ class EditorProfileViewModel @Inject constructor(
 
     private fun setFirstName(firstName: String) {
         _editorViewState.update {
-            Log.d("EDIT", firstName)
            it.copy(firstName = firstName)
         }
-
-        Log.d("EDIT",_editorViewState.value.toString())
-
     }
 
     private fun setLastName(lastName: String) {
         _editorViewState.update {
-            Log.d("EDIT", lastName)
             it.copy(lastName = lastName)
         }
     }
 
     private fun setSex(sex: String) {
         _editorViewState.update {
-            Log.d("EDIT", sex)
             it.copy(sex = sex)
         }
     }
 
     private fun setEmail(email: String) {
         _editorViewState.update {
-            Log.d("EDIT", email)
             it.copy(email = email)
         }
     }
 
     private fun setBirthday(birthday: Date) {
         _editorViewState.update {
-            Log.d("EDIT", birthday.toString())
             it.copy(birthday = birthday)
         }
     }
 
     private fun loadProfile() {
-        Log.d("LOAD","loadProfile")
         viewModelScope.launch {
             _editorOldViewState.update {
                 EditorViewState(
@@ -246,19 +237,17 @@ class EditorProfileViewModel @Inject constructor(
             if (_editorOldViewState.value != _editorViewState.value) {
                 if (viewStateFlow.value.tempFileGalleryUrl != null || viewStateFlow.value.tempFileSystemUrl != null) {
                     _stateProgressIndicator.update { true }
-                    if ( viewStateFlow.value.tempFileGalleryUrl != null) {
-                        val imagePart = createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
-                        imagePart?.let {
-                            profileRepository.saveAvatarProfile(it)
-                        }
+                    val imagePart = if ( viewStateFlow.value.tempFileGalleryUrl != null) {
+                        createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
                     } else {
-                        val imagePart = MultipartBody.Part.createFormData(
-                                name = "image",
-                                filename = File(viewStateFlow.value.tempFileSystemUrl!!).getName(),
-                                body = File(viewStateFlow.value.tempFileSystemUrl!!).asRequestBody(contentType = "image/jpeg".toMediaType()),
-                            )
-                        imagePart.let {
-                            Log.d("imagePart" ,  "111")
+                        MultipartBody.Part.createFormData(
+                            name = "image",
+                            filename = File(viewStateFlow.value.tempFileSystemUrl!!).getName(),
+                            body = File(viewStateFlow.value.tempFileSystemUrl!!).asRequestBody(contentType = "image/jpeg".toMediaType()),
+                        )
+                    }
+                    imagePart.let {
+                        if (it != null) {
                             profileRepository.saveAvatarProfile(it)
                         }
                     }
@@ -290,7 +279,6 @@ class EditorProfileViewModel @Inject constructor(
                 }
             }
         }
-        Log.d("createImageRequestBody","NULL")
         return null
     }
 }

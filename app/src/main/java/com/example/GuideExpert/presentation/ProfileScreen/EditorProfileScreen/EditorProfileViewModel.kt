@@ -1,11 +1,9 @@
 package com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen
 
-import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
-import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -14,22 +12,25 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.FileProvider
-import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
 import com.example.GuideExpert.domain.repository.ProfileRepository
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.utils.getOrientation
 import com.example.GuideExpert.utils.rotateBitmap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
@@ -37,7 +38,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.io.IOException
 import java.util.Date
 import javax.inject.Inject
 
@@ -100,6 +100,10 @@ class EditorProfileViewModel @Inject constructor(
 
     private val _stateLoadAvatar = MutableStateFlow<LoadAvatarUIState>(LoadAvatarUIState())
     val stateLoadAvatar: StateFlow<LoadAvatarUIState> = _stateLoadAvatar.asStateFlow()
+
+
+    private val _effectChannel = Channel<SnackbarEffect>()
+    val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
 
     // receives user generated events and processes them in the provided coroutine context
@@ -271,6 +275,8 @@ class EditorProfileViewModel @Inject constructor(
                             updateAvatarProfileUseCase(it).collectLatest { resources ->
                                 when(resources){
                                     is UIResources.Error -> {
+                                       // _effectChannel.trySend(SnackbarEffect.ShowSnackbar("Error loading avatar : ${resources.message}"))
+                                        sendEffectFlow("Error loading avatar : ${resources.message}")
                                         _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Error(resources.message)) }
                                     }
                                     is UIResources.Loading -> {
@@ -286,6 +292,11 @@ class EditorProfileViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {
+        Log.d("MODEL", message)
+        _effectChannel.send(SnackbarEffect.ShowSnackbar(message))
     }
 
     init{

@@ -53,6 +53,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -89,8 +90,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Profile
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import okhttp3.internal.UTC
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -120,13 +123,25 @@ object PastOrPresentSelectableDates: SelectableDates {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorProfileScreen(onNavigateToProfile: () -> Boolean,
+fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
+                        onNavigateToProfile: () -> Boolean,
                         viewModel: EditorProfileViewModel = hiltViewModel(),
                         scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
                             viewStateFlow = viewModel.viewStateFlow,
                             handleEvent = viewModel::handleEvent),) {
 
     val stateLoadAvatar by viewModel.stateLoadAvatar.collectAsStateWithLifecycle()
+    val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(stateLoadAvatar,effectFlow) {
+        effectFlow?.let {
+            when (it) {
+                is SnackbarEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(it.message)
+                }
+            }
+        }
+    }
 
     Box(Modifier.fillMaxSize()) {
          Scaffold(

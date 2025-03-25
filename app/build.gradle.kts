@@ -74,6 +74,7 @@ kapt {
 
 dependencies {
 
+    implementation ("androidx.exifinterface:exifinterface:1.4.0")
     implementation ("androidx.datastore:datastore-preferences:1.1.3")
 
     implementation ("com.yandex.android:authsdk:3.1.3")

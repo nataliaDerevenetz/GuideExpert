@@ -1,9 +1,11 @@
 package com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen
 
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -12,14 +14,15 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
 import com.example.GuideExpert.domain.repository.ProfileRepository
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionListSearchUIState
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsSearchUIState
+import com.example.GuideExpert.utils.getOrientation
+import com.example.GuideExpert.utils.rotateBitmap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +37,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.io.IOException
 import java.util.Date
 import javax.inject.Inject
 
@@ -135,7 +139,10 @@ class EditorProfileViewModel @Inject constructor(
                     val bitmapOptions = BitmapFactory.Options()
                     bitmapOptions.inMutable = true
                     val bitmap: Bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bitmapOptions)
-                    newImages = bitmap.asImageBitmap()
+                    val orientation = event.imageUrl.getOrientation(event.compositionContext.contentResolver)
+                    val rotatedBitmap = orientation.let { rotateBitmap(bitmap, it) } ?: bitmap
+                    val imageBitmap = Bitmap.createScaledBitmap(rotatedBitmap, rotatedBitmap.width, rotatedBitmap.height, true)
+                    newImages = imageBitmap.asImageBitmap()
                 } else {
                     // error reading the bytes from the image url
                     println("The image that was picked could not be read from the device at this url: ${event.imageUrl}")
@@ -198,7 +205,7 @@ class EditorProfileViewModel @Inject constructor(
             }
         }
     }
-
+    
     private fun setFirstName(firstName: String) {
         _editorViewState.update {
            it.copy(firstName = firstName)

@@ -205,7 +205,7 @@ class EditorProfileViewModel @Inject constructor(
             }
         }
     }
-    
+
     private fun setFirstName(firstName: String) {
         _editorViewState.update {
            it.copy(firstName = firstName)

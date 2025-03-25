@@ -28,7 +28,7 @@ fun ProfilePOJO.toProfile():Profile {
         email = email,
         birthday = _birthday,
         phone = phone,
-        avatar = avatar.toAvatar()
+        avatar = avatar?.toAvatar()
     )
 }
 

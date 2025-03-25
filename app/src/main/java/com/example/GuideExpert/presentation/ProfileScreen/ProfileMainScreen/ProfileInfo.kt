@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,8 +43,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
@@ -55,6 +62,8 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.data.repository.ProfileResources
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
+import com.example.GuideExpert.ui.theme.Shadow1
+import com.example.GuideExpert.ui.theme.Shadow2
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
@@ -231,6 +240,11 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
 
     val birthday = profile?.birthday?.let { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(it) }
 
+    val gradient45 = Brush.linearGradient(
+        colors = listOf(Shadow1, Shadow2),
+        start = Offset(0f, Float.POSITIVE_INFINITY),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
 
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
 
@@ -247,23 +261,42 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
                 //ProfileActivity.newIntent(context)
             }
         )*/
-            Row(horizontalArrangement = Arrangement.Center) {
-                SubcomposeAsyncImage(
-                    model = profile?.avatar?.url,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(200.dp).clip(CircleShape ).clickable {  },
-                    loading = {
-                        CircularProgressIndicator(
-                            color = Color.Gray,
-                            modifier = Modifier.requiredSize(48.dp)
-                        )
-                    },
-                    error = {
-                        Log.d("TAG", "image load: Error!")
-                        Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
-                    }
+
+            if (profile?.avatar == null) {
+                Icon(
+                    Icons.Filled.AccountCircle, modifier = Modifier.size(200.dp)
+                        .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen
+                        }
+                        .drawWithCache {
+                            onDrawWithContent {
+                                drawContent()
+                                drawRect(gradient45, blendMode = BlendMode.SrcAtop)
+                            }
+                        }.clip(CircleShape).clickable {  },
+                    contentDescription = null, tint = Color.Gray
                 )
+            } else {
+                Row(horizontalArrangement = Arrangement.Center) {
+                    SubcomposeAsyncImage(
+                        model = profile?.avatar?.url,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(200.dp).clip(CircleShape).clickable { },
+                        loading = {
+                            CircularProgressIndicator(
+                                color = Color.Gray,
+                                modifier = Modifier.requiredSize(48.dp)
+                            )
+                        },
+                        error = {
+                            Log.d("TAG", "image load: Error!")
+                            Log.d(
+                                "TAG",
+                                "something went wrong ${it.result.throwable.localizedMessage}"
+                            )
+                        }
+                    )
+                }
             }
 
             Row(horizontalArrangement = Arrangement.Center) {

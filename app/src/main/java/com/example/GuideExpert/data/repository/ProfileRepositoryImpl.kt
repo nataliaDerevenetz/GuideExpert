@@ -76,7 +76,7 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchProfile() {
-        try {
+        //try {
             Log.d("VIEW999", "1")
             val profileId = runBlocking {
                 sessionManager.getProfileId().first()
@@ -103,10 +103,10 @@ class ProfileRepositoryImpl @Inject constructor(
                     _profileStateFlow.update { ProfileResources.Success }
                 }
             }
-        } catch (e:Exception) {
-            Log.d("TAG", "ERROR")
-            _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
-        }
+       // } catch (e:Exception) {
+       //     Log.d("TAG", "ERROR")
+       //     _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
+       // }
     }
 
     override suspend fun updateProfile(newProfile: Profile) {

@@ -33,9 +33,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
@@ -74,8 +76,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -91,6 +99,8 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
+import com.example.GuideExpert.ui.theme.Shadow1
+import com.example.GuideExpert.ui.theme.Shadow2
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -461,6 +471,12 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
 
     val currentContext = LocalContext.current
 
+    val gradient45 = Brush.linearGradient(
+        colors = listOf(Shadow1, Shadow2),
+        start = Offset(0f, Float.POSITIVE_INFINITY),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+
     // launches camera
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isImageSaved ->
         if (isImageSaved) {
@@ -493,25 +509,43 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
             )
         }
         if (viewState.selectedPicture == null) {
-            SubcomposeAsyncImage(
-                model = profile?.avatar?.url,
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-                    .clickable { onChangeShowBottomSheet(true) },
-                loading = {
-                    CircularProgressIndicator(
-                        color = Color.Gray,
-                        modifier = Modifier.requiredSize(48.dp)
+
+            if (profile?.avatar == null) {
+                    Icon(
+                        Icons.Filled.AccountCircle, modifier = Modifier.size(200.dp)
+                            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen
+                                clip = true
+                                shape = CircleShape
+                            }
+                            .drawWithCache {
+                                onDrawWithContent {
+                                    drawContent()
+                                    drawRect(gradient45, blendMode = BlendMode.SrcAtop)
+                                }
+                            }.clickable { onChangeShowBottomSheet(true) },
+                        contentDescription = null, tint = Color.Gray
                     )
-                },
-                error = {
-                    Log.d("TAG", "image load: Error!")
-                    Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
-                }
-            )
+            } else {
+                SubcomposeAsyncImage(
+                    model = profile?.avatar?.url,
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .clickable { onChangeShowBottomSheet(true) },
+                    loading = {
+                        CircularProgressIndicator(
+                            color = Color.Gray,
+                            modifier = Modifier.requiredSize(48.dp)
+                        )
+                    },
+                    error = {
+                        Log.d("TAG", "image load: Error!")
+                        Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
+                    }
+                )
+            }
         }
     }
 }

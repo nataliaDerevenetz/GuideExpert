@@ -40,6 +40,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.util.Date
 import javax.inject.Inject
+import kotlin.random.Random
 
 sealed class EditorProfileUiEvent {
     data class OnPermissionGrantedWith(val compositionContext: Context): EditorProfileUiEvent()
@@ -104,7 +105,6 @@ class EditorProfileViewModel @Inject constructor(
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
-
 
     // receives user generated events and processes them in the provided coroutine context
     @RequiresApi(Build.VERSION_CODES.P)
@@ -275,7 +275,7 @@ class EditorProfileViewModel @Inject constructor(
                             updateAvatarProfileUseCase(it).collectLatest { resources ->
                                 when(resources){
                                     is UIResources.Error -> {
-                                       // _effectChannel.trySend(SnackbarEffect.ShowSnackbar("Error loading avatar : ${resources.message}"))
+                                        _editorViewState.update { it.copy(selectedPicture = null) }
                                         sendEffectFlow("Error loading avatar : ${resources.message}")
                                         _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Error(resources.message)) }
                                     }

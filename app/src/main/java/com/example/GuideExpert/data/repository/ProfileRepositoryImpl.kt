@@ -50,7 +50,6 @@ class ProfileRepositoryImpl @Inject constructor(
     private val _profileStateFlow = MutableStateFlow<ProfileResources>(ProfileResources.Idle)
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
 
-
     override suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>> = flow {
         try {
             emit(UIResources.Loading)

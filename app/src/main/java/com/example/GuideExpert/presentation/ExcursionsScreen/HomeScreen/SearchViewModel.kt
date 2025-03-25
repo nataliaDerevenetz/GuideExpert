@@ -133,7 +133,6 @@ class SearchViewModel @Inject constructor(
             .flatMapLatest {
                 Log.d("TAG", "get list ::${it.query}")
                 getExcursionByQueryUseCase(it)
-                //excursionRepository.getExcursionList()
             }.cachedIn(viewModelScope).collect {
                 if(_stateView.value.contentState is ExcursionListSearchUIState.Loading){
                     updateExcursionListSearchUIState(ExcursionListSearchUIState.Data)

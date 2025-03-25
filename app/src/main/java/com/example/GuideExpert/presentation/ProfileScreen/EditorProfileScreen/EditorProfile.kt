@@ -92,8 +92,8 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import okhttp3.internal.UTC
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -119,7 +119,6 @@ object PastOrPresentSelectableDates: SelectableDates {
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,20 +127,13 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                         viewModel: EditorProfileViewModel = hiltViewModel(),
                         scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
                             viewStateFlow = viewModel.viewStateFlow,
-                            handleEvent = viewModel::handleEvent),) {
+                            handleEvent = viewModel::handleEvent,
+                            stateLoadAvatar = viewModel.stateLoadAvatar,
+                            effectFlow = viewModel.effectFlow
+                            ),) {
 
-    val stateLoadAvatar by viewModel.stateLoadAvatar.collectAsStateWithLifecycle()
-    val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
-
-    LaunchedEffect(stateLoadAvatar,effectFlow) {
-        effectFlow?.let {
-            when (it) {
-                is SnackbarEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(it.message)
-                }
-            }
-        }
-    }
+    val stateLoadAvatar by scopeState.stateLoadAvatar.collectAsStateWithLifecycle()
+    val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
 
     Box(Modifier.fillMaxSize()) {
          Scaffold(
@@ -165,7 +157,17 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
 
 
         when(stateLoadAvatar.contentState){
-            is LoadAvatarState.Error -> {}
+            is LoadAvatarState.Error -> {
+                LaunchedEffect(effectFlow) {
+                    effectFlow?.let {
+                        when (it) {
+                            is SnackbarEffect.ShowSnackbar -> {
+                                snackbarHostState.showSnackbar(it.message)
+                            }
+                        }
+                    }
+                }
+            }
             LoadAvatarState.Idle -> {}
             LoadAvatarState.Loading -> {
                 Box(
@@ -189,13 +191,17 @@ interface EditorProfileStateScope {
     val profile: StateFlow<Profile?>
     val viewStateFlow: StateFlow<EditorViewState>
     val handleEvent: (EditorProfileUiEvent) -> Job
+    val stateLoadAvatar: StateFlow<LoadAvatarUIState>
+    val effectFlow: Flow<SnackbarEffect>
 }
 
 
 fun DefaultEditorProfileStateScope(
     profile: StateFlow<Profile?>,
     viewStateFlow: StateFlow<EditorViewState>,
-    handleEvent : (EditorProfileUiEvent) -> Job
+    handleEvent : (EditorProfileUiEvent) -> Job,
+    stateLoadAvatar: StateFlow<LoadAvatarUIState>,
+    effectFlow : Flow<SnackbarEffect>
 ): EditorProfileStateScope {
     return object : EditorProfileStateScope {
         override val profile: StateFlow<Profile?>
@@ -204,7 +210,10 @@ fun DefaultEditorProfileStateScope(
             get() = viewStateFlow
         override val handleEvent: (EditorProfileUiEvent) -> Job
             get() = handleEvent
-
+        override val stateLoadAvatar: StateFlow<LoadAvatarUIState>
+            get() = stateLoadAvatar
+        override val effectFlow: Flow<SnackbarEffect>
+            get() = effectFlow
     }
 }
 
@@ -212,9 +221,11 @@ fun DefaultEditorProfileStateScope(
 fun rememberDefaultEditorProfileStateScope(
     profile: StateFlow<Profile?>,
     viewStateFlow: StateFlow<EditorViewState>,
-    handleEvent: (EditorProfileUiEvent) -> Job
-): EditorProfileStateScope = remember(profile,viewStateFlow,handleEvent) {
-    DefaultEditorProfileStateScope(profile,viewStateFlow,handleEvent)
+    handleEvent: (EditorProfileUiEvent) -> Job,
+    stateLoadAvatar: StateFlow<LoadAvatarUIState>,
+    effectFlow : Flow<SnackbarEffect>
+): EditorProfileStateScope = remember(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow) {
+    DefaultEditorProfileStateScope(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -120,33 +120,41 @@ object PastOrPresentSelectableDates: SelectableDates {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorProfileScreen(onNavigateToProfile: () -> Boolean,) {
+fun EditorProfileScreen(onNavigateToProfile: () -> Boolean,
+                        viewModel: EditorProfileViewModel = hiltViewModel(),
+                        scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
+                            viewStateFlow = viewModel.viewStateFlow,
+                            handleEvent = viewModel::handleEvent),) {
 
-   /* Box {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
-                .pointerInput(Unit) {}
-        )
-        CircularProgressIndicator(Modifier.align(Alignment.Center))
-    }*/
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("") },
-                navigationIcon={ IconButton({ onNavigateToProfile() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") } },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.primary
-                ),
-                modifier = Modifier.height(56.dp).shadow(6.dp),
-                windowInsets = WindowInsets(0)
-            )
-        }
-    ) {
-        innerPadding -> EditorProfileContent(innerPadding)
-    }
+    val stateProgressIndicator by viewModel.stateProgressIndicator.collectAsStateWithLifecycle()
+
+     Box(Modifier.fillMaxSize()) {
+         Scaffold(
+             topBar = {
+                 TopAppBar(
+                     title = { Text("") },
+                     navigationIcon={ IconButton({ onNavigateToProfile() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") } },
+                     colors = TopAppBarDefaults.topAppBarColors(
+                         containerColor = MaterialTheme.colorScheme.background,
+                         titleContentColor = MaterialTheme.colorScheme.primary
+                     ),
+                     modifier = Modifier.height(56.dp).shadow(6.dp),
+                     windowInsets = WindowInsets(0)
+                 )
+             }
+         ) {
+                 innerPadding -> scopeState.EditorProfileContent(innerPadding)
+         }
+
+         if (stateProgressIndicator) {
+             Box(
+                 Modifier
+                     .fillMaxSize()
+                     .background(Color.Black.copy(alpha = 0.3f))
+             )
+             CircularProgressIndicator(Modifier.align(Alignment.Center))
+         }
+     }
 }
 
 
@@ -186,15 +194,9 @@ fun rememberDefaultEditorProfileStateScope(
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun EditorProfileContent(innerPadding: PaddingValues,
-                         viewModel: EditorProfileViewModel = hiltViewModel(),
-                         scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
-                             viewStateFlow = viewModel.viewStateFlow,
-                             handleEvent = viewModel::handleEvent),
-) {
-    val profile by scopeState.profile.collectAsStateWithLifecycle()
-
-    val stateProgressIndicator by viewModel.stateProgressIndicator.collectAsStateWithLifecycle()
+fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
+{
+    val profile by profile.collectAsStateWithLifecycle()
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
     var lastName by rememberSaveable{mutableStateOf(profile?.lastName)}
@@ -214,10 +216,10 @@ fun EditorProfileContent(innerPadding: PaddingValues,
    // launches camera permissions
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
-            scopeState.handleEvent(EditorProfileUiEvent.OnPermissionGrantedWith(currentContext))
+            handleEvent(EditorProfileUiEvent.OnPermissionGrantedWith(currentContext))
         } else {
             // handle permission denied such as:
-            scopeState.handleEvent(EditorProfileUiEvent.OnPermissionDenied)
+            handleEvent(EditorProfileUiEvent.OnPermissionDenied)
         }
     }
 
@@ -226,19 +228,10 @@ fun EditorProfileContent(innerPadding: PaddingValues,
         url?.let { EditorProfileUiEvent.OnFinishPickingImagesWith(currentContext, it) }
             ?.let {
                 showBottomSheet = false
-                scopeState.handleEvent(it) }
+                handleEvent(it) }
     }
 
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-        if (stateProgressIndicator) {//CircularProgressIndicator(Modifier.align(Alignment.Center))
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .pointerInput(Unit) {}
-            )
-            CircularProgressIndicator(Modifier.align(Alignment.Center))
-        }
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
@@ -250,7 +243,8 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                 horizontalAlignment = Alignment.Start
             ) {
 
-                scopeState.LoadAvatar(onChangeShowBottomSheet = { it: Boolean ->
+                Spacer(Modifier.height(10.dp))
+                LoadAvatar(onChangeShowBottomSheet = { it: Boolean ->
                     showBottomSheet = it
                 })
 
@@ -272,7 +266,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     firstName ?: "",
                     {
                         firstName = it
-                        scopeState.handleEvent(EditorProfileUiEvent.OnFirstNameChanged(it))
+                        handleEvent(EditorProfileUiEvent.OnFirstNameChanged(it))
                     },
                     textStyle = TextStyle(fontSize = 16.sp),
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
@@ -287,14 +281,14 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     lastName ?: "",
                     {
                         lastName = it
-                        scopeState.handleEvent(EditorProfileUiEvent.OnLastNameChanged(it))
+                        handleEvent(EditorProfileUiEvent.OnLastNameChanged(it))
                     },
                     textStyle = TextStyle(fontSize = 16.sp),
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
                     singleLine = true,
                 )
 
-                scopeState.SelectSexToModal()
+                SelectSexToModal()
 
                 Text(
                     stringResource(id = R.string.birthday),
@@ -302,7 +296,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     modifier = Modifier.padding(top = 10.dp)
                 )
 
-                scopeState.DatePickerFieldToModal(selectedDate)
+                DatePickerFieldToModal(selectedDate)
 
                 Text(
                     stringResource(id = R.string.email),
@@ -313,7 +307,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     email ?: "",
                     {
                         email = it
-                        scopeState.handleEvent(EditorProfileUiEvent.OnEmailChanged(it))
+                        handleEvent(EditorProfileUiEvent.OnEmailChanged(it))
                     },
                     textStyle = TextStyle(fontSize = 16.sp),
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
@@ -358,7 +352,7 @@ fun EditorProfileContent(innerPadding: PaddingValues,
                     if (email.isValidEmail() && selectedDate.value.isValidBirthday()) {
                         //SAVE!!!!!
                         Log.d("SAVE", "OK")
-                        scopeState.handleEvent(EditorProfileUiEvent.OnSaveProfile)
+                        handleEvent(EditorProfileUiEvent.OnSaveProfile)
                     } else {
                         Log.d("SAVE", "ERROR")
                     }
@@ -430,7 +424,7 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
 
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        viewState.selectedPictures?.let {
+        viewState.selectedPicture?.let {
             Image(
                 bitmap = it,
                 contentDescription = "avatar",
@@ -438,7 +432,7 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
                 modifier = Modifier.size(200.dp).clip(CircleShape ).clickable { onChangeShowBottomSheet(true) },
             )
         }
-        if (viewState.selectedPictures == null) {
+        if (viewState.selectedPicture == null) {
             SubcomposeAsyncImage(
                 model = profile?.avatar?.url,
                 contentDescription = "",

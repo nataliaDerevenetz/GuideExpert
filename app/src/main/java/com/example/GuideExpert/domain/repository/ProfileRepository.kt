@@ -13,5 +13,5 @@ interface ProfileRepository {
     suspend fun fetchProfile()
     suspend fun updateProfile(newProfile: Profile)
     suspend fun removeProfile()
-    suspend fun saveProfile(imagePart: MultipartBody.Part)
+    suspend fun saveAvatarProfile(imagePart: MultipartBody.Part)
 }

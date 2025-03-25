@@ -45,14 +45,13 @@ class ProfileRepositoryImpl @Inject constructor(
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
 
 
-    override suspend fun saveProfile(imagePart: MultipartBody.Part) {
+    override suspend fun saveAvatarProfile(imagePart: MultipartBody.Part) {
         try {
             val result = profileService.saveProfile(profileFlow.value?.id.toString().toRequestBody("text/plain".toMediaTypeOrNull()),imagePart)
             if (result.code() == 403) {
                 removeProfile()
             }
             val response = result.body()
-
             if ( response?.idAvatar != null && response.imageUrl != null) {
                 profileFlow.value?.let {
                     updateProfile(
@@ -65,11 +64,9 @@ class ProfileRepositoryImpl @Inject constructor(
                     )
                 }
             }
-
-
         } catch (e:Exception) {
             Log.d("TAG", "ERROR")
-         //   _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
+   //         _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
         }
 
     }

@@ -11,7 +11,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -24,10 +23,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.util.Date
@@ -46,12 +44,14 @@ sealed class EditorProfileUiEvent {
     data class OnBirthdayChanged(val birthday: Date): EditorProfileUiEvent()
     data object OnLoadProfile: EditorProfileUiEvent()
     data object OnSaveProfile: EditorProfileUiEvent()
+    data object OnSaveAvatarProfile: EditorProfileUiEvent()
 }
 
 data class EditorViewState(
     val tempFileUrl: Uri? = null,
-    val selectedPictures: ImageBitmap? = null,
+    val selectedPicture: ImageBitmap? = null,
     val tempFileGalleryUrl: Uri? = null,
+    val tempFileSystemUrl: String? = null,
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
@@ -93,12 +93,15 @@ class EditorProfileViewModel @Inject constructor(
                     ".jpg", /* suffix */
                     event.compositionContext.cacheDir  /* cache directory */
                 )
+
+                Log.d("TAG",tempFile.toString())
                 // Create sandboxed url for this temp file - needed for the camera API
                 val uri = FileProvider.getUriForFile(event.compositionContext,
                      "${this@EditorProfileViewModel.application.packageName}.provider", /* needs to match the provider information in the manifest */
                     tempFile
                 )
-                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = uri,tempFileGalleryUrl=null)
+
+                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = uri,tempFileSystemUrl = tempFile.toString(),tempFileGalleryUrl=null)
             }
 
             is EditorProfileUiEvent.OnPermissionDenied -> {
@@ -125,11 +128,12 @@ class EditorProfileViewModel @Inject constructor(
                 }
                 val currentViewState = _editorViewState.value
                 val newCopy = currentViewState.copy(
-                    selectedPictures =  newImages,
+                    selectedPicture =  newImages,
                     tempFileGalleryUrl = event.imageUrl,
                     tempFileUrl = null
                 )
                 _editorViewState.value = newCopy
+                saveAvatarProfile()
             }
 
             is EditorProfileUiEvent.OnImageSavedWith -> {
@@ -137,13 +141,14 @@ class EditorProfileViewModel @Inject constructor(
                 if (tempImageUrl != null) {
                     val source = ImageDecoder.createSource(event.compositionContext.contentResolver, tempImageUrl)
                     val currentPictures = ImageDecoder.decodeBitmap(source).asImageBitmap()
-                    _editorViewState.value = _editorViewState.value.copy(//tempFileUrl = null,
-                        selectedPictures = currentPictures)
+                    _editorViewState.value = _editorViewState.value.copy(tempFileUrl = null,
+                        selectedPicture = currentPictures)
+                    saveAvatarProfile()
                 }
             }
 
             is EditorProfileUiEvent.OnImageSavingCanceled -> {
-                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = null)
+                _editorViewState.value = _editorViewState.value.copy(tempFileUrl = null,tempFileSystemUrl=null, tempFileGalleryUrl = null)
             }
 
             is EditorProfileUiEvent.OnFirstNameChanged -> {
@@ -171,7 +176,11 @@ class EditorProfileViewModel @Inject constructor(
             }
 
             is EditorProfileUiEvent.OnSaveProfile -> {
-                saveProfile()
+             //   saveProfile()
+            }
+
+            is EditorProfileUiEvent.OnSaveAvatarProfile -> {
+                saveAvatarProfile()
             }
         }
     }
@@ -232,22 +241,29 @@ class EditorProfileViewModel @Inject constructor(
         }
     }
 
-    private fun saveProfile() {
+    private fun saveAvatarProfile() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_editorOldViewState.value == _editorViewState.value) {
-                Log.d("SAVE", "NOT SEND")
-            } else {
-                if (viewStateFlow.value.tempFileGalleryUrl != null) {
-
+            if (_editorOldViewState.value != _editorViewState.value) {
+                if (viewStateFlow.value.tempFileGalleryUrl != null || viewStateFlow.value.tempFileSystemUrl != null) {
                     _stateProgressIndicator.update { true }
-                    val imagePart =
-                        createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
-                    imagePart?.let {
-                        profileRepository.saveProfile(it)
+                    if ( viewStateFlow.value.tempFileGalleryUrl != null) {
+                        val imagePart = createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
+                        imagePart?.let {
+                            profileRepository.saveAvatarProfile(it)
+                        }
+                    } else {
+                        val imagePart = MultipartBody.Part.createFormData(
+                                name = "image",
+                                filename = File(viewStateFlow.value.tempFileSystemUrl!!).getName(),
+                                body = File(viewStateFlow.value.tempFileSystemUrl!!).asRequestBody(contentType = "image/jpeg".toMediaType()),
+                            )
+                        imagePart.let {
+                            Log.d("imagePart" ,  "111")
+                            profileRepository.saveAvatarProfile(it)
+                        }
                     }
                     _stateProgressIndicator.update { false }
                 }
-                Log.d("SAVE", "SEND")
             }
         }
     }
@@ -274,6 +290,7 @@ class EditorProfileViewModel @Inject constructor(
                 }
             }
         }
+        Log.d("createImageRequestBody","NULL")
         return null
     }
 }

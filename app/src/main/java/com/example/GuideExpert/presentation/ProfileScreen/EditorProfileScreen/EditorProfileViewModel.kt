@@ -112,8 +112,6 @@ class EditorProfileViewModel @Inject constructor(
 
             is EditorProfileUiEvent.OnFinishPickingImagesWith -> {
                 var newImages: ImageBitmap? = null
-
-                Log.d("URI333",event.imageUrl.toString())
                 val inputStream = event.compositionContext.contentResolver.openInputStream(event.imageUrl)
                 val bytes = inputStream?.readBytes()
                 inputStream?.close()
@@ -133,7 +131,7 @@ class EditorProfileViewModel @Inject constructor(
                     tempFileUrl = null
                 )
                 _editorViewState.value = newCopy
-                saveAvatarProfile()
+                updateAvatarProfile()
             }
 
             is EditorProfileUiEvent.OnImageSavedWith -> {
@@ -143,7 +141,7 @@ class EditorProfileViewModel @Inject constructor(
                     val currentPictures = ImageDecoder.decodeBitmap(source).asImageBitmap()
                     _editorViewState.value = _editorViewState.value.copy(tempFileUrl = null,
                         selectedPicture = currentPictures)
-                    saveAvatarProfile()
+                    updateAvatarProfile()
                 }
             }
 
@@ -180,7 +178,7 @@ class EditorProfileViewModel @Inject constructor(
             }
 
             is EditorProfileUiEvent.OnSaveAvatarProfile -> {
-                saveAvatarProfile()
+                updateAvatarProfile()
             }
         }
     }
@@ -232,7 +230,7 @@ class EditorProfileViewModel @Inject constructor(
         }
     }
 
-    private fun saveAvatarProfile() {
+    private fun updateAvatarProfile() {
         viewModelScope.launch(Dispatchers.IO) {
             if (_editorOldViewState.value != _editorViewState.value) {
                 if (viewStateFlow.value.tempFileGalleryUrl != null || viewStateFlow.value.tempFileSystemUrl != null) {
@@ -248,7 +246,7 @@ class EditorProfileViewModel @Inject constructor(
                     }
                     imagePart.let {
                         if (it != null) {
-                            profileRepository.saveAvatarProfile(it)
+                            profileRepository.updateAvatarProfile(it)
                         }
                     }
                     _stateProgressIndicator.update { false }

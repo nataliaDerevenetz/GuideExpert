@@ -45,9 +45,9 @@ class ProfileRepositoryImpl @Inject constructor(
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
 
 
-    override suspend fun saveAvatarProfile(imagePart: MultipartBody.Part) {
+    override suspend fun updateAvatarProfile(imagePart: MultipartBody.Part) {
         try {
-            val result = profileService.saveProfile(profileFlow.value?.id.toString().toRequestBody("text/plain".toMediaTypeOrNull()),imagePart)
+            val result = profileService.updateAvatarProfile(profileFlow.value?.id.toString().toRequestBody("text/plain".toMediaTypeOrNull()),imagePart)
             if (result.code() == 403) {
                 removeProfile()
             }

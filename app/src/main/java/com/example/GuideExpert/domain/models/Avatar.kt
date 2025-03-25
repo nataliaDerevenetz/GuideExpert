@@ -1,7 +1,7 @@
 package com.example.GuideExpert.domain.models
 
 data class Avatar(
-    val id:Int,
-    val profileId: Int,
-    val url:String
+    val id:Int? = null,
+    val profileId: Int = 0,
+    val url:String = ""
 )

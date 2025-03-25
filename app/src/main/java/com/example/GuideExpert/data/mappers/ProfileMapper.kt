@@ -44,7 +44,7 @@ fun Profile.toProfileWithAvatar() = this.avatar?.let {
 
 fun AvatarPOJO.toAvatar() =  Avatar(id = id, profileId = profileId, url = url)
 
-fun Avatar.toAvatarEntity() =  AvatarEntity(id = id, profileId = profileId, url = url)
+fun Avatar.toAvatarEntity() =  AvatarEntity(id = id!!, profileId = profileId, url = url)
 
 fun ProfileWithAvatar.toProfile() = Profile(
     id = profile.id, login=profile.login,realName=profile.realName,firstName=profile.firstName,

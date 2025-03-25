@@ -1,7 +1,7 @@
 package com.example.GuideExpert.data.remote.services
 
 import com.example.GuideExpert.data.remote.pojo.ProfilePOJO
-import com.example.GuideExpert.data.remote.pojo.SaveProfileResponsePOJO
+import com.example.GuideExpert.data.remote.pojo.UpdateAvatarProfileResponsePOJO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -21,5 +21,5 @@ interface ProfileService {
     suspend fun updateAvatarProfile(
         @Part("user_id") userId: RequestBody,
         @Part image: MultipartBody.Part
-    ): Response<SaveProfileResponsePOJO>
+    ): Response<UpdateAvatarProfileResponsePOJO>
 }

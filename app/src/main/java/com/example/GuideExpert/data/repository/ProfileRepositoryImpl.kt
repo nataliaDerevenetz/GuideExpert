@@ -7,15 +7,21 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
+import com.example.GuideExpert.data.mappers.toAvatar
+import com.example.GuideExpert.data.mappers.toConfig
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
+import com.example.GuideExpert.domain.models.Config
+import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.repository.ProfileRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
@@ -45,28 +51,27 @@ class ProfileRepositoryImpl @Inject constructor(
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
 
 
-    override suspend fun updateAvatarProfile(imagePart: MultipartBody.Part) {
+    override suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>> = flow {
         try {
+            emit(UIResources.Loading)
             val result = profileService.updateAvatarProfile(profileFlow.value?.id.toString().toRequestBody("text/plain".toMediaTypeOrNull()),imagePart)
             if (result.code() == 403) {
                 removeProfile()
             }
-            val response = result.body()
-            if ( response?.idAvatar != null && response.imageUrl != null) {
-                profileFlow.value?.let {
-                    updateProfile(
-                        it.copy(
-                            avatar = Avatar(
-                                id = response.idAvatar, profileId = it.id,
-                                url = response.imageUrl
-                            )
-                        )
-                    )
+            if (result.isSuccessful) {
+                val newAvatar = result.body()?.toAvatar(profileFlow.value?.id!!) ?: Avatar()
+                if ( newAvatar.id != null ) {
+                    profileFlow.value?.let {
+                        updateProfile(it.copy(avatar = newAvatar))
+                    }
+                    emit(UIResources.Success(newAvatar))
+                } else {
+                    emit(UIResources.Error("Avatar loaded error"))
                 }
             }
         } catch (e:Exception) {
             Log.d("TAG", "ERROR")
-   //         _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
+            emit(UIResources.Error(e.message.toString()))
         }
 
     }

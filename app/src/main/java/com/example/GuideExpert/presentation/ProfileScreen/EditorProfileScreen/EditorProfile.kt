@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -96,7 +97,6 @@ import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
-
 fun convertLocalDateToTimestampUTC(localDate: LocalDate): Long {
     val zonedDateTime = localDate.atStartOfDay(UTC.toZoneId())
     val instant = zonedDateTime.toInstant()
@@ -126,9 +126,9 @@ fun EditorProfileScreen(onNavigateToProfile: () -> Boolean,
                             viewStateFlow = viewModel.viewStateFlow,
                             handleEvent = viewModel::handleEvent),) {
 
-    val stateProgressIndicator by viewModel.stateProgressIndicator.collectAsStateWithLifecycle()
+    val stateLoadAvatar by viewModel.stateLoadAvatar.collectAsStateWithLifecycle()
 
-     Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
          Scaffold(
              topBar = {
                  TopAppBar(
@@ -138,7 +138,9 @@ fun EditorProfileScreen(onNavigateToProfile: () -> Boolean,
                          containerColor = MaterialTheme.colorScheme.background,
                          titleContentColor = MaterialTheme.colorScheme.primary
                      ),
-                     modifier = Modifier.height(56.dp).shadow(6.dp),
+                     modifier = Modifier
+                         .height(56.dp)
+                         .shadow(6.dp),
                      windowInsets = WindowInsets(0)
                  )
              }
@@ -146,14 +148,23 @@ fun EditorProfileScreen(onNavigateToProfile: () -> Boolean,
                  innerPadding -> scopeState.EditorProfileContent(innerPadding)
          }
 
-         if (stateProgressIndicator) {
-             Box(
-                 Modifier
-                     .fillMaxSize()
-                     .background(Color.Black.copy(alpha = 0.3f))
-             )
-             CircularProgressIndicator(Modifier.align(Alignment.Center))
-         }
+
+        when(stateLoadAvatar.contentState){
+            is LoadAvatarState.Error -> {}
+            LoadAvatarState.Idle -> {}
+            LoadAvatarState.Loading -> {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f))
+                )
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+            LoadAvatarState.Success -> {
+                Toast.makeText(LocalContext.current, "Изображение успешно загружено", Toast.LENGTH_LONG).show()
+            }
+        }
+
      }
 }
 
@@ -231,14 +242,19 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                 handleEvent(it) }
     }
 
-    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+    Box(modifier = Modifier
+        .padding(innerPadding)
+        .fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
            Column(
-                modifier = Modifier.padding(top = 0.dp, start = 15.dp, end = 15.dp).fillMaxSize()
-                    .verticalScroll(scrollState).weight(1f, false),
+                modifier = Modifier
+                    .padding(top = 0.dp, start = 15.dp, end = 15.dp)
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .weight(1f, false),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -249,7 +265,9 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                 })
 
                 Row(
-                    Modifier.padding(10.dp).fillMaxWidth(),
+                    Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(profile?.firstName ?: "", fontWeight = FontWeight.Bold)
@@ -269,7 +287,9 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                         handleEvent(EditorProfileUiEvent.OnFirstNameChanged(it))
                     },
                     textStyle = TextStyle(fontSize = 16.sp),
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
                     singleLine = true,
                 )
                 Text(
@@ -284,7 +304,9 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                         handleEvent(EditorProfileUiEvent.OnLastNameChanged(it))
                     },
                     textStyle = TextStyle(fontSize = 16.sp),
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
                     singleLine = true,
                 )
 
@@ -310,7 +332,9 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                         handleEvent(EditorProfileUiEvent.OnEmailChanged(it))
                     },
                     textStyle = TextStyle(fontSize = 16.sp),
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
                     isError = isErrorEmail,
                     trailingIcon = {
                         if (isErrorEmail)
@@ -341,7 +365,9 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                     {},
                     enabled = false,
                     textStyle = TextStyle(fontSize = 16.sp),
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
                     singleLine = true,
                 )
             }
@@ -358,7 +384,10 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                     }
 
                 },
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp).height(50.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+                    .height(50.dp)
+                    .fillMaxWidth()
 
             ) {
                 Text(stringResource(id = R.string.save))
@@ -367,7 +396,9 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
         }
         if (showBottomSheet) {
             ModalBottomSheet(
-                modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.3f),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxHeight(0.3f),
                 sheetState = sheetState,
                 onDismissRequest = { showBottomSheet = false }
             ) {
@@ -429,7 +460,10 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
                 bitmap = it,
                 contentDescription = "avatar",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable { onChangeShowBottomSheet(true) },
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .clickable { onChangeShowBottomSheet(true) },
             )
         }
         if (viewState.selectedPicture == null) {
@@ -437,7 +471,10 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
                 model = profile?.avatar?.url,
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(200.dp).clip(CircleShape ).clickable { onChangeShowBottomSheet(true) },
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .clickable { onChangeShowBottomSheet(true) },
                 loading = {
                     CircularProgressIndicator(
                         color = Color.Gray,
@@ -476,15 +513,18 @@ fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
         {  },
         readOnly = true,
         textStyle = TextStyle(fontSize = 16.sp),
-        modifier = Modifier.height(50.dp).fillMaxWidth().pointerInput(sexLocal) {
-            awaitEachGesture {
-                awaitFirstDown(pass = PointerEventPass.Initial)
-                val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                if (upEvent != null) {
-                    showModal.value = true
+        modifier = Modifier
+            .height(50.dp)
+            .fillMaxWidth()
+            .pointerInput(sexLocal) {
+                awaitEachGesture {
+                    awaitFirstDown(pass = PointerEventPass.Initial)
+                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                    if (upEvent != null) {
+                        showModal.value = true
+                    }
                 }
-            }
-        },
+            },
         singleLine = true,
         trailingIcon = {
             Icon(

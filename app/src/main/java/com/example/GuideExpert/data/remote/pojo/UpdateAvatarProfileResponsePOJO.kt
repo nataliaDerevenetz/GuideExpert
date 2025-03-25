@@ -3,7 +3,7 @@ package com.example.GuideExpert.data.remote.pojo
 import com.google.gson.annotations.SerializedName
 
 
-data class SaveProfileResponsePOJO(
+data class UpdateAvatarProfileResponsePOJO(
     @SerializedName("success")
     val success: Boolean,
     @SerializedName("message")
@@ -11,5 +11,5 @@ data class SaveProfileResponsePOJO(
     @SerializedName("imageUrl")
     val imageUrl: String?,
     @SerializedName("idAvatar")
-    val idAvatar: Int?,
+    val idAvatar: Int?
 )

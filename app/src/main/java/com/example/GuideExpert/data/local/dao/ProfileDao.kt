@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProfileDao {
 
+    @Transaction
     @Query("SELECT * FROM profileEntity WHERE id = :id")
     fun getById(id: Int) : Flow<ProfileWithAvatar?>
 

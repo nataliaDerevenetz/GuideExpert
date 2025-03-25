@@ -15,12 +15,18 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.GuideExpert.data.repository.UIResources
+import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
 import com.example.GuideExpert.domain.repository.ProfileRepository
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionListSearchUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsSearchUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
@@ -58,6 +64,17 @@ data class EditorViewState(
     val sex: String = "",
     val birthday: Date? = null, )
 
+sealed interface LoadAvatarState{
+    object Idle:LoadAvatarState
+    object Loading:LoadAvatarState
+    object Success:LoadAvatarState
+    data class Error(val error: String):LoadAvatarState
+}
+
+data class LoadAvatarUIState(
+    val contentState: LoadAvatarState = LoadAvatarState.Idle
+)
+
 
 @RequiresApi(Build.VERSION_CODES.P)
 @HiltViewModel
@@ -65,7 +82,8 @@ class EditorProfileViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     private val profileRepository: ProfileRepository,
     @ApplicationContext val application: Context,
-) : ViewModel() {
+    val updateAvatarProfileUseCase: UpdateAvatarProfileUseCase,
+    ) : ViewModel() {
 
     val profileFlow = profileRepository.profileFlow
 
@@ -76,10 +94,8 @@ class EditorProfileViewModel @Inject constructor(
 
     private val _editorOldViewState: MutableStateFlow<EditorViewState> = MutableStateFlow(EditorViewState())
 
-
-    private val _stateProgressIndicator: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val stateProgressIndicator: StateFlow<Boolean>
-        get() = _stateProgressIndicator
+    private val _stateLoadAvatar = MutableStateFlow<LoadAvatarUIState>(LoadAvatarUIState())
+    val stateLoadAvatar: StateFlow<LoadAvatarUIState> = _stateLoadAvatar.asStateFlow()
 
 
     // receives user generated events and processes them in the provided coroutine context
@@ -234,7 +250,6 @@ class EditorProfileViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (_editorOldViewState.value != _editorViewState.value) {
                 if (viewStateFlow.value.tempFileGalleryUrl != null || viewStateFlow.value.tempFileSystemUrl != null) {
-                    _stateProgressIndicator.update { true }
                     val imagePart = if ( viewStateFlow.value.tempFileGalleryUrl != null) {
                         createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
                     } else {
@@ -244,12 +259,23 @@ class EditorProfileViewModel @Inject constructor(
                             body = File(viewStateFlow.value.tempFileSystemUrl!!).asRequestBody(contentType = "image/jpeg".toMediaType()),
                         )
                     }
-                    imagePart.let {
+                    imagePart.let { it ->
                         if (it != null) {
-                            profileRepository.updateAvatarProfile(it)
+                            updateAvatarProfileUseCase(it).collectLatest { resources ->
+                                when(resources){
+                                    is UIResources.Error -> {
+                                        _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Error(resources.message)) }
+                                    }
+                                    is UIResources.Loading -> {
+                                        _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Loading) }
+                                    }
+                                    is UIResources.Success -> {
+                                        _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Success) }
+                                    }
+                                }
+                            }
                         }
                     }
-                    _stateProgressIndicator.update { false }
                 }
             }
         }

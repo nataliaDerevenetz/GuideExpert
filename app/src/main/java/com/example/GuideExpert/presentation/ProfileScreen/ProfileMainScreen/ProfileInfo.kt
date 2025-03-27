@@ -272,7 +272,7 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
                         model = profile?.avatar?.url,
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(200.dp).clip(CircleShape).clickable { },
+                        modifier = Modifier.size(200.dp).clip(CircleShape).clickable { navigateToEditorProfile() },
                         loading = {
                             CircularProgressIndicator(
                                 color = Color.Gray,

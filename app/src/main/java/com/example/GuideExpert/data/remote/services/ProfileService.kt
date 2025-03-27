@@ -17,7 +17,7 @@ interface ProfileService {
     suspend fun getProfile(@Query("id") profileId:Int): Response<ProfilePOJO>
 
     @Multipart
-    @POST("saveprofile.php")
+    @POST("updateavatar.php")
     suspend fun updateAvatarProfile(
         @Part("user_id") userId: RequestBody,
         @Part image: MultipartBody.Part

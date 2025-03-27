@@ -428,22 +428,31 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(text = stringResource(id = R.string.take_photo),
-                        modifier = Modifier.clickable {  permissionLauncher.launch(Manifest.permission.CAMERA) }
+                        modifier = Modifier.graphicsLayer { clip = true
+                            shape = RoundedCornerShape(50.dp)
+                        }.clickable {  permissionLauncher.launch(Manifest.permission.CAMERA) }
+                            .padding(start = 5.dp,end=5.dp)
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     Text(text = stringResource(id = R.string.pick_picture),
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.graphicsLayer {
+                            clip = true
+                            shape = RoundedCornerShape(50.dp)
+                        }.clickable {
                             val mediaRequest =
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             pickImageFromAlbumLauncher.launch(mediaRequest)
-                        }
+                        }.padding(start = 5.dp,end=5.dp)
                     )
                     profile?.avatar?.let {
                         Spacer(modifier = Modifier.height(30.dp))
                         Text(text = stringResource(id = R.string.remove_avatar),
-                            modifier = Modifier.clickable {
-
-                            }
+                            modifier = Modifier
+                                .graphicsLayer {
+                                clip = true
+                                shape = RoundedCornerShape(50.dp)
+                            }.clickable {}
+                                .padding(start = 5.dp,end=5.dp)
                         )
                     }
                 }

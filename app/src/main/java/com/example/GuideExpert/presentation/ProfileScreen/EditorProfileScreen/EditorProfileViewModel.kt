@@ -16,6 +16,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.repository.UIResources
+import com.example.GuideExpert.domain.DeleteAvatarProfileUseCase
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
@@ -55,6 +56,7 @@ sealed class EditorProfileUiEvent {
     data object OnLoadProfile: EditorProfileUiEvent()
     data object OnSaveProfile: EditorProfileUiEvent()
     data object OnSaveAvatarProfile: EditorProfileUiEvent()
+    data object OnDeleteAvatarProfile: EditorProfileUiEvent()
 }
 
 data class EditorViewState(
@@ -87,6 +89,7 @@ class EditorProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     @ApplicationContext val application: Context,
     val updateAvatarProfileUseCase: UpdateAvatarProfileUseCase,
+    val deleteAvatarProfileUseCase: DeleteAvatarProfileUseCase
     ) : ViewModel() {
 
     val profileFlow = profileRepository.profileFlow
@@ -206,6 +209,16 @@ class EditorProfileViewModel @Inject constructor(
             is EditorProfileUiEvent.OnSaveAvatarProfile -> {
                 updateAvatarProfile()
             }
+
+            is EditorProfileUiEvent.OnDeleteAvatarProfile -> {
+                deleteAvatarProfile()
+            }
+        }
+    }
+
+    private fun deleteAvatarProfile() {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteAvatarProfileUseCase()
         }
     }
 

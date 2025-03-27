@@ -451,7 +451,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                                 .graphicsLayer {
                                 clip = true
                                 shape = RoundedCornerShape(50.dp)
-                            }.clickable {}
+                            }.clickable { handleEvent(EditorProfileUiEvent.OnDeleteAvatarProfile)}
                                 .padding(start = 5.dp,end=5.dp)
                         )
                     }

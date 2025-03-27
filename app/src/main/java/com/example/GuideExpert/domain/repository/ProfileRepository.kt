@@ -15,4 +15,5 @@ interface ProfileRepository {
     suspend fun updateProfile(newProfile: Profile)
     suspend fun removeProfile()
     suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>>
+    suspend fun removeAvatarProfile()
 }

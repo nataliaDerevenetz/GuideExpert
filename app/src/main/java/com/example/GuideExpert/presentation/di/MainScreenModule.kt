@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.di
 
+import com.example.GuideExpert.domain.DeleteAvatarProfileUseCase
 import com.example.GuideExpert.domain.GetAuthTokenByYandexUseCase
 import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
@@ -17,6 +18,7 @@ import com.example.GuideExpert.domain.GetProfileUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
 import com.example.GuideExpert.domain.LogoutProfileUseCase
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
+import com.example.GuideExpert.domain.impl.DeleteAvatarProfileUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetAuthTokenByYandexUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetConfigUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByFiltersUseCaseImpl
@@ -139,4 +141,10 @@ abstract class MainScreenModule {
     abstract fun bindLogoutProfileUseCase(
         updateLogoutProfileUseCaseImpl: LogoutProfileUseCaseImpl
     ) : LogoutProfileUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindDeleteAvatarProfileUseCase(
+        deleteAvatarProfileUseCaseImpl: DeleteAvatarProfileUseCaseImpl
+    ) : DeleteAvatarProfileUseCase
 }

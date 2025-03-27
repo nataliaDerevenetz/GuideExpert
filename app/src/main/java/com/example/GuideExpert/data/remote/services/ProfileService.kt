@@ -1,6 +1,7 @@
 package com.example.GuideExpert.data.remote.services
 
 import com.example.GuideExpert.data.remote.pojo.ProfilePOJO
+import com.example.GuideExpert.data.remote.pojo.RemoveAvatarProfileResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.UpdateAvatarProfileResponsePOJO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -19,7 +20,11 @@ interface ProfileService {
     @Multipart
     @POST("updateavatar.php")
     suspend fun updateAvatarProfile(
-        @Part("user_id") userId: RequestBody,
+        @Part("profile_id") userId: RequestBody,
         @Part image: MultipartBody.Part
     ): Response<UpdateAvatarProfileResponsePOJO>
+
+    @GET("removeavatar.php")
+    suspend fun removeAvatarProfile(@Query("profile_id") profileId:Int): Response<RemoveAvatarProfileResponsePOJO>
+
 }

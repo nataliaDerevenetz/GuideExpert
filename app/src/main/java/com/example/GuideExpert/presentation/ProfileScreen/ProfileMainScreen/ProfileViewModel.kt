@@ -20,7 +20,6 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     private val profileRepository: ProfileRepository,
-  //  val sessionManager: SessionManager,
 ) : ViewModel() {
 
     val profileFlow = profileRepository.profileFlow

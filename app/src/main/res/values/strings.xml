@@ -28,4 +28,6 @@
     <string name="take_photo">Сделать снимок</string>
     <string name="pick_picture">Загрузить с устройства</string>
     <string name="deleted">Удалить</string>
+    <string name="message_avatar_succes_load">Изображение успешно загружено</string>
+    <string name="exit">Выйти</string>
 </resources>

@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.SessionManager
+import com.example.GuideExpert.domain.LogoutProfileUseCase
+import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +22,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     private val profileRepository: ProfileRepository,
+    val logoutProfileUseCase: LogoutProfileUseCase
 ) : ViewModel() {
 
     val profileFlow = profileRepository.profileFlow
@@ -36,7 +39,7 @@ class ProfileViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
-            profileRepository.removeProfile()
+            logoutProfileUseCase()
         }
     }
 }

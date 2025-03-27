@@ -110,25 +110,6 @@ import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
-fun convertLocalDateToTimestampUTC(localDate: LocalDate): Long {
-    val zonedDateTime = localDate.atStartOfDay(UTC.toZoneId())
-    val instant = zonedDateTime.toInstant()
-    return instant.toEpochMilli()
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-object PastOrPresentSelectableDates: SelectableDates {
-    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-       // val aa = LocalDate.parse("2025-01-11")
-       // if (utcTimeMillis == convertLocalDateToTimestampUTC(aa) ) { return false}
-        return utcTimeMillis <= System.currentTimeMillis()
-    }
-
-    override fun isSelectableYear(year: Int): Boolean {
-        return year <= LocalDate.now().year
-    }
-}
-
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -188,7 +169,7 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
             LoadAvatarState.Success -> {
-                Toast.makeText(LocalContext.current, "Изображение успешно загружено", Toast.LENGTH_LONG).show()
+                Toast.makeText(LocalContext.current, stringResource(id = R.string.message_avatar_succes_load), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -327,6 +308,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                         .height(50.dp)
                         .fillMaxWidth(),
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 Text(
                     stringResource(id = R.string.last_name),
@@ -344,6 +326,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                         .height(50.dp)
                         .fillMaxWidth(),
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
 
                 SelectSexToModal()
@@ -381,6 +364,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                             )
                     },
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 if (isErrorEmail) {
                     Text(
@@ -405,6 +389,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                         .height(50.dp)
                         .fillMaxWidth(),
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
             }
 
@@ -511,20 +496,20 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
         if (viewState.selectedPicture == null) {
 
             if (profile?.avatar == null) {
-                    Icon(
-                        Icons.Filled.AccountCircle, modifier = Modifier.size(200.dp)
-                            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen
-                                clip = true
-                                shape = CircleShape
+                Icon(
+                    Icons.Filled.AccountCircle, modifier = Modifier.size(200.dp)
+                        .clip(CircleShape)
+                        .graphicsLayer {
+                            compositingStrategy = CompositingStrategy.Offscreen
+                        }
+                        .drawWithCache {
+                            onDrawWithContent {
+                                drawContent()
+                                drawRect(gradient45, blendMode = BlendMode.SrcAtop)
                             }
-                            .drawWithCache {
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRect(gradient45, blendMode = BlendMode.SrcAtop)
-                                }
-                            }.clickable { onChangeShowBottomSheet(true) },
-                        contentDescription = null, tint = Color.Gray
-                    )
+                        }.clickable { onChangeShowBottomSheet(true) },
+                    contentDescription = null, tint = Color.Gray
+                )
             } else {
                 SubcomposeAsyncImage(
                     model = profile?.avatar?.url,
@@ -590,9 +575,9 @@ fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
             Icon(
                 Icons.Filled.ArrowDropDown,
                 "",
-                // tint = MaterialTheme.colorScheme.error
             )
-        }
+        },
+        shape = RoundedCornerShape(12.dp)
     )
 
 
@@ -707,6 +692,7 @@ fun EditorProfileStateScope.DatePickerFieldToModal(selectedDate: MutableState<Lo
                     }
                 }
             },
+        shape = RoundedCornerShape(12.dp),
         isError = isErrorBirthday,
     )
     if (isErrorBirthday) {
@@ -772,3 +758,17 @@ fun DatePickerModal(
 fun CharSequence?.isValidEmail() = !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 fun Long?.isValidBirthday() =  this !== null && this < Date().time
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+object PastOrPresentSelectableDates: SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+        // val aa = LocalDate.parse("2025-01-11")
+        // if (utcTimeMillis == convertLocalDateToTimestampUTC(aa) ) { return false}
+        return utcTimeMillis <= System.currentTimeMillis()
+    }
+
+    override fun isSelectableYear(year: Int): Boolean {
+        return year <= LocalDate.now().year
+    }
+}

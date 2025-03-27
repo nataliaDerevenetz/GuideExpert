@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -169,7 +170,6 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
         }
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -253,18 +253,9 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            /* Image(
-            imageVector = ImageVector.vectorResource(R.drawable.button_yandex),
-            contentDescription = "Yandex",
-            modifier = Modifier.clickable {
-                onNavigateToYandex()
-                //ProfileActivity.newIntent(context)
-            }
-        )*/
-
             if (profile?.avatar == null) {
                 Icon(
-                    Icons.Filled.AccountCircle, modifier = Modifier.size(200.dp)
+                    Icons.Filled.AccountCircle, modifier = Modifier.size(240.dp)
                         .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen
                         }
                         .drawWithCache {
@@ -272,7 +263,7 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
                                 drawContent()
                                 drawRect(gradient45, blendMode = BlendMode.SrcAtop)
                             }
-                        }.clip(CircleShape).clickable {  },
+                        }.clip(CircleShape).clickable {  navigateToEditorProfile() },
                     contentDescription = null, tint = Color.Gray
                 )
             } else {
@@ -307,12 +298,12 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
             Text(birthday.toString())
             Text(profile?.email ?: "")
             Text(profile?.phone ?: "")
-           /* Button(onClick = { navigateToEditorProfile() }) {
-                Text("EDIT")
-            }*/
-            Button(onClick = {logout()}) {
-                Text("EXIT")
-            }
+            Spacer(Modifier.height(30.dp))
+            Text(
+                text = stringResource(id = R.string.exit),
+                modifier = Modifier.clickable { logout() },
+                color = Color.Red
+                )
 
         }
     }

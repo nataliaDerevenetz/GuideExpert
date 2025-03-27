@@ -451,7 +451,9 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                                 .graphicsLayer {
                                 clip = true
                                 shape = RoundedCornerShape(50.dp)
-                            }.clickable { handleEvent(EditorProfileUiEvent.OnDeleteAvatarProfile)}
+                            }.clickable {
+                                    showBottomSheet = false
+                                    handleEvent(EditorProfileUiEvent.OnDeleteAvatarProfile)}
                                 .padding(start = 5.dp,end=5.dp)
                         )
                     }
@@ -496,55 +498,44 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
 
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        viewState.selectedPicture?.let {
-            Image(
-                bitmap = it,
-                contentDescription = "avatar",
+        if (profile?.avatar == null) {
+            Icon(
+                Icons.Filled.AccountCircle, modifier = Modifier.size(200.dp)
+                    .clip(CircleShape)
+                    .graphicsLayer {
+                        compositingStrategy = CompositingStrategy.Offscreen
+                    }
+                    .drawWithCache {
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(gradient45, blendMode = BlendMode.SrcAtop)
+                        }
+                    }.clickable { onChangeShowBottomSheet(true) },
+                contentDescription = null, tint = Color.Gray
+            )
+        } else {
+            SubcomposeAsyncImage(
+                model = profile?.avatar?.url,
+                contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(200.dp)
                     .clip(CircleShape)
                     .clickable { onChangeShowBottomSheet(true) },
+                loading = {
+                    CircularProgressIndicator(
+                        color = Color.Gray,
+                        modifier = Modifier.requiredSize(48.dp)
+                    )
+                },
+                error = {
+                    Log.d("TAG", "image load: Error!")
+                    Log.d(
+                        "TAG",
+                        "something went wrong ${it.result.throwable.localizedMessage}"
+                    )
+                }
             )
-        }
-        if (viewState.selectedPicture == null) {
-
-            if (profile?.avatar == null) {
-                Icon(
-                    Icons.Filled.AccountCircle, modifier = Modifier.size(200.dp)
-                        .clip(CircleShape)
-                        .graphicsLayer {
-                            compositingStrategy = CompositingStrategy.Offscreen
-                        }
-                        .drawWithCache {
-                            onDrawWithContent {
-                                drawContent()
-                                drawRect(gradient45, blendMode = BlendMode.SrcAtop)
-                            }
-                        }.clickable { onChangeShowBottomSheet(true) },
-                    contentDescription = null, tint = Color.Gray
-                )
-            } else {
-                SubcomposeAsyncImage(
-                    model = profile?.avatar?.url,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape)
-                        .clickable { onChangeShowBottomSheet(true) },
-                    loading = {
-                        CircularProgressIndicator(
-                            color = Color.Gray,
-                            modifier = Modifier.requiredSize(48.dp)
-                        )
-                    },
-                    error = {
-                        Log.d("TAG", "image load: Error!")
-                        Log.d("TAG", "something went wrong ${it.result.throwable.localizedMessage}")
-                    }
-                )
-            }
         }
     }
 }

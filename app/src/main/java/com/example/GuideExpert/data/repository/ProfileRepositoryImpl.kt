@@ -63,46 +63,47 @@ class ProfileRepositoryImpl @Inject constructor(
                     } else {
                         emit(UIResources.Error("Avatar loaded error"))
                     }
+                } else {
+                    emit(UIResources.Error("Error loaded avatar"))
                 }
             } catch (e: Exception) {
-                Log.d("TAG", "ERROR")
                 emit(UIResources.Error(e.message.toString()))
             }
 
         }
 
     override suspend fun fetchProfile() {
-        //try {
-        Log.d("VIEW999", "1")
-        val profileId = runBlocking {
-            sessionManager.getProfileId().first()
-        }
-        if (profileId != 0) {
-            Log.d("VIEW999", "2")
-            _profileStateFlow.update { ProfileResources.Loading }
-            val localProfile = dbStorage.getProfile(profileId).firstOrNull()
-            if (localProfile !== null) {
-                _profileFlow.update { localProfile }
-                Log.d("VIEW999", "3")
-                //    _profileFlow2.update { ProfileResources.Success(localProfile) }
+        try {
+            Log.d("VIEW999", "1")
+            val profileId = runBlocking {
+                sessionManager.getProfileId().first()
             }
-            val result = profileService.getProfile(profileId)
-            Log.d("VIEW999", "4")
-            if (result.code() == 403) {
-                removeProfile()
+            if (profileId != 0) {
+                Log.d("VIEW999", "2")
+                _profileStateFlow.update { ProfileResources.Loading }
+                val localProfile = dbStorage.getProfile(profileId).firstOrNull()
+                if (localProfile !== null) {
+                    _profileFlow.update { localProfile }
+                    Log.d("VIEW999", "3")
+                    //    _profileFlow2.update { ProfileResources.Success(localProfile) }
+                }
+                val result = profileService.getProfile(profileId)
+                Log.d("VIEW999", "4")
+                if (result.code() == 403) {
+                    removeProfile()
+                }
+                if (result.isSuccessful) {
+                    val profile = result.body()?.toProfile()
+                    _profileFlow.update { profile }
+                    dbStorage.insertProfile(profile!!)
+                    Log.d("VIEW999", "5")
+                    _profileStateFlow.update { ProfileResources.Success }
+                }
             }
-            if (result.isSuccessful) {
-                val profile = result.body()?.toProfile()
-                _profileFlow.update { profile }
-                dbStorage.insertProfile(profile!!)
-                Log.d("VIEW999", "5")
-                _profileStateFlow.update { ProfileResources.Success }
-            }
-        }
-        // } catch (e:Exception) {
-        //     Log.d("TAG", "ERROR")
-        //     _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
-        // }
+        } catch (e:Exception) {
+             Log.d("TAG", "ERROR")
+             _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
+         }
     }
 
     override suspend fun updateProfile(newProfile: Profile) {
@@ -118,22 +119,29 @@ class ProfileRepositoryImpl @Inject constructor(
         _profileStateFlow.update { ProfileResources.Idle }
     }
 
-    override suspend fun removeAvatarProfile() {
-        val result = profileService.removeAvatarProfile(profileFlow.value?.id!!)
-        Log.d("AVATAR", "remote")
-        if (result.code() == 403) {
-            removeProfile()
-        }
-        if (result.isSuccessful) {
-            val response = result.body()?.toRemoveAvatarProfileResponse() ?: RemoveAvatarProfileResponse()
-            if (response.success) {
-                profileFlow.value?.let {
-                    updateProfile(it.copy(avatar = null))
-                }
-                Log.d("AVATAR", "remote true")
-            } else {
-                Log.d("AVATAR", "remote false")
+    override suspend fun removeAvatarProfile(): Flow<UIResources<RemoveAvatarProfileResponse>> = flow {
+        try {
+            emit(UIResources.Loading)
+            val result = profileService.removeAvatarProfile(profileFlow.value?.id!!)
+             if (result.code() == 403) {
+                removeProfile()
             }
+            if (result.isSuccessful) {
+                val response =
+                    result.body()?.toRemoveAvatarProfileResponse() ?: RemoveAvatarProfileResponse()
+                if (response.success) {
+                    profileFlow.value?.let {
+                        updateProfile(it.copy(avatar = null))
+                    }
+                    emit(UIResources.Success(response))
+                } else {
+                    emit(UIResources.Error("Error :: ${response.message}"))
+                }
+            } else {
+                emit(UIResources.Error("Error removed avatar"))
+            }
+        } catch (e: Exception) {
+            emit(UIResources.Error(e.message.toString()))
         }
     }
 }

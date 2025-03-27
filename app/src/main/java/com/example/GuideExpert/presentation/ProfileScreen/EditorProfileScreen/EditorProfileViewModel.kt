@@ -81,6 +81,18 @@ data class LoadAvatarUIState(
     val contentState: LoadAvatarState = LoadAvatarState.Idle
 )
 
+sealed interface RemoveAvatarState{
+    object Idle:RemoveAvatarState
+    object Loading:RemoveAvatarState
+    object Success:RemoveAvatarState
+    data class Error(val error: String):RemoveAvatarState
+}
+
+data class RemoveAvatarUIState(
+    val contentState: RemoveAvatarState = RemoveAvatarState.Idle
+)
+
+
 
 @RequiresApi(Build.VERSION_CODES.P)
 @HiltViewModel
@@ -103,6 +115,9 @@ class EditorProfileViewModel @Inject constructor(
 
     private val _stateLoadAvatar = MutableStateFlow<LoadAvatarUIState>(LoadAvatarUIState())
     val stateLoadAvatar: StateFlow<LoadAvatarUIState> = _stateLoadAvatar.asStateFlow()
+
+    private val _stateRemoveAvatar = MutableStateFlow<RemoveAvatarUIState>(RemoveAvatarUIState())
+    val stateRemoveAvatar: StateFlow<RemoveAvatarUIState> = _stateRemoveAvatar.asStateFlow()
 
 
     private val _effectChannel = Channel<SnackbarEffect>()
@@ -218,7 +233,29 @@ class EditorProfileViewModel @Inject constructor(
 
     private fun deleteAvatarProfile() {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteAvatarProfileUseCase()
+            deleteAvatarProfileUseCase().collectLatest { resources ->
+                when (resources) {
+                    is UIResources.Error -> {
+                        _stateRemoveAvatar.update {
+                            it.copy(
+                                contentState = RemoveAvatarState.Error(
+                                    resources.message
+                                )
+                            )
+                        }
+                        Log.d("DELETE","error")
+                        sendEffectFlow(resources.message)
+                    }
+
+                    is UIResources.Loading -> {
+                        _stateRemoveAvatar.update { it.copy(contentState = RemoveAvatarState.Loading) }
+                    }
+
+                    is UIResources.Success -> {
+                        _stateRemoveAvatar.update { it.copy(contentState = RemoveAvatarState.Success) }
+                    }
+                }
+            }
         }
     }
 

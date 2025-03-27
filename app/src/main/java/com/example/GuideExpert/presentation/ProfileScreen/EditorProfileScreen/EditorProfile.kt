@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
@@ -125,6 +123,8 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
     val stateLoadAvatar by scopeState.stateLoadAvatar.collectAsStateWithLifecycle()
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
 
+    val stateRemoveAvatar by viewModel.stateRemoveAvatar.collectAsStateWithLifecycle()
+
     Box(Modifier.fillMaxSize()) {
          Scaffold(
              topBar = {
@@ -144,6 +144,21 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
          ) {
                  innerPadding -> scopeState.EditorProfileContent(innerPadding)
          }
+
+        when(stateRemoveAvatar.contentState){
+            is RemoveAvatarState.Error -> {
+                LaunchedEffect(effectFlow) {
+                    effectFlow?.let {
+                        when (it) {
+                            is SnackbarEffect.ShowSnackbar -> {
+                                snackbarHostState.showSnackbar(it.message)
+                            }
+                        }
+                    }
+                }
+            }
+            else -> {}
+        }
 
 
         when(stateLoadAvatar.contentState){

@@ -104,7 +104,6 @@ import com.example.GuideExpert.ui.theme.Shadow2
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import okhttp3.internal.UTC
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -424,22 +423,28 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                 onDismissRequest = { showBottomSheet = false }
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(top = 5.dp, start = 15.dp).fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Button(onClick = {
-                        permissionLauncher.launch(Manifest.permission.CAMERA)
-                    }) {
-                        Text(text = stringResource(id = R.string.take_photo))
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(onClick = {
-                        val mediaRequest =
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        pickImageFromAlbumLauncher.launch(mediaRequest)
-                    }) {
-                        Text(text = stringResource(id = R.string.pick_picture))
+                    Text(text = stringResource(id = R.string.take_photo),
+                        modifier = Modifier.clickable {  permissionLauncher.launch(Manifest.permission.CAMERA) }
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Text(text = stringResource(id = R.string.pick_picture),
+                        modifier = Modifier.clickable {
+                            val mediaRequest =
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            pickImageFromAlbumLauncher.launch(mediaRequest)
+                        }
+                    )
+                    profile?.avatar?.let {
+                        Spacer(modifier = Modifier.height(30.dp))
+                        Text(text = stringResource(id = R.string.remove_avatar),
+                            modifier = Modifier.clickable {
+
+                            }
+                        )
                     }
                 }
             }

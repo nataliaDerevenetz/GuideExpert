@@ -5,9 +5,11 @@ import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.RemoveAvatarProfileResponse
+import com.example.GuideExpert.domain.models.UpdateProfileResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import okhttp3.MultipartBody
+import java.util.Date
 
 interface ProfileRepository {
     val profileFlow: StateFlow<Profile?>
@@ -17,4 +19,5 @@ interface ProfileRepository {
     suspend fun removeProfile()
     suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>>
     suspend fun removeAvatarProfile():Flow<UIResources<RemoveAvatarProfileResponse>>
+    suspend fun updateProfile(firstName: String, lastName: String, sex: String, email:String, birthday: Date):Flow<UIResources<UpdateProfileResponse>>
 }

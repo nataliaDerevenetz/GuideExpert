@@ -18,6 +18,7 @@ import com.example.GuideExpert.domain.GetProfileUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
 import com.example.GuideExpert.domain.LogoutProfileUseCase
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
+import com.example.GuideExpert.domain.UpdateProfileUseCase
 import com.example.GuideExpert.domain.impl.DeleteAvatarProfileUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetAuthTokenByYandexUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetConfigUseCaseImpl
@@ -36,6 +37,7 @@ import com.example.GuideExpert.domain.impl.GetProfileUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetSortDefaultUseCaseImpl
 import com.example.GuideExpert.domain.impl.LogoutProfileUseCaseImpl
 import com.example.GuideExpert.domain.impl.UpdateAvatarProfileUseCaseImpl
+import com.example.GuideExpert.domain.impl.UpdateProfileUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -147,4 +149,10 @@ abstract class MainScreenModule {
     abstract fun bindDeleteAvatarProfileUseCase(
         deleteAvatarProfileUseCaseImpl: DeleteAvatarProfileUseCaseImpl
     ) : DeleteAvatarProfileUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindUpdateProfileUseCase(
+        updateProfileUseCaseImpl: UpdateProfileUseCaseImpl
+    ) : UpdateProfileUseCase
 }

@@ -18,6 +18,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.DeleteAvatarProfileUseCase
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
+import com.example.GuideExpert.domain.UpdateProfileUseCase
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.utils.getOrientation
@@ -54,7 +55,7 @@ sealed class EditorProfileUiEvent {
     data class OnEmailChanged(val email: String): EditorProfileUiEvent()
     data class OnBirthdayChanged(val birthday: Date): EditorProfileUiEvent()
     data object OnLoadProfile: EditorProfileUiEvent()
-    data object OnSaveProfile: EditorProfileUiEvent()
+    data object OnUpdateProfile: EditorProfileUiEvent()
     data object OnSaveAvatarProfile: EditorProfileUiEvent()
     data object OnDeleteAvatarProfile: EditorProfileUiEvent()
 }
@@ -92,7 +93,16 @@ data class RemoveAvatarUIState(
     val contentState: RemoveAvatarState = RemoveAvatarState.Idle
 )
 
+sealed interface UpdateProfileState{
+    object Idle:UpdateProfileState
+    object Loading:UpdateProfileState
+    object Success:UpdateProfileState
+    data class Error(val error: String):UpdateProfileState
+}
 
+data class UpdateProfileUIState(
+    val contentState: UpdateProfileState = UpdateProfileState.Idle
+)
 
 @RequiresApi(Build.VERSION_CODES.P)
 @HiltViewModel
@@ -101,7 +111,8 @@ class EditorProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     @ApplicationContext val application: Context,
     val updateAvatarProfileUseCase: UpdateAvatarProfileUseCase,
-    val deleteAvatarProfileUseCase: DeleteAvatarProfileUseCase
+    val deleteAvatarProfileUseCase: DeleteAvatarProfileUseCase,
+    val updateProfileUseCase: UpdateProfileUseCase
     ) : ViewModel() {
 
     val profileFlow = profileRepository.profileFlow
@@ -118,6 +129,9 @@ class EditorProfileViewModel @Inject constructor(
 
     private val _stateRemoveAvatar = MutableStateFlow<RemoveAvatarUIState>(RemoveAvatarUIState())
     val stateRemoveAvatar: StateFlow<RemoveAvatarUIState> = _stateRemoveAvatar.asStateFlow()
+
+    private val _stateUpdateProfile = MutableStateFlow<UpdateProfileUIState>(UpdateProfileUIState())
+    val stateUpdateProfile: StateFlow<UpdateProfileUIState> = _stateUpdateProfile.asStateFlow()
 
 
     private val _effectChannel = Channel<SnackbarEffect>()
@@ -217,8 +231,8 @@ class EditorProfileViewModel @Inject constructor(
                 loadProfile()
             }
 
-            is EditorProfileUiEvent.OnSaveProfile -> {
-             //   saveProfile()
+            is EditorProfileUiEvent.OnUpdateProfile -> {
+                updateProfile()
             }
 
             is EditorProfileUiEvent.OnSaveAvatarProfile -> {
@@ -227,6 +241,39 @@ class EditorProfileViewModel @Inject constructor(
 
             is EditorProfileUiEvent.OnDeleteAvatarProfile -> {
                 deleteAvatarProfile()
+            }
+        }
+    }
+
+    private fun updateProfile() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_editorOldViewState.value != _editorViewState.value) {
+                updateProfileUseCase(firstName = viewStateFlow.value.firstName,lastName = viewStateFlow.value.lastName,
+                    sex = viewStateFlow.value.sex, email = viewStateFlow.value.email,birthday = viewStateFlow.value.birthday!!)
+                    .collectLatest { resources ->
+                    when (resources) {
+                        is UIResources.Error -> {
+                            _stateUpdateProfile.update {
+                                it.copy(
+                                    contentState = UpdateProfileState.Error(
+                                        resources.message
+                                    )
+                                )
+                            }
+                            //Log.d("DELETE","error")
+                            sendEffectFlow(resources.message)
+                        }
+
+                        is UIResources.Loading -> {
+                            _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Loading) }
+                        }
+
+                        is UIResources.Success -> {
+                            _editorOldViewState.update { _editorViewState.value.copy() }
+                            _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Success) }
+                        }
+                    }
+                }
             }
         }
     }
@@ -243,7 +290,6 @@ class EditorProfileViewModel @Inject constructor(
                                 )
                             )
                         }
-                        Log.d("DELETE","error")
                         sendEffectFlow(resources.message)
                     }
 
@@ -308,32 +354,35 @@ class EditorProfileViewModel @Inject constructor(
 
     private fun updateAvatarProfile() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_editorOldViewState.value != _editorViewState.value) {
-                if (viewStateFlow.value.tempFileGalleryUrl != null || viewStateFlow.value.tempFileSystemUrl != null) {
-                    val imagePart = if ( viewStateFlow.value.tempFileGalleryUrl != null) {
-                        createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
-                    } else {
-                        MultipartBody.Part.createFormData(
-                            name = "image",
-                            filename = File(viewStateFlow.value.tempFileSystemUrl!!).getName(),
-                            body = File(viewStateFlow.value.tempFileSystemUrl!!).asRequestBody(contentType = "image/jpeg".toMediaType()),
-                        )
-                    }
-                    imagePart.let { it ->
-                        if (it != null) {
-                            updateAvatarProfileUseCase(it).collectLatest { resources ->
-                                when(resources){
-                                    is UIResources.Error -> {
-                                        _editorViewState.update { it.copy(selectedPicture = null) }
-                                        sendEffectFlow("Error loading avatar : ${resources.message}")
-                                        _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Error(resources.message)) }
-                                    }
-                                    is UIResources.Loading -> {
-                                        _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Loading) }
-                                    }
-                                    is UIResources.Success -> {
-                                        _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Success) }
-                                    }
+            if (viewStateFlow.value.tempFileGalleryUrl != null || viewStateFlow.value.tempFileSystemUrl != null) {
+                val imagePart = if ( viewStateFlow.value.tempFileGalleryUrl != null) {
+                    createImageRequestBody(viewStateFlow.value.tempFileGalleryUrl!!, "image")
+                } else {
+                    MultipartBody.Part.createFormData(
+                        name = "image",
+                        filename = File(viewStateFlow.value.tempFileSystemUrl!!).getName(),
+                        body = File(viewStateFlow.value.tempFileSystemUrl!!).asRequestBody(contentType = "image/jpeg".toMediaType()),
+                    )
+                }
+                imagePart.let { it ->
+                    if (it != null) {
+                        updateAvatarProfileUseCase(it).collectLatest { resources ->
+                            when(resources){
+                                is UIResources.Error -> {
+                                    _editorViewState.update { it.copy(selectedPicture = null) }
+                                    sendEffectFlow("Error loading avatar : ${resources.message}")
+                                    _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Error(resources.message)) }
+                                }
+                                is UIResources.Loading -> {
+                                    _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Loading) }
+                                }
+                                is UIResources.Success -> {
+                                    _editorOldViewState.update { it.copy(tempFileUrl = viewStateFlow.value.tempFileUrl,
+                                        selectedPicture = viewStateFlow.value.selectedPicture,
+                                        tempFileGalleryUrl = viewStateFlow.value.tempFileGalleryUrl,
+                                        tempFileSystemUrl = viewStateFlow.value.tempFileSystemUrl
+                                    ) }
+                                    _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Success) }
                                 }
                             }
                         }

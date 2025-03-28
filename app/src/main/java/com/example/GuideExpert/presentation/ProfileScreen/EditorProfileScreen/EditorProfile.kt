@@ -125,6 +125,8 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
 
     val stateRemoveAvatar by viewModel.stateRemoveAvatar.collectAsStateWithLifecycle()
 
+    val stateUpdateProfile by viewModel.stateUpdateProfile.collectAsStateWithLifecycle()
+
     Box(Modifier.fillMaxSize()) {
          Scaffold(
              topBar = {
@@ -160,6 +162,23 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
             else -> {}
         }
 
+        when(stateUpdateProfile.contentState){
+            is UpdateProfileState.Success -> {
+                Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
+            }
+            is UpdateProfileState.Error -> {
+                LaunchedEffect(effectFlow) {
+                    effectFlow?.let {
+                        when (it) {
+                            is SnackbarEffect.ShowSnackbar -> {
+                                snackbarHostState.showSnackbar(it.message)
+                            }
+                        }
+                    }
+                }
+            }
+            else -> {}
+        }
 
         when(stateLoadAvatar.contentState){
             is LoadAvatarState.Error -> {
@@ -411,11 +430,8 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                 onClick = {
                     isErrorEmail = !email.isValidEmail()
                     if (email.isValidEmail() && selectedDate.value.isValidBirthday()) {
-                        //SAVE!!!!!
                         Log.d("SAVE", "OK")
-                        handleEvent(EditorProfileUiEvent.OnSaveProfile)
-                    } else {
-                        Log.d("SAVE", "ERROR")
+                        handleEvent(EditorProfileUiEvent.OnUpdateProfile)
                     }
 
                 },

@@ -117,15 +117,14 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                             viewStateFlow = viewModel.viewStateFlow,
                             handleEvent = viewModel::handleEvent,
                             stateLoadAvatar = viewModel.stateLoadAvatar,
-                            effectFlow = viewModel.effectFlow
+                            effectFlow = viewModel.effectFlow,
+                            stateRemoveAvatar = viewModel.stateRemoveAvatar,
+                            stateUpdateProfile = viewModel.stateUpdateProfile,
+                            snackbarHostState = snackbarHostState,
                             ),) {
 
     val stateLoadAvatar by scopeState.stateLoadAvatar.collectAsStateWithLifecycle()
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
-
-    val stateRemoveAvatar by viewModel.stateRemoveAvatar.collectAsStateWithLifecycle()
-
-    val stateUpdateProfile by viewModel.stateUpdateProfile.collectAsStateWithLifecycle()
 
     Box(Modifier.fillMaxSize()) {
          Scaffold(
@@ -147,38 +146,10 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                  innerPadding -> scopeState.EditorProfileContent(innerPadding)
          }
 
-        when(stateRemoveAvatar.contentState){
-            is RemoveAvatarState.Error -> {
-                LaunchedEffect(effectFlow) {
-                    effectFlow?.let {
-                        when (it) {
-                            is SnackbarEffect.ShowSnackbar -> {
-                                snackbarHostState.showSnackbar(it.message)
-                            }
-                        }
-                    }
-                }
-            }
-            else -> {}
-        }
+        scopeState.ContentRemoveAvatar(effectFlow)
 
-        when(stateUpdateProfile.contentState){
-            is UpdateProfileState.Success -> {
-                Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
-            }
-            is UpdateProfileState.Error -> {
-                LaunchedEffect(effectFlow) {
-                    effectFlow?.let {
-                        when (it) {
-                            is SnackbarEffect.ShowSnackbar -> {
-                                snackbarHostState.showSnackbar(it.message)
-                            }
-                        }
-                    }
-                }
-            }
-            else -> {}
-        }
+        scopeState.ContentUpdateProfile(effectFlow)
+
 
         when(stateLoadAvatar.contentState){
             is LoadAvatarState.Error -> {
@@ -191,6 +162,7 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                         }
                     }
                 }
+                scopeState.handleEvent(EditorProfileUiEvent.OnLoadAvatarUIStateSetIdle)
             }
             LoadAvatarState.Idle -> {}
             LoadAvatarState.Loading -> {
@@ -202,13 +174,62 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
             LoadAvatarState.Success -> {
+                Log.d("LoadAvatarState","Success")
                 Toast.makeText(LocalContext.current, stringResource(id = R.string.message_avatar_succes_load), Toast.LENGTH_LONG).show()
+                scopeState.handleEvent(EditorProfileUiEvent.OnLoadAvatarUIStateSetIdle)
             }
         }
 
      }
 }
 
+@Composable
+fun EditorProfileStateScope.ContentUpdateProfile(effectFlow: SnackbarEffect?) {
+    val stateUpdateProfile by stateUpdateProfile.collectAsStateWithLifecycle()
+
+    when(stateUpdateProfile.contentState){
+        is UpdateProfileState.Success -> {
+            Log.d("UpdateProfileState","Success")
+            Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
+            handleEvent(EditorProfileUiEvent.OnUpdateProfileUIStateSetIdle)
+        }
+        is UpdateProfileState.Error -> {
+            LaunchedEffect(effectFlow) {
+                effectFlow?.let {
+                    when (it) {
+                        is SnackbarEffect.ShowSnackbar -> {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            handleEvent(EditorProfileUiEvent.OnUpdateProfileUIStateSetIdle)
+        }
+        else -> {}
+    }
+
+}
+
+@Composable
+fun EditorProfileStateScope.ContentRemoveAvatar(effectFlow: SnackbarEffect?) {
+    val stateRemoveAvatar by stateRemoveAvatar.collectAsStateWithLifecycle()
+
+    when(stateRemoveAvatar.contentState){
+        is RemoveAvatarState.Error -> {
+            LaunchedEffect(effectFlow) {
+                effectFlow?.let {
+                    when (it) {
+                        is SnackbarEffect.ShowSnackbar -> {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            handleEvent(EditorProfileUiEvent.OnRemoveAvatarUIStateSetIdle)
+        }
+        else -> {}
+    }
+}
 
 @Stable
 interface EditorProfileStateScope {
@@ -217,6 +238,9 @@ interface EditorProfileStateScope {
     val handleEvent: (EditorProfileUiEvent) -> Job
     val stateLoadAvatar: StateFlow<LoadAvatarUIState>
     val effectFlow: Flow<SnackbarEffect>
+    val stateUpdateProfile: StateFlow<UpdateProfileUIState>
+    val stateRemoveAvatar: StateFlow<RemoveAvatarUIState>
+    val snackbarHostState: SnackbarHostState
 }
 
 
@@ -225,7 +249,10 @@ fun DefaultEditorProfileStateScope(
     viewStateFlow: StateFlow<EditorViewState>,
     handleEvent : (EditorProfileUiEvent) -> Job,
     stateLoadAvatar: StateFlow<LoadAvatarUIState>,
-    effectFlow : Flow<SnackbarEffect>
+    effectFlow : Flow<SnackbarEffect>,
+    stateUpdateProfile: StateFlow<UpdateProfileUIState>,
+    stateRemoveAvatar: StateFlow<RemoveAvatarUIState>,
+    snackbarHostState: SnackbarHostState
 ): EditorProfileStateScope {
     return object : EditorProfileStateScope {
         override val profile: StateFlow<Profile?>
@@ -238,6 +265,12 @@ fun DefaultEditorProfileStateScope(
             get() = stateLoadAvatar
         override val effectFlow: Flow<SnackbarEffect>
             get() = effectFlow
+        override val stateUpdateProfile: StateFlow<UpdateProfileUIState>
+            get() = stateUpdateProfile
+        override val stateRemoveAvatar: StateFlow<RemoveAvatarUIState>
+            get() = stateRemoveAvatar
+        override val snackbarHostState:SnackbarHostState
+            get() = snackbarHostState
     }
 }
 
@@ -247,9 +280,12 @@ fun rememberDefaultEditorProfileStateScope(
     viewStateFlow: StateFlow<EditorViewState>,
     handleEvent: (EditorProfileUiEvent) -> Job,
     stateLoadAvatar: StateFlow<LoadAvatarUIState>,
-    effectFlow : Flow<SnackbarEffect>
-): EditorProfileStateScope = remember(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow) {
-    DefaultEditorProfileStateScope(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow)
+    effectFlow : Flow<SnackbarEffect>,
+    stateUpdateProfile: StateFlow<UpdateProfileUIState>,
+    stateRemoveAvatar: StateFlow<RemoveAvatarUIState>,
+    snackbarHostState: SnackbarHostState
+): EditorProfileStateScope = remember(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow,stateUpdateProfile,stateRemoveAvatar,snackbarHostState) {
+    DefaultEditorProfileStateScope(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow,stateUpdateProfile,stateRemoveAvatar,snackbarHostState)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

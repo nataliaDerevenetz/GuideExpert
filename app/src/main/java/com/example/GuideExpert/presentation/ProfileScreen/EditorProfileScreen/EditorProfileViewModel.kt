@@ -58,6 +58,9 @@ sealed class EditorProfileUiEvent {
     data object OnUpdateProfile: EditorProfileUiEvent()
     data object OnSaveAvatarProfile: EditorProfileUiEvent()
     data object OnDeleteAvatarProfile: EditorProfileUiEvent()
+    data object OnRemoveAvatarUIStateSetIdle: EditorProfileUiEvent()
+    data object OnLoadAvatarUIStateSetIdle: EditorProfileUiEvent()
+    data object OnUpdateProfileUIStateSetIdle: EditorProfileUiEvent()
 }
 
 data class EditorViewState(
@@ -242,7 +245,29 @@ class EditorProfileViewModel @Inject constructor(
             is EditorProfileUiEvent.OnDeleteAvatarProfile -> {
                 deleteAvatarProfile()
             }
+
+            is EditorProfileUiEvent.OnLoadAvatarUIStateSetIdle -> {
+                setIdleLoadAvatarUIState()
+            }
+            is EditorProfileUiEvent.OnRemoveAvatarUIStateSetIdle -> {
+                setIdleRemoveAvatarUIState()
+            }
+            is EditorProfileUiEvent.OnUpdateProfileUIStateSetIdle -> {
+                setIdleUpdateProfileUIState()
+            }
         }
+    }
+
+    private fun setIdleUpdateProfileUIState() {
+        _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Idle) }
+    }
+
+    private fun setIdleRemoveAvatarUIState() {
+        _stateRemoveAvatar.update { it.copy(contentState = RemoveAvatarState.Idle) }
+    }
+
+    private fun setIdleLoadAvatarUIState() {
+        _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Idle) }
     }
 
     private fun updateProfile() {

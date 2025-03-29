@@ -81,6 +81,7 @@ class ProfileRepositoryImpl @Inject constructor(
             val profileId = runBlocking {
                 sessionManager.getProfileId().first()
             }
+
             if (profileId != 0) {
                 Log.d("VIEW999", "2")
                 _profileStateFlow.update { ProfileResources.Loading }
@@ -88,12 +89,12 @@ class ProfileRepositoryImpl @Inject constructor(
                 if (localProfile !== null) {
                     _profileFlow.update { localProfile }
                     Log.d("VIEW999", "3")
-                    //    _profileFlow2.update { ProfileResources.Success(localProfile) }
                 }
                 val result = profileService.getProfile(profileId)
                 Log.d("VIEW999", "4")
                 if (result.code() == 403) {
                     removeProfile()
+                    _profileStateFlow.update { ProfileResources.Error("Error authorization") }
                 }
                 if (result.isSuccessful) {
                     val profile = result.body()?.toProfile()

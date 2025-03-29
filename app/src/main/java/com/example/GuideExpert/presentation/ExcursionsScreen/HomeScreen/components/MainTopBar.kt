@@ -33,7 +33,8 @@ fun MainTopBar(modifier: Modifier = Modifier,
                toolbarOffsetHeightPx: Float,
                scrollingOn:()->Unit,
                scrollingOff:()->Unit,
-               onToolbarHeightChange:(Float)->Unit
+               onToolbarHeightChange:(Float)->Unit,
+               navigateToProfileInfo:()->Unit
 ){
 
     var boxVisible by rememberSaveable { mutableStateOf(true) }
@@ -54,7 +55,7 @@ fun MainTopBar(modifier: Modifier = Modifier,
             }
         ) {
 
-            ProfileBox(boxVisible = boxVisible)
+            ProfileBox(boxVisible = boxVisible,navigateToProfileInfo = navigateToProfileInfo)
 
             SearchScreen(
                 modifier = Modifier,

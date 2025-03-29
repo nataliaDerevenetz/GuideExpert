@@ -76,7 +76,17 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         NavHost(navController, startDestination = Home, Modifier.padding(innerPadding)) {
             composable<Home> {
                 ExcursionsScreen(snackbarHostState = snackbarHostState,
-                onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar})
+                    onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
+                    onNavigateToProfile = {
+                        navController.navigate(Profile){
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
             composable<Profile> {
                 ProfileScreen(snackbarHostState = snackbarHostState,

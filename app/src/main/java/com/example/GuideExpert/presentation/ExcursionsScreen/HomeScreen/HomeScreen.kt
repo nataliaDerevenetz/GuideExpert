@@ -43,6 +43,7 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     navigateToExcursion: (Excursion) -> Unit,
+    navigateToProfileInfo: () -> Unit
      //  viewModel: ExcursionsViewModel = hiltViewModel()
 ) {
 
@@ -117,6 +118,7 @@ fun HomeScreen(
             MainTopBar(modifier = Modifier.fillMaxSize(),
                 snackbarHostState = snackbarHostState,
                 navigateToExcursion = navigateToExcursion,
+                navigateToProfileInfo = navigateToProfileInfo,
                 toolbarHeightDp = toolbarHeightDp,
                 toolbarOffsetHeightPx = toolbarOffsetHeightPx,
                 scrollingOn = {

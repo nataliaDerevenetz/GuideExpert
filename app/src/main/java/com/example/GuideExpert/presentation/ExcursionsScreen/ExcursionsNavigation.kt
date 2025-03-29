@@ -54,15 +54,17 @@ class ExcursionDetail(val excursion : Excursion) {
 fun NavigationHomeScreen(
     snackbarHostState : SnackbarHostState,
     onChangeVisibleBottomBar: (Boolean) -> Unit,
+    onNavigateToProfile : () -> Unit
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = ExcursionSearchScreen) {
+        val onNavigateToProfileInfo = {onNavigateToProfile() }
         val onNavigateToExcursion = { it: Excursion -> navController.navigateToExcursionDetail(excursion = it) }
         val onNavigateToAlbum = { excursionId: Int -> navController.navigateToAlbum(excursionId = excursionId) }
         val onNavigateToImage = { imageId: Int,excursionImages: List<Image>,indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
         val onNavigateToBack = {navController.popBackStack() }
-        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack)
+        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack,onNavigateToProfileInfo)
     }
 }
 
@@ -71,10 +73,11 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
                                           onNavigateToAlbum: (Int) -> Unit,
                                           onNavigateToImage: (Int,List<Image>,Int) -> Unit,
                                           onChangeVisibleBottomBar: (Boolean) -> Unit,
-                                          onNavigateToBack:() -> Boolean) {
+                                          onNavigateToBack:() -> Boolean,
+                                          onNavigateToProfileInfo:() -> Unit) {
     composable<ExcursionSearchScreen> {
         onChangeVisibleBottomBar(true)
-        HomeScreen(snackbarHostState,onNavigateToExcursion)
+        HomeScreen(snackbarHostState,onNavigateToExcursion,onNavigateToProfileInfo)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)

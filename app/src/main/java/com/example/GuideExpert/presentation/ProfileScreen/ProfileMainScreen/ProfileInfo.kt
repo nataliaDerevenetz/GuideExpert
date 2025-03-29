@@ -2,6 +2,7 @@ package com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -272,7 +273,7 @@ fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
                         model = profile?.avatar?.url,
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(200.dp).clip(CircleShape).clickable { navigateToEditorProfile() },
+                        modifier = Modifier.size(200.dp).clip(CircleShape).border(1.dp, Color.LightGray, CircleShape).clickable { navigateToEditorProfile() },
                         loading = {
                             CircularProgressIndicator(
                                 color = Color.Gray,

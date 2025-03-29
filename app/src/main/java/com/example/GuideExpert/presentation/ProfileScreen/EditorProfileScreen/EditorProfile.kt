@@ -10,6 +10,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -577,7 +578,8 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
                             drawContent()
                             drawRect(gradient45, blendMode = BlendMode.SrcAtop)
                         }
-                    }.clickable { onChangeShowBottomSheet(true) },
+                    }
+                    .clickable { onChangeShowBottomSheet(true) },
                 contentDescription = null, tint = Color.Gray
             )
         } else {
@@ -588,6 +590,7 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
                 modifier = Modifier
                     .size(200.dp)
                     .clip(CircleShape)
+                    .border(1.dp, Color.LightGray, CircleShape)
                     .clickable { onChangeShowBottomSheet(true) },
                 loading = {
                     CircularProgressIndicator(

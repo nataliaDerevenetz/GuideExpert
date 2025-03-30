@@ -285,8 +285,7 @@ class EditorProfileViewModel @Inject constructor(
                                     )
                                 )
                             }
-                            //Log.d("DELETE","error")
-                            sendEffectFlow(resources.message)
+                            sendEffectFlow("Error updating profile : ${resources.message}")
                         }
 
                         is UIResources.Loading -> {
@@ -315,7 +314,7 @@ class EditorProfileViewModel @Inject constructor(
                                 )
                             )
                         }
-                        sendEffectFlow(resources.message)
+                        sendEffectFlow("Error deletion avatar : ${resources.message}")
                     }
 
                     is UIResources.Loading -> {

@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
@@ -28,8 +30,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -76,6 +83,9 @@ class HomeViewModel @Inject constructor(
     private val _configApp = MutableStateFlow(Config())
     val configApp: StateFlow<Config> = _configApp
 
+    val modifications = flowOf(listOf(1,5,8))
+
+
     fun handleEvent(event: ExcursionsUiEvent) {
         viewModelScope.launch {
             when (event) {
@@ -108,15 +118,12 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun loadConfig() {
-        Log.d("TAG","loadConfig")
-        getConfigUseCase().flowOn(Dispatchers.IO).collectLatest { resource ->
+       getConfigUseCase().flowOn(Dispatchers.IO).collectLatest { resource ->
             when(resource) {
-                is UIResources.Error -> {Log.d("TAG2","loadConfig Error")}
-                is UIResources.Loading -> {Log.d("TAG2","loadConfig Loading")}
                 is UIResources.Success -> {
-                    Log.d("TAG2","loadConfig Success")
                     _configApp.update { resource.data }
                 }
+                else -> {}
             }
         }
     }
@@ -182,10 +189,29 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun loadExcursionsFilters() {
+     //   val list = listOf(1,5,8)
+      //  val modifications = flowOf(listOf(1,5,8))
         Log.d("TAG","loadExcursionsFilters")
         changeFilter.flatMapLatest{
             getExcursionByFiltersUseCase(changeFilter.value)
-        }.cachedIn(viewModelScope).collectLatest{
+        }
+          /*  .map { pagingData ->
+                pagingData
+                    .map {
+                    if (it.id in list) it.isFavorite = true
+                    it
+                }
+            }*/
+         //   .cachedIn(viewModelScope)
+
+            .combine(modifications) { pagingData, modification ->
+                pagingData.map {  if (it.id in modification) it.isFavorite = true
+                    it }
+            }
+            .cachedIn(viewModelScope)
+
+
+            .collectLatest{
             _uiPagingState.value = it
         }
     }

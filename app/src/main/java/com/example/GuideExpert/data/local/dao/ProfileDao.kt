@@ -1,5 +1,6 @@
 package com.example.GuideExpert.data.local.dao
 
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -20,15 +21,19 @@ interface ProfileDao {
     @Query("SELECT * FROM profileEntity WHERE id = :id")
     fun getById(id: Int) : Flow<ProfileWithAvatar?>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(profile: ProfileEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAvatar(avatar: AvatarEntity)
 
+    @Query("DELETE FROM avatarEntity  WHERE profileId = :profileId")
+    suspend fun deleteAvatarById(profileId:Int)
+
     @Transaction
     suspend fun insertAll(profileWithAvatar: ProfileWithAvatar) {
         insert(profileWithAvatar.profile)
-        insertAvatar(profileWithAvatar.avatar)
+        deleteAvatarById(profileWithAvatar.profile.id)
+        profileWithAvatar.avatar?.let { insertAvatar(it) }
     }
 }

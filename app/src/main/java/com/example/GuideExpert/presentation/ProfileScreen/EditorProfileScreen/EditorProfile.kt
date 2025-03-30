@@ -70,6 +70,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -103,6 +104,7 @@ import com.example.GuideExpert.ui.theme.Shadow2
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -126,6 +128,7 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
 
     val stateLoadAvatar by scopeState.stateLoadAvatar.collectAsStateWithLifecycle()
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
+    val scope = rememberCoroutineScope()
 
     Box(Modifier.fillMaxSize()) {
          Scaffold(
@@ -151,13 +154,12 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
 
         scopeState.ContentUpdateProfile(effectFlow)
 
-
         when(stateLoadAvatar.contentState){
             is LoadAvatarState.Error -> {
-                LaunchedEffect(effectFlow) {
-                    effectFlow?.let {
-                        when (it) {
-                            is SnackbarEffect.ShowSnackbar -> {
+                effectFlow?.let {
+                    when (it) {
+                        is SnackbarEffect.ShowSnackbar -> {
+                            scope.launch {
                                 snackbarHostState.showSnackbar(it.message)
                             }
                         }
@@ -188,6 +190,8 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
 fun EditorProfileStateScope.ContentUpdateProfile(effectFlow: SnackbarEffect?) {
     val stateUpdateProfile by stateUpdateProfile.collectAsStateWithLifecycle()
 
+    val scope = rememberCoroutineScope()
+
     when(stateUpdateProfile.contentState){
         is UpdateProfileState.Success -> {
             Log.d("UpdateProfileState","Success")
@@ -195,10 +199,10 @@ fun EditorProfileStateScope.ContentUpdateProfile(effectFlow: SnackbarEffect?) {
             handleEvent(EditorProfileUiEvent.OnUpdateProfileUIStateSetIdle)
         }
         is UpdateProfileState.Error -> {
-            LaunchedEffect(effectFlow) {
-                effectFlow?.let {
-                    when (it) {
-                        is SnackbarEffect.ShowSnackbar -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
                             snackbarHostState.showSnackbar(it.message)
                         }
                     }
@@ -214,13 +218,14 @@ fun EditorProfileStateScope.ContentUpdateProfile(effectFlow: SnackbarEffect?) {
 @Composable
 fun EditorProfileStateScope.ContentRemoveAvatar(effectFlow: SnackbarEffect?) {
     val stateRemoveAvatar by stateRemoveAvatar.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     when(stateRemoveAvatar.contentState){
         is RemoveAvatarState.Error -> {
-            LaunchedEffect(effectFlow) {
-                effectFlow?.let {
-                    when (it) {
-                        is SnackbarEffect.ShowSnackbar -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
                             snackbarHostState.showSnackbar(it.message)
                         }
                     }

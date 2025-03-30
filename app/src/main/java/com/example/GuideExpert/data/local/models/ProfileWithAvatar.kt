@@ -8,5 +8,5 @@ data class ProfileWithAvatar(
     @Relation(
         parentColumn = "id",
         entityColumn = "profileId")
-    val avatar: AvatarEntity
+    val avatar: AvatarEntity?
 )

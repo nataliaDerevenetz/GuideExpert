@@ -77,21 +77,17 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun fetchProfile() {
         try {
-            Log.d("VIEW999", "1")
             val profileId = runBlocking {
                 sessionManager.getProfileId().first()
             }
 
             if (profileId != 0) {
-                Log.d("VIEW999", "2")
                 _profileStateFlow.update { ProfileResources.Loading }
                 val localProfile = dbStorage.getProfile(profileId).firstOrNull()
                 if (localProfile !== null) {
                     _profileFlow.update { localProfile }
-                    Log.d("VIEW999", "3")
                 }
                 val result = profileService.getProfile(profileId)
-                Log.d("VIEW999", "4")
                 if (result.code() == 403) {
                     removeProfile()
                     _profileStateFlow.update { ProfileResources.Error("Error authorization") }
@@ -100,12 +96,10 @@ class ProfileRepositoryImpl @Inject constructor(
                     val profile = result.body()?.toProfile()
                     _profileFlow.update { profile }
                     dbStorage.insertProfile(profile!!)
-                    Log.d("VIEW999", "5")
                     _profileStateFlow.update { ProfileResources.Success }
                 }
             }
         } catch (e:Exception) {
-             Log.d("TAG", "ERROR")
              _profileStateFlow.update { ProfileResources.Error(e.message.toString()) }
          }
     }
@@ -127,7 +121,6 @@ class ProfileRepositoryImpl @Inject constructor(
         try {
             emit(UIResources.Loading)
             profileFlow.value?.let {
-                Log.d("UPDATE", it.firstName)
                 val result = profileService.updateProfile(it.id,firstName,lastName,sex,email,birthday)
                 if (result.code() == 403) {
                     removeProfile()

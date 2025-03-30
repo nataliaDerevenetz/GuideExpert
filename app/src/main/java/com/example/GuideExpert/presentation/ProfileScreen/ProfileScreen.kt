@@ -1,13 +1,12 @@
 package com.example.GuideExpert.presentation.ProfileScreen
 
-import androidx.compose.foundation.layout.Column
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ProfileScreen(
     snackbarHostState: SnackbarHostState,

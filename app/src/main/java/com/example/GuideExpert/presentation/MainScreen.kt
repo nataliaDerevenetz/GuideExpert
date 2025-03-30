@@ -1,6 +1,8 @@
 package com.example.GuideExpert.presentation
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -61,6 +63,7 @@ val topLevelRoutes = listOf(
     TopLevelRoute("Person", Profile, Icons.Filled.Person,Icons.Outlined.Person)
 )
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()

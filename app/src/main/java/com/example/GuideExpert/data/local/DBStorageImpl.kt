@@ -8,7 +8,6 @@ import com.example.GuideExpert.data.mappers.toExcursionDataEntity
 import com.example.GuideExpert.data.mappers.toImage
 import com.example.GuideExpert.data.mappers.toImageEntity
 import com.example.GuideExpert.data.mappers.toProfile
-import com.example.GuideExpert.data.mappers.toProfileEntity
 import com.example.GuideExpert.data.mappers.toProfileWithAvatar
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
@@ -50,7 +49,7 @@ class DBStorageImpl @Inject constructor(
     }
 
     override suspend fun insertProfile(profile: Profile) {
-        profile.toProfileWithAvatar()?.let { profileDao.insertAll(it) }
+        profileDao.insertAll(profile.toProfileWithAvatar())
     }
 
 }

@@ -1,6 +1,5 @@
 package com.example.GuideExpert.data.local
 
-import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.Profile

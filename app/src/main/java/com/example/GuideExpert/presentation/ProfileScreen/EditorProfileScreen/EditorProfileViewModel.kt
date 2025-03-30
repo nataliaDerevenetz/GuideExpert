@@ -71,7 +71,7 @@ data class EditorViewState(
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
-    val sex: String = "",
+    val sex: String? = null,
     val birthday: Date? = null, )
 
 sealed interface LoadAvatarState{

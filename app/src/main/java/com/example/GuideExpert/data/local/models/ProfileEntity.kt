@@ -15,7 +15,7 @@ data class ProfileEntity (
     @ColumnInfo val realName: String,
     @ColumnInfo val firstName: String,
     @ColumnInfo val lastName: String,
-    @ColumnInfo val sex: String,
+    @ColumnInfo val sex: String?,
     @ColumnInfo val email: String,
     @ColumnInfo val birthday: Date,
     @ColumnInfo val phone: String,

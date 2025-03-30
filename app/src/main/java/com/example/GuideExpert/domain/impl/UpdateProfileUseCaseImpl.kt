@@ -11,7 +11,7 @@ import javax.inject.Inject
 class UpdateProfileUseCaseImpl @Inject constructor(
     private val profileRepository: ProfileRepository
 ): UpdateProfileUseCase {
-    override suspend operator fun invoke(firstName: String, lastName: String, sex: String, email:String, birthday: Date): Flow<UIResources<UpdateProfileResponse>> {
+    override suspend operator fun invoke(firstName: String, lastName: String, sex: String?, email:String, birthday: Date): Flow<UIResources<UpdateProfileResponse>> {
         return profileRepository.updateProfile(firstName,lastName,sex,email,birthday)
     }
 }

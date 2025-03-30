@@ -20,7 +20,7 @@ data class ProfilePOJO(
     val lastName: String,
 
     @SerializedName("sex")
-    val sex: String,
+    val sex: String?,
 
     @SerializedName("email")
     val email: String,

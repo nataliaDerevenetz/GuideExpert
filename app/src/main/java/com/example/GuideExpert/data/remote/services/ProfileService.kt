@@ -32,7 +32,7 @@ interface ProfileService {
 
     @GET("updateprofile.php")
     suspend fun updateProfile(@Query("profile_id") profileId:Int, @Query("first_name") firstName:String,
-                              @Query("last_name") lastName:String, @Query("sex") sex:String,
+                              @Query("last_name") lastName:String, @Query("sex") sex:String?,
                               @Query("email") email:String, @Query("birthday") birthday: Date
                               ): Response<UpdateProfileResponsePOJO>
 

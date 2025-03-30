@@ -622,9 +622,9 @@ fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
 
     val sex = rememberSaveable{mutableStateOf(profile?.sex)}
     val male = stringResource(id = R.string.male)
-    val women = stringResource(id = R.string.women)
+    val female = stringResource(id = R.string.female)
 
-    val sexLocal by remember{derivedStateOf { if (sex.value == "male") male else women }}
+    val sexLocal by remember{derivedStateOf { if (sex.value == "male") male else female }}
     var showModal = rememberSaveable { mutableStateOf(false) }
 
 
@@ -702,7 +702,7 @@ fun EditorProfileStateScope.CommonDialog(
 @Composable
 fun EditorProfileStateScope.SingleChoiceView(sex: MutableState<String?>) {
     val radioOptions = listOf(stringResource(id = R.string.male),
-        stringResource(id = R.string.women)
+        stringResource(id = R.string.female)
     )
     val index = if (sex.value == "male") 0 else 1
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[index]) }
@@ -716,7 +716,7 @@ fun EditorProfileStateScope.SingleChoiceView(sex: MutableState<String?>) {
                     .selectable(
                         selected = (text == selectedOption),
                         onClick = {
-                            sex.value = if (index == 0) "male" else "women"
+                            sex.value = if (index == 0) "male" else "female"
                             handleEvent(EditorProfileUiEvent.OnSexChanged(sex.value!!))
                             onOptionSelected(text)
                         }
@@ -727,7 +727,7 @@ fun EditorProfileStateScope.SingleChoiceView(sex: MutableState<String?>) {
                 RadioButton(
                     selected = (text == selectedOption),
                     onClick = {
-                        sex.value = if (index == 0) "male" else "women"
+                        sex.value = if (index == 0) "male" else "female"
                         handleEvent(EditorProfileUiEvent.OnSexChanged(sex.value!!))
                         onOptionSelected(text)
                     }

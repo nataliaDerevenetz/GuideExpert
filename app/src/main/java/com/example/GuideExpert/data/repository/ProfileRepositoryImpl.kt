@@ -117,7 +117,7 @@ class ProfileRepositoryImpl @Inject constructor(
         _profileStateFlow.update { ProfileResources.Idle }
     }
 
-    override suspend fun updateProfile(firstName: String, lastName: String, sex: String, email:String, birthday: Date): Flow<UIResources<UpdateProfileResponse>> = flow {
+    override suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date): Flow<UIResources<UpdateProfileResponse>> = flow {
         try {
             emit(UIResources.Loading)
             profileFlow.value?.let {

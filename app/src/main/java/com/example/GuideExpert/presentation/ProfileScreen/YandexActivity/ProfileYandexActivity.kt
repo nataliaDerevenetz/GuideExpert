@@ -31,11 +31,7 @@ class ProfileYandexActivity : ComponentActivity() {
         launcher.launch(loginOptions)
         lifecycleScope.launch {
             viewmodel.isClosed.collectLatest {
-                if (it) {
-                    Log.d("YANDEX", "FINISH")
-                    Log.d("ACTIVITY", "CLOSED")
-                    finish()
-                }
+                if (it) { finish() }
             }
         }
         setContent {
@@ -50,7 +46,6 @@ class ProfileYandexActivity : ComponentActivity() {
     private  fun handleResult(result: YandexAuthResult) {
         when (result) {
             is YandexAuthResult.Success -> {
-                Log.d("YANDEX",result.token.value)
                 viewmodel.loginYandex(result.token.value)
             }
             is YandexAuthResult.Failure -> {

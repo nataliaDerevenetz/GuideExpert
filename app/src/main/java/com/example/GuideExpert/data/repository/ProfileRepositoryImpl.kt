@@ -92,6 +92,7 @@ class ProfileRepositoryImpl @Inject constructor(
                     removeProfile()
                     _profileStateFlow.update { ProfileResources.Error("Error authorization") }
                 }
+
                 if (result.isSuccessful) {
                     val profile = result.body()?.toProfile()
                     _profileFlow.update { profile }

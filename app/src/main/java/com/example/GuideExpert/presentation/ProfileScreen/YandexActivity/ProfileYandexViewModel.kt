@@ -28,24 +28,20 @@ class ProfileYandexViewModel @Inject constructor(
     val isClosed: StateFlow<Boolean> = _isClosed.asStateFlow()
 
     fun loginYandex(oauthToken : String) {
-        Log.d("VIEW", "111")
         viewModelScope.launch((Dispatchers.IO)) {
             getAuthTokenByYandexUseCase(oauthToken)
                 .collectLatest { resource ->
                     when (resource) {
-                        is UIResources.Error -> { _isClosed.update { true }
-                            Log.d("TAG2", "authToken Error") }
-                        is UIResources.Loading -> { Log.d("TAG2", "authToken Loading") }
+                        is UIResources.Error -> { _isClosed.update { true } }
+                        is UIResources.Loading -> { }
                         is UIResources.Success -> {
                             resource.data.authToken?.let { sessionManager.setAuthToken(it) }
                             resource.data.id?.let { sessionManager.setProfileId(it) }
                             resource.data.time?.let { sessionManager.setProfileTime(it) }
-                            Log.d("VIEW", "222")
                             _isClosed.update { true }
                         }
                     }
                 }
         }
-        Log.d("VIEW", "333")
     }
 }

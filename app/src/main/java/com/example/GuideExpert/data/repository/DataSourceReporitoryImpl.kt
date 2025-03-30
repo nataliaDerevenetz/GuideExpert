@@ -72,6 +72,8 @@ class DataSourceRepositoryImpl @Inject constructor(
         if (result.isSuccessful) {
             val profile = result.body()?.toProfileYandex() ?: ProfileYandex()
             emit(UIResources.Success(profile))
+        } else {
+            emit(UIResources.Error("Unknown error"))
         }
     }.catch { e->
         emit(UIResources.Error(e.localizedMessage ?: "Unknown error"))

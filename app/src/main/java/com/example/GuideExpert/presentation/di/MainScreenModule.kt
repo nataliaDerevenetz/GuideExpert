@@ -7,6 +7,7 @@ import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
 import com.example.GuideExpert.domain.GetExcursionDataUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
+import com.example.GuideExpert.domain.GetExcursionsFavoriteIdUseCase
 import com.example.GuideExpert.domain.GetFiltersBarUseCase
 import com.example.GuideExpert.domain.GetFiltersCategoriesUseCase
 import com.example.GuideExpert.domain.GetFiltersDurationUseCase
@@ -26,6 +27,7 @@ import com.example.GuideExpert.domain.impl.GetExcursionByFiltersUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByQueryUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionDataUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionDetailUseCaseImpl
+import com.example.GuideExpert.domain.impl.GetExcursionsFavoriteIdUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersBarUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersCategoriesUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetFiltersDurationUseCaseImpl
@@ -155,4 +157,10 @@ abstract class MainScreenModule {
     abstract fun bindUpdateProfileUseCase(
         updateProfileUseCaseImpl: UpdateProfileUseCaseImpl
     ) : UpdateProfileUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindGetExcursionsFavoriteIdUseCase(
+        getExcursionsFavoriteIdUseCaseImpl: GetExcursionsFavoriteIdUseCaseImpl
+    ) : GetExcursionsFavoriteIdUseCase
 }

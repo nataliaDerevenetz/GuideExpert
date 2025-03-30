@@ -35,7 +35,6 @@ class DataSourceRepositoryImpl @Inject constructor(
            emit(UIResources.Loading)
            val result = excursionService.getExcursionData(excursionId)
            val data = result.body()?.toExcursionData() ?: ExcursionData()
-           Log.d("TAG", "DATA:::  ${data.title}")
            emit(UIResources.Success(data))
            dbStorage.insertExcursionInfo(data, data.images)
        } catch (e: IOException) {

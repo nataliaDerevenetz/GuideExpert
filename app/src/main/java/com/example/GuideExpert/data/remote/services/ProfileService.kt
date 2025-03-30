@@ -1,5 +1,6 @@
 package com.example.GuideExpert.data.remote.services
 
+import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoriteIdResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.ProfilePOJO
 import com.example.GuideExpert.data.remote.pojo.RemoveAvatarProfileResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.UpdateAvatarProfileResponsePOJO
@@ -35,5 +36,8 @@ interface ProfileService {
                               @Query("last_name") lastName:String, @Query("sex") sex:String?,
                               @Query("email") email:String, @Query("birthday") birthday: Date
                               ): Response<UpdateProfileResponsePOJO>
+
+    @GET("getlistidfavoriteexcursion.php")
+    suspend fun getExcursionsFavoriteId(@Query("profile_id") profileId:Int): Response<ExcursionsFavoriteIdResponsePOJO>
 
 }

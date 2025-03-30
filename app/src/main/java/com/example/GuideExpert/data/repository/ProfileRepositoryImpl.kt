@@ -4,11 +4,13 @@ import android.util.Log
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toAvatar
+import com.example.GuideExpert.data.mappers.toExcursionsFavoriteIdResponse
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toRemoveAvatarProfileResponse
 import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
+import com.example.GuideExpert.domain.models.ExcursionsFavoriteIdResponse
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.RemoveAvatarProfileResponse
 import com.example.GuideExpert.domain.models.UpdateProfileResponse
@@ -44,6 +46,10 @@ class ProfileRepositoryImpl @Inject constructor(
 
     private val _profileStateFlow = MutableStateFlow<ProfileResources>(ProfileResources.Idle)
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
+
+    private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<Int>>(listOf())
+    override val profileFavoriteExcursionIdFlow: StateFlow<List<Int>> get() = _profileFavoriteExcursionIdFlow
+
 
     override suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>> =
         flow {
@@ -171,5 +177,43 @@ class ProfileRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             emit(UIResources.Error(e.message.toString()))
         }
+    }
+
+    override suspend fun getIdExcursionsFavorite(): Flow<UIResources<ExcursionsFavoriteIdResponse>> = flow{
+        Log.d("FAVORITE", "111")
+        try {
+            Log.d("FAVORITE", "222")
+            emit(UIResources.Loading)
+            val result = profileService.getExcursionsFavoriteId(profileFlow.value?.id!!)
+            Log.d("FAVORITE", "333")
+            if (result.code() == 403) {
+                removeProfile()
+            }
+            if (result.isSuccessful) {
+                Log.d("FAVORITE", "444")
+                val response =
+                    result.body()?.toExcursionsFavoriteIdResponse() ?: ExcursionsFavoriteIdResponse()
+                if (response.success) {
+                     profileFlow.value?.let {
+                         updateExcursionsFavoriteId(response.excursions)
+                    }
+                    emit(UIResources.Success(response))
+                } else {
+                    emit(UIResources.Error("Error :: ${response.message}"))
+                }
+            } else {
+                emit(UIResources.Error("Error"))
+            }
+
+
+        }catch (e: Exception) {
+            emit(UIResources.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun updateExcursionsFavoriteId(newExcursionsId: List<Int>) {
+        _profileFavoriteExcursionIdFlow.update { newExcursionsId }
+       // _profileFlow.update { newProfile }
+       // dbStorage.insertProfile(newProfile)
     }
 }

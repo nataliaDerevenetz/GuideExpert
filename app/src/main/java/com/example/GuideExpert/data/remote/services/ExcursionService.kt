@@ -13,10 +13,6 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ExcursionService {
-    //  @Headers("User-Agent: Your-App-Name")
-   // @GET("excursions.json")
-   // suspend fun getExcursions(): Response<List<ExcursionPOJO>>
-
     @GET("config.json")
     suspend fun getConfig(): Response<ConfigPOJO>
 

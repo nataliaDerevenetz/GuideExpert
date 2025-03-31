@@ -9,6 +9,7 @@ import androidx.paging.cachedIn
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.FilterQuery
+import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,30 +62,22 @@ sealed interface SearchEvent {
     data class SetStateListSearch(val state:ExcursionListSearchUIState) : SearchEvent
     data class OnClickFavoriteExcursion(val excursion: Excursion) : SearchEvent
 }
-/*
-sealed class SnackbarEffect {
-    data class ShowSnackbar(val message: String, val actionLabel: String? = null) : SnackbarEffect()
-}*/
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-   // private val excursionRepository: ExcursionRepository,
     val getExcursionByQueryUseCase: GetExcursionByQueryUseCase,
+    private val profileRepository: ProfileRepository,
     private val state: SavedStateHandle
 ) : ViewModel() {
-    //  val excursions: Flow<List<Excursion>> = excursionRepository.getExcursions()
+    val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
 
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()
 
-
     private val sortParamsFlow = MutableStateFlow(SortParams().relevancy)
-
 
     private val _stateView = MutableStateFlow<ExcursionsSearchUIState>(ExcursionsSearchUIState())
     val stateView: StateFlow<ExcursionsSearchUIState> = _stateView.asStateFlow()
-
-
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
@@ -95,7 +88,6 @@ class SearchViewModel @Inject constructor(
     private val currentQueryFlow = savedSearchText
         .debounce(500L)
         .filter { it.isNotEmpty() }
-       // .distinctUntilChanged()
         .onEach {
             onEvent(SearchEvent.SetStateListSearch(ExcursionListSearchUIState.Loading))
         }
@@ -131,17 +123,14 @@ class SearchViewModel @Inject constructor(
             FilterQuery(query, sort)
         }.flowOn(Dispatchers.IO)
             .flatMapLatest {
-                Log.d("TAG", "get list ::${it.query}")
                 getExcursionByQueryUseCase(it)
             }.cachedIn(viewModelScope).collect {
                 if(_stateView.value.contentState is ExcursionListSearchUIState.Loading){
                     updateExcursionListSearchUIState(ExcursionListSearchUIState.Data)
                 }
                 _uiPagingState.value = it
-                Log.d("TAG", "ExcursionListSearchUIState.Data")
             }
     }
-
 
     private fun updateExcursionListSearchUIState(state : ExcursionListSearchUIState) {
         _stateView.update { it.copy(contentState = state) }
@@ -150,7 +139,6 @@ class SearchViewModel @Inject constructor(
     init {
         onEvent(SearchEvent.GetSearchExcursions)
     }
-
 
     private fun setCurrentText(query: String) {
         state["QUERY"] = query

@@ -35,36 +35,33 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchStateScope
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import java.util.ArrayList
 
 @Composable
-fun ExcursionListSearchItem(
+fun SearchStateScope.ExcursionListSearchItem(
     excursion: Excursion,
     onEvent: (SearchEvent) -> Unit,
     navigateToExcursion: (Excursion) -> Unit,
     ) {
+    val favoriteExcursions = profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
+    if (excursion.id in favoriteExcursions.value) {excursion.isFavorite = true} else {excursion.isFavorite = false}
+
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
-        /* colors = CardDefaults.cardColors(
-             containerColor = Color.White, //Card background color
-             contentColor = Color.DarkGray  //Card content color,e.g.text
-         ),*/
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ){
-        Row( modifier = Modifier.clickable{
-            Log.d("TAG", "clickable :: ${excursion.id}")
-            navigateToExcursion(excursion)
-        }
-        ){
+        Row( modifier = Modifier.clickable{ navigateToExcursion(excursion) }) {
             Column ( modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
@@ -85,7 +82,7 @@ fun ExcursionListSearchItem(
                         Image(
                             imageVector = Icons.Filled.Favorite,
                             contentDescription = "featured",
-                            colorFilter = ColorFilter.tint(Color.Gray.copy(alpha = .3f)),
+                            colorFilter = if (excursion.isFavorite) {ColorFilter.tint(Color.Red)} else {ColorFilter.tint(Color.Gray.copy(alpha = .3f))},
                             modifier = Modifier.size(48.dp).align(Alignment.Center))
                         Image(
                             imageVector = Icons.Filled.FavoriteBorder,

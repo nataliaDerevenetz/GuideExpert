@@ -81,6 +81,7 @@ interface SearchStateScope {
     val onEvent : (SearchEvent) -> Unit
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>
     val navigateToExcursion : (Excursion) -> Unit
+    val profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
 }
 
 fun DefaultSearchStateScope(
@@ -91,6 +92,7 @@ fun DefaultSearchStateScope(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
+    profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
 ): SearchStateScope {
     return object : SearchStateScope {
         override val searchListState: StateFlow<PagingData<Excursion>>
@@ -107,6 +109,8 @@ fun DefaultSearchStateScope(
             get() = sendEffectFlow
         override val navigateToExcursion: (Excursion) -> Unit
             get() = navigateToExcursion
+        override val profileFavoriteExcursionIdFlow: StateFlow<List<Int>>
+            get() = profileFavoriteExcursionIdFlow
 
     }
 }
@@ -121,8 +125,9 @@ fun rememberDefaultSearchStateScope(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion) {
-    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion)
+    profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
+): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow) {
+    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,7 +145,8 @@ fun SearchScreen(modifier: Modifier = Modifier,
                             snackbarHostState = snackbarHostState,
                             onEvent = viewModel::onEvent,
                             sendEffectFlow = viewModel::sendEffectFlow,
-                            navigateToExcursion = navigateToExcursion,),
+                            navigateToExcursion = navigateToExcursion,
+                            profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow),
                  searchContent: @Composable SearchStateScope.() -> Unit,
 ){
 

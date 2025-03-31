@@ -74,7 +74,7 @@ fun HomeScreenContentState.ExcursionListFilterItem(
                         Image(
                             imageVector = Icons.Filled.Favorite,
                             contentDescription = "featured",
-                            colorFilter = if (excursion.isFavorite) {ColorFilter.tint(Color.Red)} else {ColorFilter.tint(Color.Gray.copy(alpha = .3f))},//ColorFilter.tint(Color.Gray.copy(alpha = .3f)),
+                            colorFilter = if (excursion.isFavorite) {ColorFilter.tint(Color.Red)} else {ColorFilter.tint(Color.Gray.copy(alpha = .3f))},
                             modifier = Modifier.size(48.dp).align(Alignment.Center))
                         Image(
                             imageVector = Icons.Filled.FavoriteBorder,

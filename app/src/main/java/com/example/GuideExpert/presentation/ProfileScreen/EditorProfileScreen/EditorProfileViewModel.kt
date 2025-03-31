@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -277,7 +278,7 @@ class EditorProfileViewModel @Inject constructor(
                     sex = viewStateFlow.value.sex, email = viewStateFlow.value.email,birthday = viewStateFlow.value.birthday!!)
                     .collectLatest { resources ->
                     when (resources) {
-                        is UIResources.Error -> {
+                        is UIResources.Error -> withContext(Dispatchers.Main){
                             _stateUpdateProfile.update {
                                 it.copy(
                                     contentState = UpdateProfileState.Error(
@@ -288,11 +289,11 @@ class EditorProfileViewModel @Inject constructor(
                             sendEffectFlow("Error updating profile : ${resources.message}")
                         }
 
-                        is UIResources.Loading -> {
+                        is UIResources.Loading -> withContext(Dispatchers.Main){
                             _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Loading) }
                         }
 
-                        is UIResources.Success -> {
+                        is UIResources.Success -> withContext(Dispatchers.Main){
                             _editorOldViewState.update { _editorViewState.value.copy() }
                             _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Success) }
                         }
@@ -306,7 +307,7 @@ class EditorProfileViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             deleteAvatarProfileUseCase().collectLatest { resources ->
                 when (resources) {
-                    is UIResources.Error -> {
+                    is UIResources.Error -> withContext(Dispatchers.Main){
                         _stateRemoveAvatar.update {
                             it.copy(
                                 contentState = RemoveAvatarState.Error(
@@ -317,11 +318,11 @@ class EditorProfileViewModel @Inject constructor(
                         sendEffectFlow("Error deletion avatar : ${resources.message}")
                     }
 
-                    is UIResources.Loading -> {
+                    is UIResources.Loading -> withContext(Dispatchers.Main){
                         _stateRemoveAvatar.update { it.copy(contentState = RemoveAvatarState.Loading) }
                     }
 
-                    is UIResources.Success -> {
+                    is UIResources.Success -> withContext(Dispatchers.Main){
                         _stateRemoveAvatar.update { it.copy(contentState = RemoveAvatarState.Success) }
                     }
                 }
@@ -392,15 +393,15 @@ class EditorProfileViewModel @Inject constructor(
                     if (it != null) {
                         updateAvatarProfileUseCase(it).collectLatest { resources ->
                             when(resources){
-                                is UIResources.Error -> {
+                                is UIResources.Error -> withContext(Dispatchers.Main){
                                     _editorViewState.update { it.copy(selectedPicture = null) }
                                     sendEffectFlow("Error loading avatar : ${resources.message}")
                                     _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Error(resources.message)) }
                                 }
-                                is UIResources.Loading -> {
+                                is UIResources.Loading -> withContext(Dispatchers.Main){
                                     _stateLoadAvatar.update { it.copy(contentState = LoadAvatarState.Loading) }
                                 }
-                                is UIResources.Success -> {
+                                is UIResources.Success -> withContext(Dispatchers.Main){
                                     _editorOldViewState.update { it.copy(tempFileUrl = viewStateFlow.value.tempFileUrl,
                                         selectedPicture = viewStateFlow.value.selectedPicture,
                                         tempFileGalleryUrl = viewStateFlow.value.tempFileGalleryUrl,

@@ -8,6 +8,7 @@ import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.domain.GetExcursionsFavoriteIdUseCase
 import com.example.GuideExpert.domain.GetProfileUseCase
 import com.example.GuideExpert.domain.models.ProfileAuthYandexData
+import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,6 +32,7 @@ sealed interface MainEvent {
 class MainViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     private val sessionManager: SessionManager,
+    private val profileRepository: ProfileRepository,
     private val getProfileUseCase: GetProfileUseCase,
     private val getExcursionsFavoriteIdUseCase: GetExcursionsFavoriteIdUseCase
     ) : ViewModel() {
@@ -39,6 +41,8 @@ class MainViewModel @Inject constructor(
 
     val authToken: StateFlow<String> = sessionManager.getAuthToken()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val profileFlow = profileRepository.profileFlow
 
     private suspend fun getProfileInfo() {
         combine(
@@ -50,6 +54,7 @@ class MainViewModel @Inject constructor(
             .distinctUntilChanged()
             .onEach {
                 getProfileUseCase()
+                getExcursionsFavoriteIdUseCase()
             }
             .flowOn(Dispatchers.IO)
             .collect {}
@@ -71,12 +76,15 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun getIdExcursionsFavorite() {
-        getExcursionsFavoriteIdUseCase().flowOn(Dispatchers.IO).collect{}
+        profileFlow.filter { it != null && it.id !=0 }
+            .distinctUntilChanged()
+            .onEach {
+                getExcursionsFavoriteIdUseCase()
+            }.flowOn(Dispatchers.IO).collectLatest {  }
     }
 
     init {
         handleEvent(MainEvent.GetProfileInfo)
-        handleEvent(MainEvent.GetExcursionsFavoriteId)
     }
 }
 

@@ -21,6 +21,7 @@ import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
+import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,6 +38,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -61,8 +63,11 @@ class HomeViewModel @Inject constructor(
     val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
     val getFiltersCategoriesUseCase: GetFiltersCategoriesUseCase,
     val getSortDefaultUseCase: GetSortDefaultUseCase,
-    val getConfigUseCase: GetConfigUseCase
+    val getConfigUseCase: GetConfigUseCase,
+    private val profileRepository: ProfileRepository,
 ) : ViewModel() {
+
+    val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
@@ -82,8 +87,6 @@ class HomeViewModel @Inject constructor(
 
     private val _configApp = MutableStateFlow(Config())
     val configApp: StateFlow<Config> = _configApp
-
-    val modifications = flowOf(listOf(1,5,8))
 
 
     fun handleEvent(event: ExcursionsUiEvent) {
@@ -182,35 +185,16 @@ class HomeViewModel @Inject constructor(
     private fun setFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("CLICK","setFavoriteExcursionUseCase")
+            profileRepository.updateExcursionsFavoriteId(listOf(2,4))
            // setFavoriteExcursionUseCase(note)
-
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun loadExcursionsFilters() {
-     //   val list = listOf(1,5,8)
-      //  val modifications = flowOf(listOf(1,5,8))
-        Log.d("TAG","loadExcursionsFilters")
         changeFilter.flatMapLatest{
             getExcursionByFiltersUseCase(changeFilter.value)
-        }
-          /*  .map { pagingData ->
-                pagingData
-                    .map {
-                    if (it.id in list) it.isFavorite = true
-                    it
-                }
-            }*/
-         //   .cachedIn(viewModelScope)
-
-            .combine(modifications) { pagingData, modification ->
-                pagingData.map {  if (it.id in modification) it.isFavorite = true
-                    it }
-            }
-            .cachedIn(viewModelScope)
-
-
+        }.cachedIn(viewModelScope)
             .collectLatest{
             _uiPagingState.value = it
         }

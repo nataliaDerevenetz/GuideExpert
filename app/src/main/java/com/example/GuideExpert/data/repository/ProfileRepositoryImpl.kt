@@ -99,6 +99,8 @@ class ProfileRepositoryImpl @Inject constructor(
                     _profileStateFlow.update { ProfileResources.Error("Error authorization") }
                 }
 
+             //   getIdExcursionsFavorite()
+
                 if (result.isSuccessful) {
                     val profile = result.body()?.toProfile()
                     _profileFlow.update { profile }
@@ -179,11 +181,11 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getIdExcursionsFavorite(): Flow<UIResources<ExcursionsFavoriteIdResponse>> = flow{
-        Log.d("FAVORITE", "111")
+    override suspend fun getIdExcursionsFavorite() {
         try {
             Log.d("FAVORITE", "222")
-            emit(UIResources.Loading)
+         //   val localExcursionsFavoriteId = dbStorage.getExcursionsFavoriteId(profileId).firstOrNull()
+         //   updateExcursionsFavoriteId(localExcursionsFavoriteId)
             val result = profileService.getExcursionsFavoriteId(profileFlow.value?.id!!)
             Log.d("FAVORITE", "333")
             if (result.code() == 403) {
@@ -197,22 +199,19 @@ class ProfileRepositoryImpl @Inject constructor(
                      profileFlow.value?.let {
                          updateExcursionsFavoriteId(response.excursions)
                     }
-                    emit(UIResources.Success(response))
                 } else {
-                    emit(UIResources.Error("Error :: ${response.message}"))
+                    Log.d("TAG", "Error loading favorite")
                 }
             } else {
-                emit(UIResources.Error("Error"))
+                Log.d("TAG", "Error loading favorite")
             }
-
-
-        }catch (e: Exception) {
-            emit(UIResources.Error(e.message.toString()))
+        }catch (_: Exception) {
+            Log.d("TAG", "Error loading favorite")
         }
     }
 
-    override suspend fun updateExcursionsFavoriteId(newExcursionsId: List<Int>) {
-        _profileFavoriteExcursionIdFlow.update { newExcursionsId }
+    override suspend fun updateExcursionsFavoriteId(ids: List<Int>) {
+        _profileFavoriteExcursionIdFlow.update { ids }
        // _profileFlow.update { newProfile }
        // dbStorage.insertProfile(newProfile)
     }

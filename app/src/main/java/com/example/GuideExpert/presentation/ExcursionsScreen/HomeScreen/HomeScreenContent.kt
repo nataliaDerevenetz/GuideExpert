@@ -210,7 +210,8 @@ fun HomeScreenContent(
                     ExcursionListFilterItem(
                         excursion,
                         state.onEvent,
-                        state.navigateToExcursion
+                        state.navigateToExcursion,
+                        viewModel.profileFavoriteExcursionIdFlow
                     )
                 }
             }

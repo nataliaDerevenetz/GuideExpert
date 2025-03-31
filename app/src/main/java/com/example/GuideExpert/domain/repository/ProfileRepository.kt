@@ -22,6 +22,6 @@ interface ProfileRepository {
     suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>>
     suspend fun removeAvatarProfile():Flow<UIResources<RemoveAvatarProfileResponse>>
     suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date):Flow<UIResources<UpdateProfileResponse>>
-    suspend fun getIdExcursionsFavorite():Flow<UIResources<ExcursionsFavoriteIdResponse>>
+    suspend fun getIdExcursionsFavorite()
     suspend fun updateExcursionsFavoriteId(newExcursionsIs: List<Int>)
 }

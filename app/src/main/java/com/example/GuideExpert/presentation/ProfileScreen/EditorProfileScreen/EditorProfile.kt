@@ -124,6 +124,7 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                             stateRemoveAvatar = viewModel.stateRemoveAvatar,
                             stateUpdateProfile = viewModel.stateUpdateProfile,
                             snackbarHostState = snackbarHostState,
+                            isEditeProfile = viewModel.isEditeProfile
                             ),) {
 
     val stateLoadAvatar by scopeState.stateLoadAvatar.collectAsStateWithLifecycle()
@@ -247,6 +248,7 @@ interface EditorProfileStateScope {
     val stateUpdateProfile: StateFlow<UpdateProfileUIState>
     val stateRemoveAvatar: StateFlow<RemoveAvatarUIState>
     val snackbarHostState: SnackbarHostState
+    val isEditeProfile: StateFlow<Boolean>
 }
 
 
@@ -258,7 +260,8 @@ fun DefaultEditorProfileStateScope(
     effectFlow : Flow<SnackbarEffect>,
     stateUpdateProfile: StateFlow<UpdateProfileUIState>,
     stateRemoveAvatar: StateFlow<RemoveAvatarUIState>,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    isEditeProfile: StateFlow<Boolean>
 ): EditorProfileStateScope {
     return object : EditorProfileStateScope {
         override val profile: StateFlow<Profile?>
@@ -277,6 +280,8 @@ fun DefaultEditorProfileStateScope(
             get() = stateRemoveAvatar
         override val snackbarHostState:SnackbarHostState
             get() = snackbarHostState
+        override val isEditeProfile:StateFlow<Boolean>
+            get() = isEditeProfile
     }
 }
 
@@ -289,9 +294,10 @@ fun rememberDefaultEditorProfileStateScope(
     effectFlow : Flow<SnackbarEffect>,
     stateUpdateProfile: StateFlow<UpdateProfileUIState>,
     stateRemoveAvatar: StateFlow<RemoveAvatarUIState>,
-    snackbarHostState: SnackbarHostState
-): EditorProfileStateScope = remember(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow,stateUpdateProfile,stateRemoveAvatar,snackbarHostState) {
-    DefaultEditorProfileStateScope(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow,stateUpdateProfile,stateRemoveAvatar,snackbarHostState)
+    snackbarHostState: SnackbarHostState,
+    isEditeProfile: StateFlow<Boolean>
+): EditorProfileStateScope = remember(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow,stateUpdateProfile,stateRemoveAvatar,snackbarHostState,isEditeProfile) {
+    DefaultEditorProfileStateScope(profile,viewStateFlow,handleEvent,stateLoadAvatar,effectFlow,stateUpdateProfile,stateRemoveAvatar,snackbarHostState,isEditeProfile)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -300,6 +306,7 @@ fun rememberDefaultEditorProfileStateScope(
 fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
 {
     val profile by profile.collectAsStateWithLifecycle()
+    val isEditeProfile by isEditeProfile.collectAsStateWithLifecycle()
 
     var firstName by rememberSaveable{mutableStateOf(profile?.firstName)}
     var lastName by rememberSaveable{mutableStateOf(profile?.lastName)}
@@ -469,10 +476,10 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
             }
 
             Button(
+                enabled = isEditeProfile,
                 onClick = {
                     isErrorEmail = !email.isValidEmail()
                     if (email.isValidEmail() && selectedDate.value.isValidBirthday()) {
-                        Log.d("SAVE", "OK")
                         handleEvent(EditorProfileUiEvent.OnUpdateProfile)
                     }
 

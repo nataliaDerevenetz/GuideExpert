@@ -137,9 +137,11 @@ class EditorProfileViewModel @Inject constructor(
     private val _stateUpdateProfile = MutableStateFlow<UpdateProfileUIState>(UpdateProfileUIState())
     val stateUpdateProfile: StateFlow<UpdateProfileUIState> = _stateUpdateProfile.asStateFlow()
 
-
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
+
+    private val _isEditeProfile = MutableStateFlow(false)
+    val isEditeProfile: StateFlow<Boolean> = _isEditeProfile.asStateFlow()
 
     // receives user generated events and processes them in the provided coroutine context
     @RequiresApi(Build.VERSION_CODES.P)
@@ -213,22 +215,27 @@ class EditorProfileViewModel @Inject constructor(
 
             is EditorProfileUiEvent.OnFirstNameChanged -> {
                 setFirstName(event.firstName)
+                checkEditeProfile()
             }
 
             is EditorProfileUiEvent.OnLastNameChanged -> {
                 setLastName(event.lastName)
+                checkEditeProfile()
             }
 
             is EditorProfileUiEvent.OnSexChanged -> {
                 setSex(event.sex)
+                checkEditeProfile()
             }
 
             is EditorProfileUiEvent.OnEmailChanged -> {
                 setEmail(event.email)
+                checkEditeProfile()
             }
 
             is EditorProfileUiEvent.OnBirthdayChanged -> {
                 setBirthday(event.birthday)
+                checkEditeProfile()
             }
 
             is EditorProfileUiEvent.OnLoadProfile -> {
@@ -259,6 +266,10 @@ class EditorProfileViewModel @Inject constructor(
         }
     }
 
+    private fun checkEditeProfile() {
+        if (_editorOldViewState.value != _editorViewState.value) {_isEditeProfile.update { true }}
+        else {_isEditeProfile.update { false }}
+    }
     private fun setIdleUpdateProfileUIState() {
         _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Idle) }
     }
@@ -294,6 +305,7 @@ class EditorProfileViewModel @Inject constructor(
                         }
 
                         is UIResources.Success -> withContext(Dispatchers.Main){
+                            _isEditeProfile.update { false }
                             _editorOldViewState.update { _editorViewState.value.copy() }
                             _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Success) }
                         }
@@ -418,7 +430,6 @@ class EditorProfileViewModel @Inject constructor(
     }
 
     suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {
-        Log.d("MODEL", message)
         _effectChannel.send(SnackbarEffect.ShowSnackbar(message))
     }
 

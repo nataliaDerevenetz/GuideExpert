@@ -51,9 +51,7 @@ fun HomeScreenContentState.ExcursionListFilterItem(
          ),
         shape = RoundedCornerShape(15.dp),
     ){
-        Row( modifier = Modifier.clickable{
-            Log.d("TAG", "clickable :: ${excursion.id}")
-            navigateToExcursion(excursion) }){
+        Row( modifier = Modifier.clickable{ navigateToExcursion(excursion) }){
             Column ( modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()

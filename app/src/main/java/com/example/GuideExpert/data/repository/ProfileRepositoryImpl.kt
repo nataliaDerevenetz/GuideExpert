@@ -186,7 +186,7 @@ class ProfileRepositoryImpl @Inject constructor(
             Log.d("FAVORITE", "222")
             val localExcursionsFavoriteId = dbStorage.getExcursionsFavoriteId().firstOrNull()
             if (localExcursionsFavoriteId != null) {
-                updateExcursionsFavoriteId(localExcursionsFavoriteId)
+                _profileFavoriteExcursionIdFlow.update { localExcursionsFavoriteId }
             }
             val result = profileService.getExcursionsFavoriteId(profileFlow.value?.id!!)
             Log.d("FAVORITE", "333")

@@ -31,32 +31,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeScreenContentState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun ExcursionListFilterItem(
-    excursion: Excursion,
-    onEvent: (ExcursionsUiEvent) -> Unit,
-    navigateToExcursion: (Excursion) -> Unit,
-    profileFavoriteExcursionIdFlow: StateFlow<List<Int>>,
+fun HomeScreenContentState.ExcursionListFilterItem(
+    excursion: Excursion
 ) {
-    val aaa = profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
-    if (excursion.id in aaa.value) {excursion.isFavorite = true} else {excursion.isFavorite = false}
+    val favoriteExcursions = profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
+    if (excursion.id in favoriteExcursions.value) {excursion.isFavorite = true} else {excursion.isFavorite = false}
 
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
          colors = CardDefaults.cardColors(
-             containerColor = Color.Transparent, //Card background color
-           //  contentColor = Color.DarkGray  //Card content color,e.g.text
+             containerColor = Color.Transparent,
          ),
         shape = RoundedCornerShape(15.dp),
-      //  elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ){
-
-        //  Log.e("TEST","row")
         Row( modifier = Modifier.clickable{
             Log.d("TAG", "clickable :: ${excursion.id}")
             navigateToExcursion(excursion) }){

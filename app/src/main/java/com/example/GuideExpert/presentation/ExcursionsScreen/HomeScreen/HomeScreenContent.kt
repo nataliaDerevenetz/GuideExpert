@@ -73,6 +73,7 @@ class HomeScreenContentState(
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>,
     val navigateToExcursion : (Excursion) -> Unit,
     val getFiltersBar:() -> List<Filter>,
+    val profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
 )
 
 @Composable
@@ -84,8 +85,9 @@ fun rememberHomeScreenContentState(
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion: (Excursion) -> Unit,
     getFiltersBar:() -> List<Filter>,
-): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar) {
-    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar)
+    profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
+): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow) {
+    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow)
 }
 
 context(SharedTransitionScope)
@@ -110,7 +112,8 @@ fun HomeScreenContent(
         onEvent = viewModel::handleEvent,
         sendEffectFlow = viewModel::sendEffectFlow,
         navigateToExcursion = navigateToExcursion,
-        getFiltersBar = viewModel::getFiltersBar
+        getFiltersBar = viewModel::getFiltersBar,
+        profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow
     )
 ) {
 
@@ -207,12 +210,7 @@ fun HomeScreenContent(
             ) { index ->
                 val excursion = excursionPagingItems[index]
                 if (excursion != null) {
-                    ExcursionListFilterItem(
-                        excursion,
-                        state.onEvent,
-                        state.navigateToExcursion,
-                        viewModel.profileFavoriteExcursionIdFlow
-                    )
+                    state.ExcursionListFilterItem(excursion)
                 }
             }
             item {

@@ -12,4 +12,6 @@ interface DBStorage {
     suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>)
     fun getProfile(profileId:Int): Flow<Profile?>
     suspend fun insertProfile(profile: Profile)
+    fun getExcursionsFavoriteId(): Flow<List<Int>>
+    suspend fun insertExcursionsFavoriteId(excursionsId: List<Int>)
 }

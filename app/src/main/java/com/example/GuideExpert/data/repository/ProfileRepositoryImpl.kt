@@ -184,8 +184,10 @@ class ProfileRepositoryImpl @Inject constructor(
     override suspend fun getIdExcursionsFavorite() {
         try {
             Log.d("FAVORITE", "222")
-         //   val localExcursionsFavoriteId = dbStorage.getExcursionsFavoriteId(profileId).firstOrNull()
-         //   updateExcursionsFavoriteId(localExcursionsFavoriteId)
+            val localExcursionsFavoriteId = dbStorage.getExcursionsFavoriteId().firstOrNull()
+            if (localExcursionsFavoriteId != null) {
+                updateExcursionsFavoriteId(localExcursionsFavoriteId)
+            }
             val result = profileService.getExcursionsFavoriteId(profileFlow.value?.id!!)
             Log.d("FAVORITE", "333")
             if (result.code() == 403) {
@@ -211,8 +213,9 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateExcursionsFavoriteId(ids: List<Int>) {
-        _profileFavoriteExcursionIdFlow.update { ids }
-       // _profileFlow.update { newProfile }
-       // dbStorage.insertProfile(newProfile)
+        profileFlow.value?.let {
+            _profileFavoriteExcursionIdFlow.update { ids }
+            dbStorage.insertExcursionsFavoriteId(ids)
+        }
     }
 }

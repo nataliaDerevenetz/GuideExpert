@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.example.GuideExpert.data.local.models.AvatarEntity
 import com.example.GuideExpert.data.local.models.ExcursionSearchWithData
+import com.example.GuideExpert.data.local.models.ExcursionsFavoriteIdEntity
 import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
 import com.example.GuideExpert.data.local.models.ProfileEntity
 import com.example.GuideExpert.data.local.models.ProfileWithAvatar
@@ -36,4 +37,21 @@ interface ProfileDao {
         deleteAvatarById(profileWithAvatar.profile.id)
         profileWithAvatar.avatar?.let { insertAvatar(it) }
     }
+
+    @Query("SELECT * FROM excursionsFavoriteIdEntity")
+    fun getExcursionsFavoriteId() : Flow<List<ExcursionsFavoriteIdEntity>>
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFavoriteExcursionId(ids: List<ExcursionsFavoriteIdEntity>)
+
+    @Query("DELETE FROM excursionsFavoriteIdEntity")
+    suspend fun deleteFavoriteExcursionId()
+
+    @Transaction
+    suspend fun insertExcursionsFavoriteId(excursionsId: List<ExcursionsFavoriteIdEntity>) {
+        deleteFavoriteExcursionId()
+        insertFavoriteExcursionId(excursionsId)
+    }
+
 }

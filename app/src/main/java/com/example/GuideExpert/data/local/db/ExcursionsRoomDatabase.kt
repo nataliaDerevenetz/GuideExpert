@@ -12,7 +12,7 @@ import com.example.GuideExpert.data.local.dao.ProfileDao
 import com.example.GuideExpert.data.local.dao.RemoteKeyDao
 import com.example.GuideExpert.data.local.models.AvatarEntity
 import com.example.GuideExpert.data.local.models.ExcursionDataEntity
-import com.example.GuideExpert.data.local.models.ExcursionsFavoriteEntity
+import com.example.GuideExpert.data.local.models.ExcursionFavoriteEntity
 import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
 import com.example.GuideExpert.data.local.models.ExcursionSearchEntity
 import com.example.GuideExpert.data.local.models.ImageEntity
@@ -25,7 +25,7 @@ import com.example.GuideExpert.data.local.models.RemoteKeyEntity
 @Database(entities = [ExcursionSearchEntity::class, RemoteKeyEntity::class, ExcursionFilterEntity::class,
                     ImageEntity::class, ExcursionDataEntity::class, ImagePreviewSearchEntity::class,
                     ImagePreviewFilterEntity::class, ProfileEntity::class, AvatarEntity::class,
-                    ExcursionsFavoriteEntity::class], version = 1,exportSchema = false)
+                    ExcursionFavoriteEntity::class], version = 1,exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class ExcursionsRoomDatabase: RoomDatabase() {
     abstract fun excursionSearchDao() : ExcursionSearchDao

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class ExcursionsFavoriteEntity(
+data class ExcursionFavoriteEntity(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo val id: Int,
     @ColumnInfo val excursionId: Int,

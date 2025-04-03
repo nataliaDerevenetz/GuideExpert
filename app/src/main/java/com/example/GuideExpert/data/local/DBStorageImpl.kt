@@ -63,9 +63,13 @@ class DBStorageImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertExcursionsFavorite(excursionsId: List<ExcursionFavorite>) {
-        profileDao.insertExcursionsFavorite(excursionsId.map {
+    override suspend fun insertAllExcursionsFavorite(excursions: List<ExcursionFavorite>) {
+        profileDao.insertAllExcursionsFavorite(excursions.map {
             it.toExcursionsFavoriteEntity()
         })
+    }
+
+    override suspend fun insertExcursionFavorite(excursion: ExcursionFavorite) {
+        profileDao.insertExcursionFavorite(excursion.toExcursionsFavoriteEntity())
     }
 }

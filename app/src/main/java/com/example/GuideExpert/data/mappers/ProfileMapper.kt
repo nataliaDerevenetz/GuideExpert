@@ -1,7 +1,7 @@
 package com.example.GuideExpert.data.mappers
 
 import com.example.GuideExpert.data.local.models.AvatarEntity
-import com.example.GuideExpert.data.local.models.ExcursionsFavoriteEntity
+import com.example.GuideExpert.data.local.models.ExcursionFavoriteEntity
 import com.example.GuideExpert.data.local.models.ProfileEntity
 import com.example.GuideExpert.data.local.models.ProfileWithAvatar
 import com.example.GuideExpert.data.remote.pojo.AvatarPOJO
@@ -52,7 +52,7 @@ fun ProfileWithAvatar.toProfile() = Profile(
 
 fun AvatarEntity.toAvatar() =  Avatar(id = id, profileId = profileId, url = url)
 
-fun ExcursionsFavoriteEntity.toExcursionFavorite() = ExcursionFavorite(id=id,excursionId=excursionId,timestamp=timestamp)
+fun ExcursionFavoriteEntity.toExcursionFavorite() = ExcursionFavorite(id=id,excursionId=excursionId,timestamp=timestamp)
 
-fun ExcursionFavorite.toExcursionsFavoriteEntity() =  ExcursionsFavoriteEntity(id=id,excursionId=excursionId,timestamp)
+fun ExcursionFavorite.toExcursionsFavoriteEntity() =  ExcursionFavoriteEntity(id=id,excursionId=excursionId,timestamp)
 

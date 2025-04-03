@@ -5,8 +5,8 @@ import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.domain.models.RemoveAvatarProfileResponse
-import com.example.GuideExpert.domain.models.UpdateProfileResponse
+import com.example.GuideExpert.domain.models.MessageResponse
+import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import okhttp3.MultipartBody
@@ -20,8 +20,9 @@ interface ProfileRepository {
     suspend fun updateProfile(newProfile: Profile)
     suspend fun removeProfile()
     suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>>
-    suspend fun removeAvatarProfile():Flow<UIResources<RemoveAvatarProfileResponse>>
-    suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date):Flow<UIResources<UpdateProfileResponse>>
+    suspend fun removeAvatarProfile():Flow<UIResources<MessageResponse>>
+    suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date):Flow<UIResources<MessageResponse>>
     suspend fun getExcursionsFavorite()
     suspend fun updateExcursionsFavoriteId(excursions: List<ExcursionFavorite>)
+    suspend fun setFavoriteExcursion(excursionId: Int):Flow<UIResources<SetFavoriteExcursionResponse>>
 }

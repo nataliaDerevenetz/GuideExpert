@@ -88,6 +88,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(libs.material)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.media3.common.ktx)
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-paging:$room_version")

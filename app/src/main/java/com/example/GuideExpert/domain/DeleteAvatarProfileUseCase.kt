@@ -1,10 +1,9 @@
 package com.example.GuideExpert.domain
 
 import com.example.GuideExpert.data.repository.UIResources
-import com.example.GuideExpert.domain.models.Avatar
-import com.example.GuideExpert.domain.models.RemoveAvatarProfileResponse
+import com.example.GuideExpert.domain.models.MessageResponse
 import kotlinx.coroutines.flow.Flow
 
 interface DeleteAvatarProfileUseCase {
-    suspend operator fun invoke() : Flow<UIResources<RemoveAvatarProfileResponse>>
+    suspend operator fun invoke() : Flow<UIResources<MessageResponse>>
 }

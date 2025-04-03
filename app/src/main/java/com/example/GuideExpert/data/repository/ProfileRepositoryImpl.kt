@@ -7,14 +7,15 @@ import com.example.GuideExpert.data.mappers.toAvatar
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toRemoveAvatarProfileResponse
+import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.ExcursionFavorite
-import com.example.GuideExpert.domain.models.ExcursionsFavoriteResponse
+import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
 import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.domain.models.RemoveAvatarProfileResponse
-import com.example.GuideExpert.domain.models.UpdateProfileResponse
+import com.example.GuideExpert.domain.models.MessageResponse
+import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -127,7 +128,7 @@ class ProfileRepositoryImpl @Inject constructor(
         _profileStateFlow.update { ProfileResources.Idle }
     }
 
-    override suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date): Flow<UIResources<UpdateProfileResponse>> = flow {
+    override suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date): Flow<UIResources<MessageResponse>> = flow {
         try {
             emit(UIResources.Loading)
             profileFlow.value?.let {
@@ -136,7 +137,7 @@ class ProfileRepositoryImpl @Inject constructor(
                     removeProfile()
                 }
                 if (result.isSuccessful) {
-                   val response = result.body()?.toUpdateProfileResponse() ?: UpdateProfileResponse()
+                   val response = result.body()?.toUpdateProfileResponse() ?: MessageResponse()
                     if (response.success) {
                         profileFlow.value?.let {
                             updateProfile(it.copy(firstName = firstName, lastName =  lastName, sex = sex, email = email, birthday = birthday))
@@ -156,7 +157,7 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeAvatarProfile(): Flow<UIResources<RemoveAvatarProfileResponse>> = flow {
+    override suspend fun removeAvatarProfile(): Flow<UIResources<MessageResponse>> = flow {
         try {
             emit(UIResources.Loading)
             val result = profileService.removeAvatarProfile(profileFlow.value?.id!!)
@@ -165,7 +166,7 @@ class ProfileRepositoryImpl @Inject constructor(
             }
             if (result.isSuccessful) {
                 val response =
-                    result.body()?.toRemoveAvatarProfileResponse() ?: RemoveAvatarProfileResponse()
+                    result.body()?.toRemoveAvatarProfileResponse() ?: MessageResponse()
                 if (response.success) {
                     profileFlow.value?.let {
                         updateProfile(it.copy(avatar = null))
@@ -184,20 +185,17 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun getExcursionsFavorite() {
         try {
-            Log.d("FAVORITE", "222")
             val localExcursionsFavoriteId = dbStorage.getExcursionsFavorite().firstOrNull()
             if (localExcursionsFavoriteId != null) {
                 _profileFavoriteExcursionIdFlow.update { localExcursionsFavoriteId }
             }
             val result = profileService.getExcursionsFavorite(profileFlow.value?.id!!)
-            Log.d("FAVORITE", "333")
             if (result.code() == 403) {
                 removeProfile()
             }
             if (result.isSuccessful) {
-                Log.d("FAVORITE", "444")
                 val response =
-                    result.body()?.toExcursionsFavoriteResponse() ?: ExcursionsFavoriteResponse()
+                    result.body()?.toExcursionsFavoriteResponse() ?: ExcursionFavoriteResponse()
                 if (response.success) {
                      profileFlow.value?.let {
                          updateExcursionsFavoriteId(response.excursions)
@@ -216,7 +214,39 @@ class ProfileRepositoryImpl @Inject constructor(
     override suspend fun updateExcursionsFavoriteId(excursions: List<ExcursionFavorite>) {
         profileFlow.value?.let {
             _profileFavoriteExcursionIdFlow.update { excursions }
-            dbStorage.insertExcursionsFavorite(excursions)
+            dbStorage.insertAllExcursionsFavorite(excursions)
         }
+    }
+
+    override suspend fun setFavoriteExcursion(excursionId: Int): Flow<UIResources<SetFavoriteExcursionResponse>> = flow {
+        Log.d("SETFAV", "000")
+        try {
+            emit(UIResources.Loading)
+            Log.d("SETFAV", "111")
+            val result = profileService.setExcursionFavorite(profileFlow.value?.id!!,excursionId)
+            if (result.code() == 403) {
+                removeProfile()
+            }
+            if (result.isSuccessful) {
+                val response =
+                    result.body()?.toSetFavoriteExcursionResponse() ?: SetFavoriteExcursionResponse()
+                if (response.success) {
+                    dbStorage.insertExcursionFavorite(response.excursion!!)
+                    _profileFavoriteExcursionIdFlow.update { it + response.excursion }
+                   /* profileFlow.value?.let {
+                        updateProfile(it.copy(avatar = null))
+                    }*/
+                    emit(UIResources.Success(response))
+                } else {
+                    emit(UIResources.Error("Error :: ${response.message}"))
+                }
+            } else {
+                emit(UIResources.Error("Error set favorite"))
+            }
+        } catch (e: Exception) {
+            Log.d("TAG", "Error set favorite")
+            emit(UIResources.Error(e.message.toString()))
+        }
+
     }
 }

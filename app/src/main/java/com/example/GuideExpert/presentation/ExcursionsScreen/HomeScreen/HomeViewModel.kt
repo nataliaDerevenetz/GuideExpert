@@ -17,11 +17,13 @@ import com.example.GuideExpert.domain.GetFiltersDurationUseCase
 import com.example.GuideExpert.domain.GetFiltersGroupsUseCase
 import com.example.GuideExpert.domain.GetFiltersSortUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
+import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.repository.ProfileRepository
+import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.UpdateProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -65,6 +68,7 @@ class HomeViewModel @Inject constructor(
     val getSortDefaultUseCase: GetSortDefaultUseCase,
     val getConfigUseCase: GetConfigUseCase,
     private val profileRepository: ProfileRepository,
+    val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase
 ) : ViewModel() {
 
     val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
@@ -186,7 +190,30 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("CLICK","setFavoriteExcursionUseCase")
            // profileRepository.updateExcursionsFavoriteId(listOf(2,4))
-           // setFavoriteExcursionUseCase(excursionId)
+            setFavoriteExcursionUseCase(excursion.id).collectLatest { resources ->
+                when (resources) {
+                    is UIResources.Error -> withContext(Dispatchers.Main){
+                      /*  _stateUpdateProfile.update {
+                            it.copy(
+                                contentState = UpdateProfileState.Error(
+                                    resources.message
+                                )
+                            )
+                        }*/
+                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                    }
+
+                    is UIResources.Loading -> withContext(Dispatchers.Main){
+                       // _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Loading) }
+                    }
+
+                    is UIResources.Success -> withContext(Dispatchers.Main){
+                       // _isEditeProfile.update { false }
+                       // _editorOldViewState.update { _editorViewState.value.copy() }
+                       // _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Success) }
+                    }
+                }
+            }
         }
     }
 

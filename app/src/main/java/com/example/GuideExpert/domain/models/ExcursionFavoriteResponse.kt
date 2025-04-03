@@ -1,6 +1,6 @@
 package com.example.GuideExpert.domain.models
 
-data class ExcursionsFavoriteResponse(
+data class ExcursionFavoriteResponse(
     val success: Boolean = false,
     val message: String ="",
     val excursions:List<ExcursionFavorite> = listOf()

@@ -1,11 +1,10 @@
 package com.example.GuideExpert.data.remote.services
 
-import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoriteIdResponsePOJO
+import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoriteResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.ProfilePOJO
 import com.example.GuideExpert.data.remote.pojo.RemoveAvatarProfileResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.UpdateAvatarProfileResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.UpdateProfileResponsePOJO
-import com.example.GuideExpert.domain.models.UpdateProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -38,6 +37,6 @@ interface ProfileService {
                               ): Response<UpdateProfileResponsePOJO>
 
     @GET("getlistidfavoriteexcursion.php")
-    suspend fun getExcursionsFavoriteId(@Query("profile_id") profileId:Int): Response<ExcursionsFavoriteIdResponsePOJO>
+    suspend fun getExcursionsFavorite(@Query("profile_id") profileId:Int): Response<ExcursionsFavoriteResponsePOJO>
 
 }

@@ -185,7 +185,7 @@ class HomeViewModel @Inject constructor(
     private fun setFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("CLICK","setFavoriteExcursionUseCase")
-            profileRepository.updateExcursionsFavoriteId(listOf(2,4))
+           // profileRepository.updateExcursionsFavoriteId(listOf(2,4))
            // setFavoriteExcursionUseCase(excursionId)
         }
     }

@@ -5,13 +5,14 @@ import com.example.GuideExpert.data.local.dao.ImageDao
 import com.example.GuideExpert.data.local.dao.ProfileDao
 import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionDataEntity
-import com.example.GuideExpert.data.mappers.toExcursionsFavoriteIdEntity
+import com.example.GuideExpert.data.mappers.toExcursionFavorite
+import com.example.GuideExpert.data.mappers.toExcursionsFavoriteEntity
 import com.example.GuideExpert.data.mappers.toImage
 import com.example.GuideExpert.data.mappers.toImageEntity
-import com.example.GuideExpert.data.mappers.toInt
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toProfileWithAvatar
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.Profile
 import kotlinx.coroutines.flow.Flow
@@ -54,17 +55,17 @@ class DBStorageImpl @Inject constructor(
         profileDao.insertAll(profile.toProfileWithAvatar())
     }
 
-    override fun getExcursionsFavoriteId(): Flow<List<Int>> {
-        return profileDao.getExcursionsFavoriteId().map {
+    override fun getExcursionsFavorite(): Flow<List<ExcursionFavorite>> {
+        return profileDao.getExcursionsFavorite().map {
             favorite -> favorite.map {
-                it.toInt()
+                it.toExcursionFavorite()
             }
         }
     }
 
-    override suspend fun insertExcursionsFavoriteId(excursionsId: List<Int>) {
-        profileDao.insertExcursionsFavoriteId(excursionsId.map {
-            it.toExcursionsFavoriteIdEntity()
+    override suspend fun insertExcursionsFavorite(excursionsId: List<ExcursionFavorite>) {
+        profileDao.insertExcursionsFavorite(excursionsId.map {
+            it.toExcursionsFavoriteEntity()
         })
     }
 }

@@ -8,6 +8,6 @@ class GetExcursionsFavoriteIdUseCaseImpl @Inject constructor(
     private val profileRepository: ProfileRepository
 ): GetExcursionsFavoriteIdUseCase {
     override suspend operator fun invoke() {
-        return profileRepository.getIdExcursionsFavorite()
+        return profileRepository.getExcursionsFavorite()
     }
 }

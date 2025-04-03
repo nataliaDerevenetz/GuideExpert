@@ -4,13 +4,14 @@ import android.util.Log
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toAvatar
-import com.example.GuideExpert.data.mappers.toExcursionsFavoriteIdResponse
+import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toRemoveAvatarProfileResponse
 import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
-import com.example.GuideExpert.domain.models.ExcursionsFavoriteIdResponse
+import com.example.GuideExpert.domain.models.ExcursionFavorite
+import com.example.GuideExpert.domain.models.ExcursionsFavoriteResponse
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.RemoveAvatarProfileResponse
 import com.example.GuideExpert.domain.models.UpdateProfileResponse
@@ -47,8 +48,8 @@ class ProfileRepositoryImpl @Inject constructor(
     private val _profileStateFlow = MutableStateFlow<ProfileResources>(ProfileResources.Idle)
     override val profileStateFlow: StateFlow<ProfileResources> get() = _profileStateFlow
 
-    private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<Int>>(listOf())
-    override val profileFavoriteExcursionIdFlow: StateFlow<List<Int>> get() = _profileFavoriteExcursionIdFlow
+    private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<ExcursionFavorite>>(listOf())
+    override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>> get() = _profileFavoriteExcursionIdFlow
 
 
     override suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>> =
@@ -181,14 +182,14 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getIdExcursionsFavorite() {
+    override suspend fun getExcursionsFavorite() {
         try {
             Log.d("FAVORITE", "222")
-            val localExcursionsFavoriteId = dbStorage.getExcursionsFavoriteId().firstOrNull()
+            val localExcursionsFavoriteId = dbStorage.getExcursionsFavorite().firstOrNull()
             if (localExcursionsFavoriteId != null) {
                 _profileFavoriteExcursionIdFlow.update { localExcursionsFavoriteId }
             }
-            val result = profileService.getExcursionsFavoriteId(profileFlow.value?.id!!)
+            val result = profileService.getExcursionsFavorite(profileFlow.value?.id!!)
             Log.d("FAVORITE", "333")
             if (result.code() == 403) {
                 removeProfile()
@@ -196,7 +197,7 @@ class ProfileRepositoryImpl @Inject constructor(
             if (result.isSuccessful) {
                 Log.d("FAVORITE", "444")
                 val response =
-                    result.body()?.toExcursionsFavoriteIdResponse() ?: ExcursionsFavoriteIdResponse()
+                    result.body()?.toExcursionsFavoriteResponse() ?: ExcursionsFavoriteResponse()
                 if (response.success) {
                      profileFlow.value?.let {
                          updateExcursionsFavoriteId(response.excursions)
@@ -212,10 +213,10 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateExcursionsFavoriteId(ids: List<Int>) {
+    override suspend fun updateExcursionsFavoriteId(excursions: List<ExcursionFavorite>) {
         profileFlow.value?.let {
-            _profileFavoriteExcursionIdFlow.update { ids }
-            dbStorage.insertExcursionsFavoriteId(ids)
+            _profileFavoriteExcursionIdFlow.update { excursions }
+            dbStorage.insertExcursionsFavorite(excursions)
         }
     }
 }

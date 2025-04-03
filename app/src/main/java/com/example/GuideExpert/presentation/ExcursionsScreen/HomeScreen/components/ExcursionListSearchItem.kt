@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,8 +54,8 @@ fun SearchStateScope.ExcursionListSearchItem(
     onEvent: (SearchEvent) -> Unit,
     navigateToExcursion: (Excursion) -> Unit,
     ) {
-    val favoriteExcursions = profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
-    if (excursion.id in favoriteExcursions.value) {excursion.isFavorite = true} else {excursion.isFavorite = false}
+    val favoriteExcursions by profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
+    if (favoriteExcursions.any { it.excursionId == excursion.id }) {excursion.isFavorite = true} else {excursion.isFavorite = false}
 
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),

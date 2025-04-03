@@ -51,6 +51,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ColumnExcursionShimmer
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
@@ -73,7 +74,7 @@ class HomeScreenContentState(
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>,
     val navigateToExcursion : (Excursion) -> Unit,
     val getFiltersBar:() -> List<Filter>,
-    val profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
+    val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
 )
 
 @Composable
@@ -85,7 +86,7 @@ fun rememberHomeScreenContentState(
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion: (Excursion) -> Unit,
     getFiltersBar:() -> List<Filter>,
-    profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
 ): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow) {
     HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow)
 }

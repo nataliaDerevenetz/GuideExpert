@@ -1,18 +1,14 @@
 package com.example.GuideExpert.data.local.dao
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.example.GuideExpert.data.local.models.AvatarEntity
-import com.example.GuideExpert.data.local.models.ExcursionSearchWithData
-import com.example.GuideExpert.data.local.models.ExcursionsFavoriteIdEntity
-import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
+import com.example.GuideExpert.data.local.models.ExcursionsFavoriteEntity
 import com.example.GuideExpert.data.local.models.ProfileEntity
 import com.example.GuideExpert.data.local.models.ProfileWithAvatar
-import com.example.GuideExpert.data.mappers.toExcursionSearchEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -38,20 +34,20 @@ interface ProfileDao {
         profileWithAvatar.avatar?.let { insertAvatar(it) }
     }
 
-    @Query("SELECT * FROM excursionsFavoriteIdEntity")
-    fun getExcursionsFavoriteId() : Flow<List<ExcursionsFavoriteIdEntity>>
+    @Query("SELECT * FROM excursionsFavoriteEntity")
+    fun getExcursionsFavorite() : Flow<List<ExcursionsFavoriteEntity>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFavoriteExcursionId(ids: List<ExcursionsFavoriteIdEntity>)
+    suspend fun insertFavoriteExcursion(ids: List<ExcursionsFavoriteEntity>)
 
-    @Query("DELETE FROM excursionsFavoriteIdEntity")
-    suspend fun deleteFavoriteExcursionId()
+    @Query("DELETE FROM excursionsFavoriteEntity")
+    suspend fun deleteFavoriteExcursion()
 
     @Transaction
-    suspend fun insertExcursionsFavoriteId(excursionsId: List<ExcursionsFavoriteIdEntity>) {
-        deleteFavoriteExcursionId()
-        insertFavoriteExcursionId(excursionsId)
+    suspend fun insertExcursionsFavorite(excursionsId: List<ExcursionsFavoriteEntity>) {
+        deleteFavoriteExcursion()
+        insertFavoriteExcursion(excursionsId)
     }
 
 }

@@ -3,7 +3,7 @@ package com.example.GuideExpert.domain.repository
 import com.example.GuideExpert.data.repository.ProfileResources
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.models.Avatar
-import com.example.GuideExpert.domain.models.ExcursionsFavoriteIdResponse
+import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.RemoveAvatarProfileResponse
 import com.example.GuideExpert.domain.models.UpdateProfileResponse
@@ -15,13 +15,13 @@ import java.util.Date
 interface ProfileRepository {
     val profileFlow: StateFlow<Profile?>
     val profileStateFlow: StateFlow<ProfileResources>
-    val profileFavoriteExcursionIdFlow: StateFlow<List<Int>>
+    val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>>
     suspend fun fetchProfile()
     suspend fun updateProfile(newProfile: Profile)
     suspend fun removeProfile()
     suspend fun updateAvatarProfile(imagePart: MultipartBody.Part): Flow<UIResources<Avatar>>
     suspend fun removeAvatarProfile():Flow<UIResources<RemoveAvatarProfileResponse>>
     suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date):Flow<UIResources<UpdateProfileResponse>>
-    suspend fun getIdExcursionsFavorite()
-    suspend fun updateExcursionsFavoriteId(newExcursionsIs: List<Int>)
+    suspend fun getExcursionsFavorite()
+    suspend fun updateExcursionsFavoriteId(excursions: List<ExcursionFavorite>)
 }

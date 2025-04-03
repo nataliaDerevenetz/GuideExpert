@@ -64,6 +64,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListSearchItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
 import kotlinx.coroutines.delay
@@ -81,7 +82,7 @@ interface SearchStateScope {
     val onEvent : (SearchEvent) -> Unit
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>
     val navigateToExcursion : (Excursion) -> Unit
-    val profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
+    val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
 }
 
 fun DefaultSearchStateScope(
@@ -92,7 +93,7 @@ fun DefaultSearchStateScope(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-    profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
 ): SearchStateScope {
     return object : SearchStateScope {
         override val searchListState: StateFlow<PagingData<Excursion>>
@@ -109,7 +110,7 @@ fun DefaultSearchStateScope(
             get() = sendEffectFlow
         override val navigateToExcursion: (Excursion) -> Unit
             get() = navigateToExcursion
-        override val profileFavoriteExcursionIdFlow: StateFlow<List<Int>>
+        override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>>
             get() = profileFavoriteExcursionIdFlow
 
     }
@@ -125,7 +126,7 @@ fun rememberDefaultSearchStateScope(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-    profileFavoriteExcursionIdFlow:  StateFlow<List<Int>>
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
 ): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow) {
     DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow)
 }

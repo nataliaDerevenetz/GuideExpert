@@ -81,7 +81,7 @@ fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
-        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack)
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState)
     }
     composable<AlbumExcursion> {
         backStackEntry ->

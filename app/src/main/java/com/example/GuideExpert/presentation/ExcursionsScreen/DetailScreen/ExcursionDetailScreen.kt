@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -38,11 +40,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,11 +57,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.ExcursionData
+import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchStateScope
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.shimmerEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlin.reflect.KFunction1
 
 @Stable
@@ -70,6 +84,11 @@ interface ExcursionDetailScope {
     val navigateToAlbum: (Int) -> Unit
     val navigateToImage: (Int,List<Image>,Int) -> Unit
     val handleEvent : (ExcursionDetailUiEvent) -> Unit
+    val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
+    val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+    val effectFlow: Flow<SnackbarEffect>
+    val snackbarHostState: SnackbarHostState
 }
 
 fun DefaultExcursionDetailScope(
@@ -80,7 +99,12 @@ fun DefaultExcursionDetailScope(
     stateView: StateFlow<UIState>,
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
-    handleEvent : (ExcursionDetailUiEvent) -> Unit
+    handleEvent : (ExcursionDetailUiEvent) -> Unit,
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    effectFlow: Flow<SnackbarEffect>,
+    snackbarHostState: SnackbarHostState
 ): ExcursionDetailScope {
     return object : ExcursionDetailScope {
         override val excursionData: Flow<ExcursionData?>
@@ -99,6 +123,16 @@ fun DefaultExcursionDetailScope(
             get() = navigateToImage
         override val handleEvent: (ExcursionDetailUiEvent) -> Unit
             get() = handleEvent
+        override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>>
+            get() = profileFavoriteExcursionIdFlow
+        override val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
+            get() = stateSetFavoriteExcursion
+        override val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+            get() = stateDeleteFavoriteExcursion
+        override val effectFlow: Flow<SnackbarEffect>
+            get() = effectFlow
+        override val snackbarHostState: SnackbarHostState
+            get() = snackbarHostState
     }
 }
 
@@ -111,9 +145,14 @@ fun rememberDefaultExcursionDetailScope(
     stateView: StateFlow<UIState>,
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
-    handleEvent : KFunction1<ExcursionDetailUiEvent, Unit>
-): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent) {
-    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent)
+    handleEvent : KFunction1<ExcursionDetailUiEvent, Unit>,
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    effectFlow: Flow<SnackbarEffect>,
+    snackbarHostState: SnackbarHostState
+): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState) {
+    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,6 +161,7 @@ fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
     onNavigateToBack:() -> Boolean,
+    snackbarHostState: SnackbarHostState,
     viewModel: ExcursionDetailViewModel = hiltViewModel(),
     scopeState:ExcursionDetailScope = rememberDefaultExcursionDetailScope(
         excursionData = viewModel.excursion,
@@ -131,18 +171,44 @@ fun ExcursionDetailScreen(
         stateView = viewModel.stateView,
         navigateToAlbum = navigateToAlbum,
         navigateToImage = navigateToImage,
-        handleEvent=viewModel::handleEvent),
+        handleEvent = viewModel::handleEvent,
+        profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow,
+        stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
+        stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion,
+        effectFlow = viewModel.effectFlow,
+        snackbarHostState = snackbarHostState
+        ),
   //  dataContent: @Composable ExcursionDetailScope.() -> Unit ={},
 ) {
     val uiState by scopeState.stateView.collectAsStateWithLifecycle()
+    val excursionData by scopeState.excursionData.collectAsStateWithLifecycle(null)
+    val favoriteExcursions by scopeState.profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
+    val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
 
-   Scaffold(
+    var isFavorite = false
+    excursionData?.let {
+        if (favoriteExcursions.any { it1 -> it1.excursionId == it.excursionId }) {isFavorite = true} else {isFavorite = false}
+    }
+
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("") },
                 navigationIcon={ IconButton({ scopeState.onNavigateToBack()}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")}},
                 actions={
-                    IconButton({ }) { Icon(Icons.Filled.FavoriteBorder, contentDescription = "featured")}
+                    IconButton({
+                        excursionData?.let {
+                            if (!isFavorite) {
+                                scopeState.handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursion(it.excursionId))
+                            } else {
+                                scopeState.handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(it.excursionId))
+                            }
+                        }
+                    }) { Icon(
+                            imageVector =  if (isFavorite) Icons.Filled.Favorite else  Icons.Filled.FavoriteBorder,
+                            contentDescription = "featured",
+                            tint = if (isFavorite)  Color.Red else MaterialTheme.typography.labelMedium.color,
+                        )}
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
@@ -160,6 +226,8 @@ fun ExcursionDetailScreen(
                is ExcursionInfoUIState.Loading -> { LoadingExcursionDetail(innerPadding) }
            }
     }
+    scopeState.ContentSetFavoriteContent(effectFlow)
+    scopeState.ContentDeleteFavoriteContent(effectFlow)
 }
 
 @Composable
@@ -180,6 +248,61 @@ fun ExcursionDetailScope.ExcursionDataError(innerPadding: PaddingValues) {
         }
     }
 }
+
+
+@Composable
+fun ExcursionDetailScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateSetFavoriteExcursion by stateSetFavoriteExcursion.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
+
+    when(stateSetFavoriteExcursion.contentState){
+        is SetFavoriteExcursionState.Success -> {
+            handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursionStateSetIdle)
+        }
+        is SetFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
+}
+
+@Composable
+fun ExcursionDetailScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateDeleteFavoriteExcursion by stateDeleteFavoriteExcursion.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
+
+    when(stateDeleteFavoriteExcursion.contentState){
+        is DeleteFavoriteExcursionState.Success -> {
+            handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        is DeleteFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
+
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

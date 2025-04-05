@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
+import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.domain.repository.ProfileRepository
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -31,6 +34,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class SortParams(
@@ -61,13 +65,15 @@ sealed interface SearchEvent {
     data class SetSearchText(val text:String) : SearchEvent
     data class SetStateListSearch(val state:ExcursionListSearchUIState) : SearchEvent
     data class OnClickFavoriteExcursion(val excursion: Excursion) : SearchEvent
+    data object OnSetFavoriteExcursionStateSetIdle : SearchEvent
 }
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     val getExcursionByQueryUseCase: GetExcursionByQueryUseCase,
     private val profileRepository: ProfileRepository,
-    private val state: SavedStateHandle
+    private val state: SavedStateHandle,
+    val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase
 ) : ViewModel() {
     val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
 
@@ -84,6 +90,9 @@ class SearchViewModel @Inject constructor(
 
     private val savedSearchText: StateFlow<String> = state.getStateFlow(key = "QUERY", initialValue = "")
 
+    private val _stateSetFavoriteExcursion = MutableStateFlow<SetFavoriteExcursionStateUIState>(SetFavoriteExcursionStateUIState())
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState> = _stateSetFavoriteExcursion.asStateFlow()
+
     @OptIn(FlowPreview::class)
     private val currentQueryFlow = savedSearchText
         .debounce(500L)
@@ -97,20 +106,17 @@ class SearchViewModel @Inject constructor(
     fun onEvent(event: SearchEvent) {
         viewModelScope.launch {
             when (event) {
-                is SearchEvent.GetSearchExcursions -> {
-                    getSearchExcursions()
-                }
-                is SearchEvent.SetSearchText -> {
-                    setCurrentText(event.text)
-                }
-
-                is SearchEvent.SetStateListSearch -> {
-                    updateExcursionListSearchUIState(event.state)
-                }
-
+                is SearchEvent.GetSearchExcursions -> { getSearchExcursions() }
+                is SearchEvent.SetSearchText -> { setCurrentText(event.text) }
+                is SearchEvent.SetStateListSearch -> { updateExcursionListSearchUIState(event.state) }
                 is SearchEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
+                is SearchEvent.OnSetFavoriteExcursionStateSetIdle -> { setIdleUpdateProfileUIState() }
             }
         }
+    }
+
+    private fun setIdleUpdateProfileUIState() {
+        _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
     }
 
 
@@ -151,11 +157,30 @@ class SearchViewModel @Inject constructor(
 
 
      private fun setFavoriteExcursion(excursion: Excursion) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.d("CLICK","setFavoriteExcursionUseCase")
-            // setFavoriteExcursionUseCase(excursionId)
+         viewModelScope.launch(Dispatchers.IO) {
+             setFavoriteExcursionUseCase(excursion.id).collectLatest { resources ->
+                 when (resources) {
+                     is UIResources.Error -> withContext(Dispatchers.Main){
+                         _stateSetFavoriteExcursion.update {
+                             it.copy(
+                                 contentState = SetFavoriteExcursionState.Error(
+                                     resources.message
+                                 )
+                             )
+                         }
+                         sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                     }
 
-        }
+                     is UIResources.Loading -> withContext(Dispatchers.Main){
+                         _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Loading) }
+                     }
+
+                     is UIResources.Success -> withContext(Dispatchers.Main){
+                         _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Success) }
+                     }
+                 }
+             }
+         }
     }
 
 

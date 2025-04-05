@@ -44,7 +44,7 @@ sealed interface ExcursionsUiEvent {
     data object OnLoadExcursionsFilters : ExcursionsUiEvent
     data object OnChangeFilters : ExcursionsUiEvent
     data object OnLoadConfig : ExcursionsUiEvent
-    data object OnUISetFavoriteExcursionStateSetIdle : ExcursionsUiEvent
+    data object OnSetFavoriteExcursionStateSetIdle : ExcursionsUiEvent
 }
 
 sealed interface SetFavoriteExcursionState{
@@ -105,7 +105,7 @@ class HomeViewModel @Inject constructor(
                 is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
                 is ExcursionsUiEvent.OnChangeFilters -> changedFilters()
                 is ExcursionsUiEvent.OnLoadConfig -> loadConfig()
-                is ExcursionsUiEvent.OnUISetFavoriteExcursionStateSetIdle -> {
+                is ExcursionsUiEvent.OnSetFavoriteExcursionStateSetIdle -> {
                     setIdleUpdateProfileUIState()
                 }
             }

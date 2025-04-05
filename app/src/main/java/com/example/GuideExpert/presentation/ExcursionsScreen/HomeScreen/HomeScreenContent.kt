@@ -128,32 +128,11 @@ fun HomeScreenContent(
 ) {
 
     val effectFlow by state.effectFlow.collectAsStateWithLifecycle(null)
-   /* LaunchedEffect(effectFlow) {
-        effectFlow?.let {
-            when (it) {
-                is SnackbarEffect.ShowSnackbar -> {
-                    state.snackbarHostState.showSnackbar(it.message)
-                }
-            }
-        }
-    }*/
-
 
     val filters = state.getFiltersBar()
     val excursionPagingItems by rememberUpdatedState(newValue = state.filterListState.collectAsLazyPagingItems())
 
     val scope = rememberCoroutineScope()
-
-    if (excursionPagingItems.loadState.append is LoadState.Error) {
-        LaunchedEffect(key1 = excursionPagingItems.loadState.append) {
-            scope.launch {
-                state.sendEffectFlow(
-                    (excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",
-                    null
-                )
-            }
-        }
-    }
 
     if (excursionPagingItems.loadState.append is LoadState.Error) {
         LaunchedEffect(excursionPagingItems.loadState.append) {
@@ -163,6 +142,17 @@ fun HomeScreenContent(
                         state.snackbarHostState.showSnackbar(it.message)
                     }
                 }
+            }
+        }
+    }
+
+    if (excursionPagingItems.loadState.append is LoadState.Error) {
+        LaunchedEffect(key1 = excursionPagingItems.loadState.append) {
+            scope.launch {
+                state.sendEffectFlow(
+                    (excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",
+                    null
+                )
             }
         }
     }
@@ -266,7 +256,9 @@ fun HomeScreenContent(
 
     }
 
-    FloatButtonUp(displayButton, listState, showTopBar)
+    if (excursionPagingItems.loadState.append !is LoadState.Error && excursionPagingItems.loadState.refresh !is LoadState.Error) {
+        FloatButtonUp(displayButton, listState, showTopBar)
+    }
 
 }
 
@@ -280,7 +272,7 @@ fun HomeScreenContentState.ContentSetFavoriteContent(effectFlow: SnackbarEffect?
     when(stateSetFavoriteExcursion.contentState){
         is SetFavoriteExcursionState.Success -> {
             Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
-            onEvent(ExcursionsUiEvent.OnUISetFavoriteExcursionStateSetIdle)
+            onEvent(ExcursionsUiEvent.OnSetFavoriteExcursionStateSetIdle)
         }
         is SetFavoriteExcursionState.Error -> {
             effectFlow?.let {
@@ -292,7 +284,7 @@ fun HomeScreenContentState.ContentSetFavoriteContent(effectFlow: SnackbarEffect?
                     }
                 }
             }
-            onEvent(ExcursionsUiEvent.OnUISetFavoriteExcursionStateSetIdle)
+            onEvent(ExcursionsUiEvent.OnSetFavoriteExcursionStateSetIdle)
         }
         else -> {}
     }

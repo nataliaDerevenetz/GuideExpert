@@ -1,6 +1,7 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -51,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -83,6 +85,7 @@ interface SearchStateScope {
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>
     val navigateToExcursion : (Excursion) -> Unit
     val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
 }
 
 fun DefaultSearchStateScope(
@@ -93,7 +96,8 @@ fun DefaultSearchStateScope(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
 ): SearchStateScope {
     return object : SearchStateScope {
         override val searchListState: StateFlow<PagingData<Excursion>>
@@ -112,7 +116,8 @@ fun DefaultSearchStateScope(
             get() = navigateToExcursion
         override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>>
             get() = profileFavoriteExcursionIdFlow
-
+        override val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
+            get() = stateSetFavoriteExcursion
     }
 }
 
@@ -126,9 +131,10 @@ fun rememberDefaultSearchStateScope(
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
-    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
-): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow) {
-    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow)
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
+): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion) {
+    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,7 +153,9 @@ fun SearchScreen(modifier: Modifier = Modifier,
                             onEvent = viewModel::onEvent,
                             sendEffectFlow = viewModel::sendEffectFlow,
                             navigateToExcursion = navigateToExcursion,
-                            profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow),
+                            profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow,
+                            stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion
+                     ),
                  searchContent: @Composable SearchStateScope.() -> Unit,
 ){
 
@@ -156,17 +164,6 @@ fun SearchScreen(modifier: Modifier = Modifier,
     val uiState by scopeState.stateView.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val coroutineScope = rememberCoroutineScope()
-
-    val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
-    LaunchedEffect(effectFlow) {
-        effectFlow?.let {
-            when (it) {
-                is SnackbarEffect.ShowSnackbar -> {
-                    scopeState.snackbarHostState.showSnackbar(it.message)
-                }
-            }
-        }
-    }
 
     val colorDefault = SearchBarDefaults.colors().containerColor
 
@@ -290,6 +287,20 @@ fun SearchStateScope.SearchResult() {
     val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
 
 
+    val effectFlow by effectFlow.collectAsStateWithLifecycle(null)
+
+    if (excursionPagingItems.loadState.append is LoadState.Error) {
+        LaunchedEffect(excursionPagingItems.loadState.append) {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        snackbarHostState.showSnackbar(it.message)
+                    }
+                }
+            }
+        }
+    }
+
     if (excursionPagingItems.loadState.append is LoadState.Error) {
         LaunchedEffect(key1 = excursionPagingItems.loadState.append) {
             scope.launch {
@@ -297,13 +308,13 @@ fun SearchStateScope.SearchResult() {
                     (excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",
                     null
                 )
-                delay(1000)
-                excursionPagingItems.retry()
             }
         }
     }
 
     Log.d("TAG", "itemCount  = ${excursionPagingItems.itemCount.toString()}")
+
+    ContentSetFavoriteContent(effectFlow)
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (excursionPagingItems.loadState.refresh is LoadState.Loading) {
@@ -365,20 +376,21 @@ fun SearchStateScope.SearchResult() {
 
                         item {
                             if (it.loadState.append is LoadState.Error) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
+                                Row(Modifier.padding(start = 15.dp, end = 15.dp, bottom = 150.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically){
+                                    Text(stringResource(id = R.string.failedload),color=Color.Gray)
+                                    TextButton({excursionPagingItems.retry()}) {
+                                        Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+                                    }
                                 }
                             }
                         }
                     }
 
                 }
-                FloatButtonUp(displayButton, listState)
+                if (excursionPagingItems.loadState.append !is LoadState.Error && excursionPagingItems.loadState.refresh !is LoadState.Error) {
+                    FloatButtonUp(displayButton, listState)
+                }
             }
         }
     }
@@ -431,3 +443,32 @@ private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState) {
         }
     }
 }
+
+@Composable
+fun SearchStateScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateSetFavoriteExcursion by stateSetFavoriteExcursion.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
+
+    when(stateSetFavoriteExcursion.contentState){
+        is SetFavoriteExcursionState.Success -> {
+            Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
+            onEvent(SearchEvent.OnSetFavoriteExcursionStateSetIdle)
+        }
+        is SetFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            onEvent(SearchEvent.OnSetFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
+
+}
+

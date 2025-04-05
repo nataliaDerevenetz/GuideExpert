@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -60,10 +59,6 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.componen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
-import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.EditorProfileStateScope
-import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.EditorProfileUiEvent
-import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.UpdateProfileState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -81,7 +76,8 @@ class HomeScreenContentState(
     val navigateToExcursion : (Excursion) -> Unit,
     val getFiltersBar:() -> List<Filter>,
     val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
-    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
 )
 
 @Composable
@@ -94,9 +90,10 @@ fun rememberHomeScreenContentState(
     navigateToExcursion: (Excursion) -> Unit,
     getFiltersBar:() -> List<Filter>,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
-    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
-): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion) {
-    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion)
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion) {
+    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion)
 }
 
 context(SharedTransitionScope)
@@ -123,7 +120,8 @@ fun HomeScreenContent(
         navigateToExcursion = navigateToExcursion,
         getFiltersBar = viewModel::getFiltersBar,
         profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow,
-        stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion
+        stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
+        stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion
     )
 ) {
 
@@ -164,6 +162,7 @@ fun HomeScreenContent(
     }
 
     state.ContentSetFavoriteContent(effectFlow)
+    state.ContentDeleteFavoriteContent(effectFlow)
 
     val listState = rememberLazyListState()
     val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
@@ -271,7 +270,6 @@ fun HomeScreenContentState.ContentSetFavoriteContent(effectFlow: SnackbarEffect?
 
     when(stateSetFavoriteExcursion.contentState){
         is SetFavoriteExcursionState.Success -> {
-            Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
             onEvent(ExcursionsUiEvent.OnSetFavoriteExcursionStateSetIdle)
         }
         is SetFavoriteExcursionState.Error -> {
@@ -290,6 +288,34 @@ fun HomeScreenContentState.ContentSetFavoriteContent(effectFlow: SnackbarEffect?
     }
 
 }
+
+@Composable
+fun HomeScreenContentState.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateDeleteFavoriteExcursion by stateDeleteFavoriteExcursion.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
+
+    when(stateDeleteFavoriteExcursion.contentState){
+        is DeleteFavoriteExcursionState.Success -> {
+            onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        is DeleteFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
+
+}
+
 
 @Composable
 private fun HomeScreenEmpty(modifier: Modifier = Modifier) {

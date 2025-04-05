@@ -36,7 +36,6 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeScre
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun HomeScreenContentState.ExcursionListFilterItem(
@@ -66,8 +65,11 @@ fun HomeScreenContentState.ExcursionListFilterItem(
                             shape = RoundedCornerShape(15.dp)
                         }
                         .clickable {
-                            onEvent(ExcursionsUiEvent.OnClickFavoriteExcursion(excursion))
-                            Log.d("CLICK", "featured")
+                            if (!excursion.isFavorite) {
+                                onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
+                            } else {
+                                onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
+                            }
                         }
                     ) {
                         Image(

@@ -3,6 +3,7 @@ package com.example.GuideExpert.domain.repository
 import com.example.GuideExpert.data.repository.ProfileResources
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.models.Avatar
+import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.MessageResponse
@@ -25,4 +26,5 @@ interface ProfileRepository {
     suspend fun getExcursionsFavorite()
     suspend fun updateExcursionsFavoriteId(excursions: List<ExcursionFavorite>)
     suspend fun setFavoriteExcursion(excursionId: Int):Flow<UIResources<SetFavoriteExcursionResponse>>
+    suspend fun removeFavoriteExcursion(excursionId: Int):Flow<UIResources<DeleteFavoriteExcursionResponse>>
 }

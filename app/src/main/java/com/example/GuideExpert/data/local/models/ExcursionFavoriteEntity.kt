@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class ExcursionFavoriteEntity(
-    @PrimaryKey(autoGenerate = false)
     @ColumnInfo val id: Int,
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo val excursionId: Int,
     @ColumnInfo val timestamp: Int,
 )

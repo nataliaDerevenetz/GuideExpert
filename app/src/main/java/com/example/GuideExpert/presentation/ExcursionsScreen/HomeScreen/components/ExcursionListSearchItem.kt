@@ -76,8 +76,11 @@ fun SearchStateScope.ExcursionListSearchItem(
                             shape = RoundedCornerShape(15.dp)
                         }
                         .clickable {
-                            onEvent(SearchEvent.OnClickFavoriteExcursion(excursion))
-                            Log.d("CLICK", "featured")
+                            if (!excursion.isFavorite) {
+                                onEvent(SearchEvent.OnSetFavoriteExcursion(excursion))
+                            } else {
+                                onEvent(SearchEvent.OnDeleteFavoriteExcursion(excursion))
+                            }
                         }
                     ) {
                         Image(

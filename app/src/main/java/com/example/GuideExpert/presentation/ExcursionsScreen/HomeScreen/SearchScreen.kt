@@ -29,7 +29,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarDefaults.colors
@@ -69,7 +68,6 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListSearchItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -85,7 +83,8 @@ interface SearchStateScope {
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>
     val navigateToExcursion : (Excursion) -> Unit
     val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
-    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
+    val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
 }
 
 fun DefaultSearchStateScope(
@@ -97,7 +96,8 @@ fun DefaultSearchStateScope(
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
-    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
 ): SearchStateScope {
     return object : SearchStateScope {
         override val searchListState: StateFlow<PagingData<Excursion>>
@@ -116,8 +116,10 @@ fun DefaultSearchStateScope(
             get() = navigateToExcursion
         override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>>
             get() = profileFavoriteExcursionIdFlow
-        override val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
+        override val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
             get() = stateSetFavoriteExcursion
+        override val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+            get() = stateDeleteFavoriteExcursion
     }
 }
 
@@ -132,9 +134,10 @@ fun rememberDefaultSearchStateScope(
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion : (Excursion) -> Unit,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
-    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
-): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion) {
-    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion)
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion) {
+    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,7 +157,8 @@ fun SearchScreen(modifier: Modifier = Modifier,
                             sendEffectFlow = viewModel::sendEffectFlow,
                             navigateToExcursion = navigateToExcursion,
                             profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow,
-                            stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion
+                            stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
+                            stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion
                      ),
                  searchContent: @Composable SearchStateScope.() -> Unit,
 ){
@@ -315,6 +319,7 @@ fun SearchStateScope.SearchResult() {
     Log.d("TAG", "itemCount  = ${excursionPagingItems.itemCount.toString()}")
 
     ContentSetFavoriteContent(effectFlow)
+    ContentDeleteFavoriteContent(effectFlow)
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (excursionPagingItems.loadState.refresh is LoadState.Loading) {
@@ -452,7 +457,6 @@ fun SearchStateScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
 
     when(stateSetFavoriteExcursion.contentState){
         is SetFavoriteExcursionState.Success -> {
-            Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
             onEvent(SearchEvent.OnSetFavoriteExcursionStateSetIdle)
         }
         is SetFavoriteExcursionState.Error -> {
@@ -469,6 +473,33 @@ fun SearchStateScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
         }
         else -> {}
     }
+}
+
+@Composable
+fun SearchStateScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateDeleteFavoriteExcursion by stateDeleteFavoriteExcursion.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
+
+    when(stateDeleteFavoriteExcursion.contentState){
+        is DeleteFavoriteExcursionState.Success -> {
+            onEvent(SearchEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        is DeleteFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            onEvent(SearchEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
 
 }
+
 

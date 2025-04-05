@@ -1,6 +1,7 @@
 package com.example.GuideExpert.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -18,14 +19,17 @@ interface FavoriteDao {
     suspend fun insertAllExcursion(excursions: List<ExcursionFavoriteEntity>)
 
     @Query("DELETE FROM excursionFavoriteEntity")
-    suspend fun delete()
+    suspend fun deleteAll()
 
     @Transaction
     suspend fun insertAll(excursions: List<ExcursionFavoriteEntity>) {
-        delete()
+        deleteAll()
         insertAllExcursion(excursions)
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(excursion: ExcursionFavoriteEntity)
+
+    @Delete
+    suspend fun delete(excursion: ExcursionFavoriteEntity)
 }

@@ -1,5 +1,6 @@
 package com.example.GuideExpert.data.local
 
+import android.util.Log
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
 import com.example.GuideExpert.data.local.dao.FavoriteDao
 import com.example.GuideExpert.data.local.dao.ImageDao
@@ -73,5 +74,9 @@ class DBStorageImpl @Inject constructor(
 
     override suspend fun insertExcursionFavorite(excursion: ExcursionFavorite) {
         favoriteDao.insert(excursion.toExcursionsFavoriteEntity())
+    }
+
+    override suspend fun deleteExcursionFavorite(excursion: ExcursionFavorite) {
+        favoriteDao.delete(excursion.toExcursionsFavoriteEntity())
     }
 }

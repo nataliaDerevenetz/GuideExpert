@@ -1,6 +1,7 @@
 package com.example.GuideExpert.presentation.di
 
 import com.example.GuideExpert.domain.DeleteAvatarProfileUseCase
+import com.example.GuideExpert.domain.DeleteFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.GetAuthTokenByYandexUseCase
 import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
@@ -22,6 +23,7 @@ import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
 import com.example.GuideExpert.domain.UpdateProfileUseCase
 import com.example.GuideExpert.domain.impl.DeleteAvatarProfileUseCaseImpl
+import com.example.GuideExpert.domain.impl.DeleteFavoriteExcursionUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetAuthTokenByYandexUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetConfigUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetExcursionByFiltersUseCaseImpl
@@ -171,4 +173,11 @@ abstract class MainScreenModule {
     abstract fun bindSetFavoriteExcursionUseCase(
         setFavoriteExcursionUseCaseImpl: SetFavoriteExcursionUseCaseImpl
     ) : SetFavoriteExcursionUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindDeleteFavoriteExcursionUseCase(
+        deleteFavoriteExcursionUseCaseImpl: DeleteFavoriteExcursionUseCaseImpl
+    ) : DeleteFavoriteExcursionUseCase
+
 }

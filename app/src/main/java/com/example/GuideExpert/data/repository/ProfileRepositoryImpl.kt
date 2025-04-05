@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toAvatar
+import com.example.GuideExpert.data.mappers.toDeleteFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toRemoveAvatarProfileResponse
@@ -11,6 +12,7 @@ import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
+import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
 import com.example.GuideExpert.domain.models.Profile
@@ -242,5 +244,30 @@ class ProfileRepositoryImpl @Inject constructor(
             emit(UIResources.Error(e.message.toString()))
         }
 
+    }
+
+    override suspend fun removeFavoriteExcursion(excursionId: Int): Flow<UIResources<DeleteFavoriteExcursionResponse>> = flow{
+        try {
+            emit(UIResources.Loading)
+            val result = profileService.removeExcursionFavorite(profileFlow.value?.id!!,excursionId)
+            if (result.code() == 403) {
+                removeProfile()
+            }
+            if (result.isSuccessful) {
+                val response =
+                    result.body()?.toDeleteFavoriteExcursionResponse() ?: DeleteFavoriteExcursionResponse()
+                if (response.success) {
+                    dbStorage.deleteExcursionFavorite(response.excursion!!)
+                    _profileFavoriteExcursionIdFlow.update {it.filter { it1 -> it1.excursionId != response.excursion.excursionId } }
+                    emit(UIResources.Success(response))
+                } else {
+                    emit(UIResources.Error("Error :: ${response.message}"))
+                }
+            } else {
+                emit(UIResources.Error("Error remove favorite"))
+            }
+        } catch (e: Exception) {
+            emit(UIResources.Error(e.message.toString()))
+        }
     }
 }

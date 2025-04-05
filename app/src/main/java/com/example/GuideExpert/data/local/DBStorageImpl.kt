@@ -1,6 +1,7 @@
 package com.example.GuideExpert.data.local
 
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
+import com.example.GuideExpert.data.local.dao.FavoriteDao
 import com.example.GuideExpert.data.local.dao.ImageDao
 import com.example.GuideExpert.data.local.dao.ProfileDao
 import com.example.GuideExpert.data.mappers.toExcursionData
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class DBStorageImpl @Inject constructor(
     private val excursionDataDao: ExcursionDataDao,
     private val imageDao: ImageDao,
-    private val profileDao: ProfileDao
+    private val profileDao: ProfileDao,
+    private val favoriteDao: FavoriteDao
 ): DBStorage{
 
     override suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>) {
@@ -56,7 +58,7 @@ class DBStorageImpl @Inject constructor(
     }
 
     override fun getExcursionsFavorite(): Flow<List<ExcursionFavorite>> {
-        return profileDao.getExcursionsFavorite().map {
+        return favoriteDao.getAll().map {
             favorite -> favorite.map {
                 it.toExcursionFavorite()
             }
@@ -64,12 +66,12 @@ class DBStorageImpl @Inject constructor(
     }
 
     override suspend fun insertAllExcursionsFavorite(excursions: List<ExcursionFavorite>) {
-        profileDao.insertAllExcursionsFavorite(excursions.map {
+        favoriteDao.insertAll(excursions.map {
             it.toExcursionsFavoriteEntity()
         })
     }
 
     override suspend fun insertExcursionFavorite(excursion: ExcursionFavorite) {
-        profileDao.insertExcursionFavorite(excursion.toExcursionsFavoriteEntity())
+        favoriteDao.insert(excursion.toExcursionsFavoriteEntity())
     }
 }

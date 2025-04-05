@@ -1,5 +1,7 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -39,6 +41,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,6 +60,9 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.componen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
+import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.EditorProfileStateScope
+import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.EditorProfileUiEvent
+import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.UpdateProfileState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,7 +80,8 @@ class HomeScreenContentState(
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>,
     val navigateToExcursion : (Excursion) -> Unit,
     val getFiltersBar:() -> List<Filter>,
-    val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
+    val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
 )
 
 @Composable
@@ -86,9 +93,10 @@ fun rememberHomeScreenContentState(
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
     navigateToExcursion: (Excursion) -> Unit,
     getFiltersBar:() -> List<Filter>,
-    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
-): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow) {
-    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow)
+    profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState>
+): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion) {
+    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion)
 }
 
 context(SharedTransitionScope)
@@ -114,12 +122,13 @@ fun HomeScreenContent(
         sendEffectFlow = viewModel::sendEffectFlow,
         navigateToExcursion = navigateToExcursion,
         getFiltersBar = viewModel::getFiltersBar,
-        profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow
+        profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow,
+        stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion
     )
 ) {
 
     val effectFlow by state.effectFlow.collectAsStateWithLifecycle(null)
-    LaunchedEffect(effectFlow) {
+   /* LaunchedEffect(effectFlow) {
         effectFlow?.let {
             when (it) {
                 is SnackbarEffect.ShowSnackbar -> {
@@ -127,7 +136,9 @@ fun HomeScreenContent(
                 }
             }
         }
-    }
+    }*/
+
+
     val filters = state.getFiltersBar()
     val excursionPagingItems by rememberUpdatedState(newValue = state.filterListState.collectAsLazyPagingItems())
 
@@ -140,16 +151,29 @@ fun HomeScreenContent(
                     (excursionPagingItems.loadState.append as LoadState.Error).error.message ?: "",
                     null
                 )
-                delay(1000)
-                excursionPagingItems.retry()
             }
         }
     }
+
+    if (excursionPagingItems.loadState.append is LoadState.Error) {
+        LaunchedEffect(excursionPagingItems.loadState.append) {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        state.snackbarHostState.showSnackbar(it.message)
+                    }
+                }
+            }
+        }
+    }
+
 
     if (isRefreshing) {
         excursionPagingItems.refresh()
         stopRefreshing()
     }
+
+    state.ContentSetFavoriteContent(effectFlow)
 
     val listState = rememberLazyListState()
     val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
@@ -229,13 +253,12 @@ fun HomeScreenContent(
 
             item {
                 if (excursionPagingItems.loadState.append is LoadState.Error) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                    Row(Modifier.padding(start = 15.dp, end = 15.dp, bottom = 150.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically){
+                        Text(stringResource(id = R.string.failedload),color=Color.Gray)
+                        TextButton({excursionPagingItems.retry()}) {
+                            Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+                        }
                     }
                 }
             }
@@ -244,6 +267,35 @@ fun HomeScreenContent(
     }
 
     FloatButtonUp(displayButton, listState, showTopBar)
+
+}
+
+
+@Composable
+fun HomeScreenContentState.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateSetFavoriteExcursion by stateSetFavoriteExcursion.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
+
+    when(stateSetFavoriteExcursion.contentState){
+        is SetFavoriteExcursionState.Success -> {
+            Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
+            onEvent(ExcursionsUiEvent.OnUISetFavoriteExcursionStateSetIdle)
+        }
+        is SetFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            onEvent(ExcursionsUiEvent.OnUISetFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
 
 }
 

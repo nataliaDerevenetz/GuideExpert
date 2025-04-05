@@ -1,5 +1,6 @@
 package com.example.GuideExpert.data.local.dao
 
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -7,23 +8,24 @@ import androidx.room.Transaction
 import com.example.GuideExpert.data.local.models.ExcursionFavoriteEntity
 import kotlinx.coroutines.flow.Flow
 
+@Dao
 interface FavoriteDao {
     @Query("SELECT * FROM excursionFavoriteEntity")
-    fun getExcursionsFavorite() : Flow<List<ExcursionFavoriteEntity>>
+    fun getAll() : Flow<List<ExcursionFavoriteEntity>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllFavoriteExcursion(excursions: List<ExcursionFavoriteEntity>)
+    suspend fun insertAllExcursion(excursions: List<ExcursionFavoriteEntity>)
 
     @Query("DELETE FROM excursionFavoriteEntity")
-    suspend fun deleteFavoriteExcursion()
+    suspend fun delete()
 
     @Transaction
-    suspend fun insertAllExcursionsFavorite(excursions: List<ExcursionFavoriteEntity>) {
-        deleteFavoriteExcursion()
-        insertAllFavoriteExcursion(excursions)
+    suspend fun insertAll(excursions: List<ExcursionFavoriteEntity>) {
+        delete()
+        insertAllExcursion(excursions)
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertExcursionFavorite(excursion: ExcursionFavoriteEntity)
+    suspend fun insert(excursion: ExcursionFavoriteEntity)
 }

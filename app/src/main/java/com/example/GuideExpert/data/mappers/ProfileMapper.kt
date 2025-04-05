@@ -1,13 +1,11 @@
 package com.example.GuideExpert.data.mappers
 
 import com.example.GuideExpert.data.local.models.AvatarEntity
-import com.example.GuideExpert.data.local.models.ExcursionFavoriteEntity
 import com.example.GuideExpert.data.local.models.ProfileEntity
 import com.example.GuideExpert.data.local.models.ProfileWithAvatar
 import com.example.GuideExpert.data.remote.pojo.AvatarPOJO
 import com.example.GuideExpert.data.remote.pojo.ProfilePOJO
 import com.example.GuideExpert.domain.models.Avatar
-import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Profile
 import java.util.Date
 
@@ -51,8 +49,4 @@ fun ProfileWithAvatar.toProfile() = Profile(
 )
 
 fun AvatarEntity.toAvatar() =  Avatar(id = id, profileId = profileId, url = url)
-
-fun ExcursionFavoriteEntity.toExcursionFavorite() = ExcursionFavorite(id=id,excursionId=excursionId,timestamp=timestamp)
-
-fun ExcursionFavorite.toExcursionsFavoriteEntity() =  ExcursionFavoriteEntity(id=id,excursionId=excursionId,timestamp)
 

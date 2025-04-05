@@ -15,6 +15,9 @@ import javax.inject.Singleton
 class LocalSourceModuleProvider {
 
     @Provides
+    fun provideFavoriteDao(database: ExcursionsRoomDatabase) = database.favoriteDao()
+
+    @Provides
     fun provideProfileDao(database: ExcursionsRoomDatabase) = database.profileDao()
 
     @Provides

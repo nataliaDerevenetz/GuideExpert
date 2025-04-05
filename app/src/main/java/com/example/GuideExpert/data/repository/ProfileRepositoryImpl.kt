@@ -219,10 +219,8 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setFavoriteExcursion(excursionId: Int): Flow<UIResources<SetFavoriteExcursionResponse>> = flow {
-        Log.d("SETFAV", "000")
         try {
             emit(UIResources.Loading)
-            Log.d("SETFAV", "111")
             val result = profileService.setExcursionFavorite(profileFlow.value?.id!!,excursionId)
             if (result.code() == 403) {
                 removeProfile()
@@ -233,9 +231,6 @@ class ProfileRepositoryImpl @Inject constructor(
                 if (response.success) {
                     dbStorage.insertExcursionFavorite(response.excursion!!)
                     _profileFavoriteExcursionIdFlow.update { it + response.excursion }
-                   /* profileFlow.value?.let {
-                        updateProfile(it.copy(avatar = null))
-                    }*/
                     emit(UIResources.Success(response))
                 } else {
                     emit(UIResources.Error("Error :: ${response.message}"))
@@ -244,7 +239,6 @@ class ProfileRepositoryImpl @Inject constructor(
                 emit(UIResources.Error("Error set favorite"))
             }
         } catch (e: Exception) {
-            Log.d("TAG", "Error set favorite")
             emit(UIResources.Error(e.message.toString()))
         }
 

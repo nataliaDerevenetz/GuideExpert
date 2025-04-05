@@ -1,13 +1,10 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.filter
-import androidx.paging.map
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
@@ -33,14 +30,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,8 +44,19 @@ sealed interface ExcursionsUiEvent {
     data object OnLoadExcursionsFilters : ExcursionsUiEvent
     data object OnChangeFilters : ExcursionsUiEvent
     data object OnLoadConfig : ExcursionsUiEvent
+    data object OnUISetFavoriteExcursionStateSetIdle : ExcursionsUiEvent
 }
 
+sealed interface SetFavoriteExcursionState{
+    object Idle:SetFavoriteExcursionState
+    object Loading:SetFavoriteExcursionState
+    object Success:SetFavoriteExcursionState
+    data class Error(val error: String):SetFavoriteExcursionState
+}
+
+data class SetFavoriteExcursionStateUIState(
+    val contentState: SetFavoriteExcursionState = SetFavoriteExcursionState.Idle
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -92,6 +94,9 @@ class HomeViewModel @Inject constructor(
     private val _configApp = MutableStateFlow(Config())
     val configApp: StateFlow<Config> = _configApp
 
+    private val _stateSetFavoriteExcursion = MutableStateFlow<SetFavoriteExcursionStateUIState>(SetFavoriteExcursionStateUIState())
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionStateUIState> = _stateSetFavoriteExcursion.asStateFlow()
+
 
     fun handleEvent(event: ExcursionsUiEvent) {
         viewModelScope.launch {
@@ -100,8 +105,16 @@ class HomeViewModel @Inject constructor(
                 is ExcursionsUiEvent.OnClickFavoriteExcursion -> setFavoriteExcursion(event.excursion)
                 is ExcursionsUiEvent.OnChangeFilters -> changedFilters()
                 is ExcursionsUiEvent.OnLoadConfig -> loadConfig()
+                is ExcursionsUiEvent.OnUISetFavoriteExcursionStateSetIdle -> {
+                    setIdleUpdateProfileUIState()
+                }
             }
         }
+    }
+
+
+    private fun setIdleUpdateProfileUIState() {
+        _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
     }
 
     fun getFiltersBar():List<Filter> {
@@ -188,29 +201,25 @@ class HomeViewModel @Inject constructor(
 
     private fun setFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("CLICK","setFavoriteExcursionUseCase")
-           // profileRepository.updateExcursionsFavoriteId(listOf(2,4))
             setFavoriteExcursionUseCase(excursion.id).collectLatest { resources ->
                 when (resources) {
                     is UIResources.Error -> withContext(Dispatchers.Main){
-                      /*  _stateUpdateProfile.update {
+                        _stateSetFavoriteExcursion.update {
                             it.copy(
-                                contentState = UpdateProfileState.Error(
+                                contentState = SetFavoriteExcursionState.Error(
                                     resources.message
                                 )
                             )
-                        }*/
+                        }
                         sendEffectFlow("Error updating favorite excursion : ${resources.message}")
                     }
 
                     is UIResources.Loading -> withContext(Dispatchers.Main){
-                       // _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Loading) }
+                        _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Loading) }
                     }
 
                     is UIResources.Success -> withContext(Dispatchers.Main){
-                       // _isEditeProfile.update { false }
-                       // _editorOldViewState.update { _editorViewState.value.copy() }
-                       // _stateUpdateProfile.update { it.copy(contentState = UpdateProfileState.Success) }
+                        _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Success) }
                     }
                 }
             }

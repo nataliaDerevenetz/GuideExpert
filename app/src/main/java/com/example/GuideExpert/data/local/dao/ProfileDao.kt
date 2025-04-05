@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.example.GuideExpert.data.local.models.AvatarEntity
-import com.example.GuideExpert.data.local.models.ExcursionFavoriteEntity
 import com.example.GuideExpert.data.local.models.ProfileEntity
 import com.example.GuideExpert.data.local.models.ProfileWithAvatar
 import kotlinx.coroutines.flow.Flow
@@ -33,24 +32,4 @@ interface ProfileDao {
         deleteAvatarById(profileWithAvatar.profile.id)
         profileWithAvatar.avatar?.let { insertAvatar(it) }
     }
-
-    @Query("SELECT * FROM excursionFavoriteEntity")
-    fun getExcursionsFavorite() : Flow<List<ExcursionFavoriteEntity>>
-
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllFavoriteExcursion(excursions: List<ExcursionFavoriteEntity>)
-
-    @Query("DELETE FROM excursionFavoriteEntity")
-    suspend fun deleteFavoriteExcursion()
-
-    @Transaction
-    suspend fun insertAllExcursionsFavorite(excursions: List<ExcursionFavoriteEntity>) {
-        deleteFavoriteExcursion()
-        insertAllFavoriteExcursion(excursions)
-    }
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertExcursionFavorite(excursion: ExcursionFavoriteEntity)
-
 }

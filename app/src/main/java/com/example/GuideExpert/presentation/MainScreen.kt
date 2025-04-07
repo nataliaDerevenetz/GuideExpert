@@ -10,8 +10,13 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Cake
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
@@ -40,6 +45,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionsScreen
+import com.example.GuideExpert.presentation.FavoriteScreen.FavoriteScreen
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileScreen
 import com.example.GuideExpert.ui.theme.Purple80
 import kotlinx.serialization.Serializable
@@ -51,6 +57,8 @@ object Home
 @Serializable
 object Profile
 
+@Serializable
+object Favorite
 
 data class TopLevelRoute<T : Any>(
     val title: String,
@@ -60,6 +68,7 @@ data class TopLevelRoute<T : Any>(
 
 val topLevelRoutes = listOf(
     TopLevelRoute("Home", Home, Icons.Filled.Home,Icons.Outlined.Home),
+    TopLevelRoute("Favorite", Favorite, Icons.Filled.Favorite,Icons.Outlined.FavoriteBorder),
     TopLevelRoute("Person", Profile, Icons.Filled.Person,Icons.Outlined.Person)
 )
 
@@ -108,6 +117,11 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                         }
                     })
             }
+            composable<Favorite> {
+                FavoriteScreen(snackbarHostState = snackbarHostState,
+                    onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
+                )
+            }
         }
     }
 }
@@ -124,7 +138,6 @@ fun BottomBar(navController: NavController, bottomBarState: Boolean) {
                 val currentDestination = navBackStackEntry?.destination
                 topLevelRoutes.forEach { topLevelRoute ->
                     val selected = currentDestination?.hierarchy?.any { it.hasRoute(topLevelRoute.route::class) } == true
-                    Log.d("TAG",selected.toString())
                     NavigationBarItem(
                         selected = selected,
                         label = { Text(topLevelRoute.title,

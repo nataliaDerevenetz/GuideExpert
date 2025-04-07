@@ -18,6 +18,7 @@ import com.example.GuideExpert.domain.GetImageExcursionUseCase
 import com.example.GuideExpert.domain.GetImagesExcursionDataUseCase
 import com.example.GuideExpert.domain.GetProfileUseCase
 import com.example.GuideExpert.domain.GetSortDefaultUseCase
+import com.example.GuideExpert.domain.LoadExcursionFavoriteUseCase
 import com.example.GuideExpert.domain.LogoutProfileUseCase
 import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.UpdateAvatarProfileUseCase
@@ -40,6 +41,7 @@ import com.example.GuideExpert.domain.impl.GetImageExcursionUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetImagesExcursionDataUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetProfileUseCaseImpl
 import com.example.GuideExpert.domain.impl.GetSortDefaultUseCaseImpl
+import com.example.GuideExpert.domain.impl.LoadExcursionFavoriteUseCaseImpl
 import com.example.GuideExpert.domain.impl.LogoutProfileUseCaseImpl
 import com.example.GuideExpert.domain.impl.SetFavoriteExcursionUseCaseImpl
 import com.example.GuideExpert.domain.impl.UpdateAvatarProfileUseCaseImpl
@@ -61,12 +63,12 @@ abstract class MainScreenModule {
 
     @Binds
     abstract fun bindGetExcursionByQueryUseCase(
-        getAllNotesUseCaseImpl: GetExcursionByQueryUseCaseImpl
+        getExcursionByQueryUseCaseImpl: GetExcursionByQueryUseCaseImpl
     ) : GetExcursionByQueryUseCase
 
     @Binds
     abstract fun bindGetExcursionByFiltersUseCase(
-        getAllNotesUseCaseImpl: GetExcursionByFiltersUseCaseImpl
+        getExcursionByFiltersUseCaseImpl: GetExcursionByFiltersUseCaseImpl
     ) : GetExcursionByFiltersUseCase
 
     @ViewModelScoped
@@ -180,4 +182,10 @@ abstract class MainScreenModule {
         deleteFavoriteExcursionUseCaseImpl: DeleteFavoriteExcursionUseCaseImpl
     ) : DeleteFavoriteExcursionUseCase
 
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindLoadExcursionFavoriteUseCase(
+        loadExcursionFavoriteUseCaseImpl: LoadExcursionFavoriteUseCaseImpl
+    ) : LoadExcursionFavoriteUseCase
 }

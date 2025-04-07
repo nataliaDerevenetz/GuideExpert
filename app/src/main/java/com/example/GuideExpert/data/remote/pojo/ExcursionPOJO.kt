@@ -16,5 +16,8 @@ data class ExcursionPOJO (
     val images: List<ImagePOJO>,
 
     @SerializedName("idSort")
-    val idSort: Int,
+    val idSort: Int?,
+
+    @SerializedName("timestamp")
+    val timestamp: Int?,
 )

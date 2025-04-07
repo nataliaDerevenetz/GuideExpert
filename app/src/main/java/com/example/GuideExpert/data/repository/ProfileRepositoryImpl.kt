@@ -3,9 +3,12 @@ package com.example.GuideExpert.data.repository
 import android.util.Log
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
+import com.example.GuideExpert.data.local.models.ExcursionFilterWithData
+import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toAvatar
 import com.example.GuideExpert.data.mappers.toDeleteFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
+import com.example.GuideExpert.data.mappers.toExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toRemoveAvatarProfileResponse
 import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
@@ -15,6 +18,7 @@ import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
+import com.example.GuideExpert.domain.models.ExcursionsFavorite
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.MessageResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
@@ -191,7 +195,7 @@ class ProfileRepositoryImpl @Inject constructor(
             if (localExcursionsFavoriteId != null) {
                 _profileFavoriteExcursionIdFlow.update { localExcursionsFavoriteId }
             }
-            val result = profileService.getExcursionsFavorite(profileFlow.value?.id!!)
+            val result = profileService.getExcursionsFavoriteId(profileFlow.value?.id!!)
             if (result.code() == 403) {
                 removeProfile()
             }
@@ -200,7 +204,7 @@ class ProfileRepositoryImpl @Inject constructor(
                     result.body()?.toExcursionsFavoriteResponse() ?: ExcursionFavoriteResponse()
                 if (response.success) {
                      profileFlow.value?.let {
-                         updateExcursionsFavoriteId(response.excursions)
+                         updateExcursionsFavorite(response.excursions)
                     }
                 } else {
                     Log.d("TAG", "Error loading favorite")
@@ -213,7 +217,7 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateExcursionsFavoriteId(excursions: List<ExcursionFavorite>) {
+    override suspend fun updateExcursionsFavorite(excursions: List<ExcursionFavorite>) {
         profileFlow.value?.let {
             _profileFavoriteExcursionIdFlow.update { excursions }
             dbStorage.insertAllExcursionsFavorite(excursions)
@@ -269,5 +273,23 @@ class ProfileRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             emit(UIResources.Error(e.message.toString()))
         }
+    }
+
+    override suspend fun fetchExcursionsFavorite(): Flow<UIResources<ExcursionsFavorite>> = flow  {
+       try{
+           val result = profileService.getExcursionsFavorite(profileFlow.value?.id!!)
+           if (result.code() == 403) {
+               removeProfile()
+           }
+           if (result.isSuccessful) {
+               val response = result.body()?.excursions ?.map { it.toExcursionsFavoriteWithData() } ?: listOf<ExcursionsFavoriteWithData>()
+               dbStorage.insertExcursionsFavorite(response)
+
+           } else {
+               emit(UIResources.Error("Error remove favorite"))
+           }
+       } catch (e: Exception) {
+           emit(UIResources.Error(e.message.toString()))
+       }
     }
 }

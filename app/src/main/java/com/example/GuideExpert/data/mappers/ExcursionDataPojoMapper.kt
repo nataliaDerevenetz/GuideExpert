@@ -1,5 +1,6 @@
 package com.example.GuideExpert.data.mappers
 
+import com.example.GuideExpert.data.local.models.ImagePreviewFavoriteEntity
 import com.example.GuideExpert.data.local.models.ImagePreviewFilterEntity
 import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
 import com.example.GuideExpert.data.remote.pojo.ExcursionDataPOJO
@@ -21,5 +22,9 @@ fun ImagePOJO.toImagePreviewSearchEntity() = ImagePreviewSearchEntity(
 )
 
 fun ImagePOJO.toImagePreviewFilterEntity() = ImagePreviewFilterEntity(
+    id = id, excursionId = excursionId, url = url
+)
+
+fun ImagePOJO.toImagePreviewFavoriteEntity() = ImagePreviewFavoriteEntity(
     id = id, excursionId = excursionId, url = url
 )

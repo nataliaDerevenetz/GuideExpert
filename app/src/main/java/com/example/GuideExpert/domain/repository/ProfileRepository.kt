@@ -5,6 +5,7 @@ import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.ExcursionFavorite
+import com.example.GuideExpert.domain.models.ExcursionsFavorite
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.MessageResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
@@ -24,7 +25,8 @@ interface ProfileRepository {
     suspend fun removeAvatarProfile():Flow<UIResources<MessageResponse>>
     suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date):Flow<UIResources<MessageResponse>>
     suspend fun getExcursionsFavorite()
-    suspend fun updateExcursionsFavoriteId(excursions: List<ExcursionFavorite>)
+    suspend fun updateExcursionsFavorite(excursions: List<ExcursionFavorite>)
     suspend fun setFavoriteExcursion(excursionId: Int):Flow<UIResources<SetFavoriteExcursionResponse>>
     suspend fun removeFavoriteExcursion(excursionId: Int):Flow<UIResources<DeleteFavoriteExcursionResponse>>
+    suspend fun fetchExcursionsFavorite():Flow<UIResources<ExcursionsFavorite>>
 }

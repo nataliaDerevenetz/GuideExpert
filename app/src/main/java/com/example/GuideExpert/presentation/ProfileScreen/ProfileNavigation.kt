@@ -24,8 +24,6 @@ object ProfileInfo
 @Serializable
 object EditorProfile
 
-
-
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,

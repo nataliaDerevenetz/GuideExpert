@@ -1,5 +1,7 @@
 package com.example.GuideExpert.data.local
 
+import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
+import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Image
@@ -17,4 +19,5 @@ interface DBStorage {
     suspend fun insertAllExcursionsFavorite(excursions: List<ExcursionFavorite>)
     suspend fun insertExcursionFavorite(excursion: ExcursionFavorite)
     suspend fun deleteExcursionFavorite(excursion: ExcursionFavorite)
+    suspend fun insertExcursionsFavorite(excursions: List<ExcursionsFavoriteWithData>)
 }

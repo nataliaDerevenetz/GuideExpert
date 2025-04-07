@@ -5,6 +5,7 @@ import com.example.GuideExpert.data.local.dao.ExcursionDataDao
 import com.example.GuideExpert.data.local.dao.FavoriteDao
 import com.example.GuideExpert.data.local.dao.ImageDao
 import com.example.GuideExpert.data.local.dao.ProfileDao
+import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionDataEntity
 import com.example.GuideExpert.data.mappers.toExcursionFavorite
@@ -13,6 +14,7 @@ import com.example.GuideExpert.data.mappers.toImage
 import com.example.GuideExpert.data.mappers.toImageEntity
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toProfileWithAvatar
+import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Image
@@ -78,5 +80,9 @@ class DBStorageImpl @Inject constructor(
 
     override suspend fun deleteExcursionFavorite(excursion: ExcursionFavorite) {
         favoriteDao.delete(excursion.toExcursionsFavoriteEntity())
+    }
+
+    override suspend fun insertExcursionsFavorite(excursions: List<ExcursionsFavoriteWithData>) {
+        favoriteDao.insertFavorites(excursions)
     }
 }

@@ -7,6 +7,7 @@ import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toProfileYandex
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Config
+import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.ProfileYandex
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import java.io.IOException
 import javax.inject.Inject
@@ -76,5 +78,9 @@ class DataSourceRepositoryImpl @Inject constructor(
         }
     }.catch { e->
         emit(UIResources.Error(e.localizedMessage ?: "Unknown error"))
+    }
+
+    override  fun getExcursionFavoriteFlow(): Flow<List<Excursion>> {
+        return dbStorage.getExcursionFavorite().flowOn(Dispatchers.IO)
     }
 }

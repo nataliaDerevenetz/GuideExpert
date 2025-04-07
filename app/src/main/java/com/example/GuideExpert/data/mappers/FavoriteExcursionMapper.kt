@@ -1,8 +1,6 @@
 package com.example.GuideExpert.data.mappers
 
 import com.example.GuideExpert.data.local.models.ExcursionFavoriteEntity
-import com.example.GuideExpert.data.local.models.ExcursionSearchEntity
-import com.example.GuideExpert.data.local.models.ExcursionSearchWithData
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteEntity
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.remote.pojo.DeleteFavoriteExcursionResponsePOJO
@@ -11,6 +9,7 @@ import com.example.GuideExpert.data.remote.pojo.ExcursionPOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoriteResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.SetFavoriteExcursionResponsePOJO
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
+import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
@@ -33,3 +32,6 @@ fun ExcursionPOJO.toExcursionsFavoriteWithData() = ExcursionsFavoriteWithData(Ex
 fun ExcursionsFavoriteWithData.toExcursionsFavoriteEntity() = ExcursionsFavoriteEntity(id = excursion.id,
     title = excursion.title, description = excursion.description, timestamp = excursion.timestamp, images = images.map { it.toImage() }
 )
+
+fun ExcursionsFavoriteWithData.toExcursion() = Excursion(id=excursion.id,title = excursion.title,
+    description = excursion.description, images = images.map{it.toImage()}, timestamp = excursion.timestamp)

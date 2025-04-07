@@ -7,6 +7,7 @@ import com.example.GuideExpert.data.local.Converters
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
 import com.example.GuideExpert.data.local.dao.ExcursionFilterDao
 import com.example.GuideExpert.data.local.dao.ExcursionSearchDao
+import com.example.GuideExpert.data.local.dao.ExcursionsFavoriteDao
 import com.example.GuideExpert.data.local.dao.FavoriteDao
 import com.example.GuideExpert.data.local.dao.ImageDao
 import com.example.GuideExpert.data.local.dao.ProfileDao
@@ -39,4 +40,5 @@ abstract class ExcursionsRoomDatabase: RoomDatabase() {
     abstract fun excursionDataDao(): ExcursionDataDao
     abstract fun profileDao(): ProfileDao
     abstract fun favoriteDao(): FavoriteDao
+    abstract fun excursionsFavoriteDao(): ExcursionsFavoriteDao
 }

@@ -20,4 +20,5 @@ interface DBStorage {
     suspend fun insertExcursionFavorite(excursion: ExcursionFavorite)
     suspend fun deleteExcursionFavorite(excursion: ExcursionFavorite)
     suspend fun insertExcursionsFavorite(excursions: List<ExcursionsFavoriteWithData>)
+    fun getExcursionFavorite(): Flow<List<Excursion>>
 }

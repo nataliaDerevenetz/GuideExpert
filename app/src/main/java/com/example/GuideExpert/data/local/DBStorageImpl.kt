@@ -1,11 +1,12 @@
 package com.example.GuideExpert.data.local
 
-import android.util.Log
 import com.example.GuideExpert.data.local.dao.ExcursionDataDao
+import com.example.GuideExpert.data.local.dao.ExcursionsFavoriteDao
 import com.example.GuideExpert.data.local.dao.FavoriteDao
 import com.example.GuideExpert.data.local.dao.ImageDao
 import com.example.GuideExpert.data.local.dao.ProfileDao
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
+import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionDataEntity
 import com.example.GuideExpert.data.mappers.toExcursionFavorite
@@ -28,7 +29,8 @@ class DBStorageImpl @Inject constructor(
     private val excursionDataDao: ExcursionDataDao,
     private val imageDao: ImageDao,
     private val profileDao: ProfileDao,
-    private val favoriteDao: FavoriteDao
+    private val favoriteDao: FavoriteDao,
+    private val excursionsFavoriteDao: ExcursionsFavoriteDao
 ): DBStorage{
 
     override suspend fun insertExcursionInfo(excursion: ExcursionData, images:List<Image>) {
@@ -83,6 +85,12 @@ class DBStorageImpl @Inject constructor(
     }
 
     override suspend fun insertExcursionsFavorite(excursions: List<ExcursionsFavoriteWithData>) {
-        favoriteDao.insertFavorites(excursions)
+        excursionsFavoriteDao.insertAll(excursions)
+    }
+
+    override fun getExcursionFavorite(): Flow<List<Excursion>> {
+        return excursionsFavoriteDao.getAll().map{
+           favorite -> favorite.map {  it.toExcursion() }
+        }
     }
 }

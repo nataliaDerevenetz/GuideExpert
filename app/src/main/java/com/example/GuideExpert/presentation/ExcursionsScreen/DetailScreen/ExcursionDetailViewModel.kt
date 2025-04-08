@@ -69,7 +69,7 @@ class ExcursionDetailViewModel @Inject constructor(
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
 
-    private val excursionDetail = ExcursionDetail.from(savedStateHandle)
+    val excursionDetail = ExcursionDetail.from(savedStateHandle)
 
     val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
 

@@ -61,6 +61,7 @@ import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
@@ -90,6 +91,7 @@ interface ExcursionDetailScope {
     val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
     val effectFlow: Flow<SnackbarEffect>
     val snackbarHostState: SnackbarHostState
+    val excursionDetail: ExcursionDetail
 }
 
 fun DefaultExcursionDetailScope(
@@ -105,7 +107,8 @@ fun DefaultExcursionDetailScope(
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
     effectFlow: Flow<SnackbarEffect>,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    excursionDetail: ExcursionDetail
 ): ExcursionDetailScope {
     return object : ExcursionDetailScope {
         override val excursionData: Flow<ExcursionData?>
@@ -134,6 +137,8 @@ fun DefaultExcursionDetailScope(
             get() = effectFlow
         override val snackbarHostState: SnackbarHostState
             get() = snackbarHostState
+        override val excursionDetail: ExcursionDetail
+            get() = excursionDetail
     }
 }
 
@@ -151,9 +156,10 @@ fun rememberDefaultExcursionDetailScope(
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
     effectFlow: Flow<SnackbarEffect>,
-    snackbarHostState: SnackbarHostState
-): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState) {
-    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState)
+    snackbarHostState: SnackbarHostState,
+    excursionDetail: ExcursionDetail
+): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail) {
+    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -177,7 +183,8 @@ fun ExcursionDetailScreen(
         stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
         stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion,
         effectFlow = viewModel.effectFlow,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        excursionDetail = viewModel.excursionDetail
         ),
   //  dataContent: @Composable ExcursionDetailScope.() -> Unit ={},
 ) {
@@ -200,9 +207,9 @@ fun ExcursionDetailScreen(
                     IconButton({
                         excursionData?.let {
                             if (!isFavorite) {
-                                scopeState.handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursion(it.toExcursion()))
+                                scopeState.handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursion(scopeState.excursionDetail.excursion))
                             } else {
-                                scopeState.handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(it.toExcursion()))
+                                scopeState.handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(scopeState.excursionDetail.excursion))
                             }
                         }
                     }) { Icon(

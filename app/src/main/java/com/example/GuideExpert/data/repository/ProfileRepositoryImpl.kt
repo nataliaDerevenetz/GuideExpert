@@ -11,6 +11,7 @@ import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toProfile
 import com.example.GuideExpert.data.mappers.toRemoveAvatarProfileResponse
+import com.example.GuideExpert.data.mappers.toRestoreFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
@@ -21,6 +22,7 @@ import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
 import com.example.GuideExpert.domain.models.MessageResponse
 import com.example.GuideExpert.domain.models.Profile
+import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
@@ -293,4 +295,32 @@ class ProfileRepositoryImpl @Inject constructor(
            emit(UIResources.Error(e.message.toString()))
        }
     }
+
+    override suspend fun restoreFavoriteExcursion(excursion: Excursion): Flow<UIResources<RestoreFavoriteExcursionResponse>> = flow {
+        try {
+            emit(UIResources.Loading)
+            val result = profileService.restoreExcursionFavorite(profileFlow.value?.id!!,excursion.id,excursion.timestamp)
+            if (result.code() == 403) {
+                removeProfile()
+            }
+            if (result.isSuccessful) {
+                val response =
+                    result.body()?.toRestoreFavoriteExcursionResponse() ?: RestoreFavoriteExcursionResponse()
+                if (response.success) {
+                    val excursionUpdate = excursion.copy(timestamp = response.excursion?.timestamp ?:0)
+                    dbStorage.insertExcursionFavorite(response.excursion!!,excursionUpdate)
+                    _profileFavoriteExcursionIdFlow.update { it + response.excursion }
+                    emit(UIResources.Success(response))
+                } else {
+                    emit(UIResources.Error("Error :: ${response.message}"))
+                }
+            } else {
+                emit(UIResources.Error("Error restore favorite"))
+            }
+        } catch (e: Exception) {
+            emit(UIResources.Error(e.message.toString()))
+        }
+
+    }
+
 }

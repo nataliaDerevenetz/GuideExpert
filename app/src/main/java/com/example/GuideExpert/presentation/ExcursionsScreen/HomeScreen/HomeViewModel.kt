@@ -71,6 +71,17 @@ data class DeleteFavoriteExcursionUIState(
     val contentState: DeleteFavoriteExcursionState = DeleteFavoriteExcursionState.Idle
 )
 
+sealed interface RestoreFavoriteExcursionState{
+    object Idle:RestoreFavoriteExcursionState
+    object Loading:RestoreFavoriteExcursionState
+    object Success:RestoreFavoriteExcursionState
+    data class Error(val error: String):RestoreFavoriteExcursionState
+}
+
+data class RestoreFavoriteExcursionUIState(
+    val contentState: RestoreFavoriteExcursionState = RestoreFavoriteExcursionState.Idle
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,

@@ -5,6 +5,7 @@ import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoritePOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoriteResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.ProfilePOJO
 import com.example.GuideExpert.data.remote.pojo.RemoveAvatarProfileResponsePOJO
+import com.example.GuideExpert.data.remote.pojo.RestoreFavoriteExcursionResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.SetFavoriteExcursionResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.UpdateAvatarProfileResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.UpdateProfileResponsePOJO
@@ -51,4 +52,6 @@ interface ProfileService {
     @GET("excursionsfavorite.php")
     suspend fun getExcursionsFavorite(@Query("profile_id") profileId:Int): Response<ExcursionsFavoritePOJO>
 
+    @GET("restorefavoriteexcursion.php")
+    suspend fun restoreExcursionFavorite(@Query("profile_id") profileId:Int,@Query("excursion_id") excursionId:Int,@Query("timestamp") timestamp:Int): Response<RestoreFavoriteExcursionResponsePOJO>
 }

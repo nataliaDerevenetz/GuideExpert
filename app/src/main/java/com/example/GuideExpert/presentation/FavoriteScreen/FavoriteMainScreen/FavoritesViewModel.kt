@@ -8,11 +8,14 @@ import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.DeleteFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.GetExcursionFavoriteUseCase
 import com.example.GuideExpert.domain.LoadExcursionFavoriteUseCase
+import com.example.GuideExpert.domain.RestoreFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
@@ -50,7 +53,7 @@ sealed interface ExcursionsFavoriteUiEvent {
     data object OnSetFavoriteExcursionStateSetIdle : ExcursionsFavoriteUiEvent
     data class OnDeleteFavoriteExcursion(val excursion: Excursion) : ExcursionsFavoriteUiEvent
     data object OnDeleteFavoriteExcursionStateSetIdle : ExcursionsFavoriteUiEvent
-
+    data class OnRestoreFavoriteExcursion(val excursion: Excursion): ExcursionsFavoriteUiEvent
 }
 
 
@@ -60,7 +63,8 @@ class FavoritesViewModel @Inject constructor(
     val loadExcursionFavoriteUseCase: LoadExcursionFavoriteUseCase,
     val getExcursionFavoriteUseCase: GetExcursionFavoriteUseCase,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
-    val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
+    val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase,
+    val restoreFavoriteExcursionUseCase: RestoreFavoriteExcursionUseCase
 ) : ViewModel() {
 
     val excursions: Flow<List<Excursion>> = getExcursionFavoriteUseCase()
@@ -81,6 +85,11 @@ class FavoritesViewModel @Inject constructor(
     )
     val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState> = _stateDeleteFavoriteExcursion.asStateFlow()
 
+    private val _stateRestoreFavoriteExcursion = MutableStateFlow<RestoreFavoriteExcursionUIState>(
+        RestoreFavoriteExcursionUIState()
+    )
+    val stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState> = _stateRestoreFavoriteExcursion.asStateFlow()
+
     fun handleEvent(event: ExcursionsFavoriteUiEvent) {
         viewModelScope.launch {
             when (event) {
@@ -90,7 +99,7 @@ class FavoritesViewModel @Inject constructor(
                 is ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursionStateSetIdle -> {setIdleDeleteFavoriteExcursionUIState()}
                 is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursion -> {setFavoriteExcursion(event.excursion)}
                 is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleUpdateProfileUIState()}
-
+                is ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion -> {restoreFavoriteExcursion(event.excursion)}
             }
         }
     }
@@ -122,6 +131,34 @@ class FavoritesViewModel @Inject constructor(
                 }
                 is UIResources.Loading -> withContext(Dispatchers.Main){
                     _stateLoadFavorites.update { it.copy(contentState = LoadFavoritesState.Loading) }
+                }
+            }
+        }
+    }
+
+
+    private fun restoreFavoriteExcursion(excursion :Excursion) {
+        viewModelScope.launch(Dispatchers.IO) {
+            restoreFavoriteExcursionUseCase(excursion).collectLatest { resources ->
+                when (resources) {
+                    is UIResources.Error -> withContext(Dispatchers.Main){
+                        _stateRestoreFavoriteExcursion.update {
+                            it.copy(
+                                contentState = RestoreFavoriteExcursionState.Error(
+                                    resources.message
+                                )
+                            )
+                        }
+                        sendEffectFlow("Error restore favorite excursion : ${resources.message}")
+                    }
+
+                    is UIResources.Loading -> withContext(Dispatchers.Main){
+                        _stateRestoreFavoriteExcursion.update { it.copy(contentState = RestoreFavoriteExcursionState.Loading) }
+                    }
+
+                    is UIResources.Success -> withContext(Dispatchers.Main){
+                        _stateRestoreFavoriteExcursion.update { it.copy(contentState = RestoreFavoriteExcursionState.Success) }
+                    }
                 }
             }
         }

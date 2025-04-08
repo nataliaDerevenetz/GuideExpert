@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -107,7 +108,7 @@ fun FavoritesScope.ExcursionFavoriteItem(
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
                         dismissState.reset()
-                        handleEvent(ExcursionsFavoriteUiEvent.OnSetFavoriteExcursion(currentItem))
+                        handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion(currentItem))
                         //   onRestore(currentItem)
                         Log.d("TAG", "Restore")
                     }
@@ -130,10 +131,10 @@ fun FavoritesScope.ExcursionFavoriteItem(
     ) {
         SwipeToDismissBox(
             state = dismissState,
-           // modifier = modifier,
+          //  modifier = Modifier.nestedScroll(),
             backgroundContent = { DismissBackground(dismissState)},
             content = {
-                ExcursionFavoriteCard(excursion)
+                ExcursionFavoriteCard(excursion,coroutineScope)
             })
 
     }
@@ -143,11 +144,10 @@ fun FavoritesScope.ExcursionFavoriteItem(
 
 @Composable
 fun FavoritesScope.ExcursionFavoriteCard(
-    excursion: Excursion
+    excursion: Excursion,
+    coroutineScope: CoroutineScope
 ) {
-  //  val favoriteExcursions by profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
-  //  if (favoriteExcursions.any { it.excursionId == excursion.id }) {excursion.isFavorite = true} else {excursion.isFavorite = false}
-
+  
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -171,13 +171,21 @@ fun FavoritesScope.ExcursionFavoriteCard(
                             shape = RoundedCornerShape(15.dp)
                         }
                         .clickable {
-                            handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(excursion))
+                            coroutineScope.launch() {
+                                handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(excursion))
 
-                            /*        if (!excursion.isFavorite) {
-                                        onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
-                                    } else {
-                                        onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
-                                    }*/
+                                val result = snackbarHostState.showSnackbar("Отменить удаление", "Отменить", true, duration = SnackbarDuration.Short)
+
+                                when (result) {
+                                    SnackbarResult.ActionPerformed -> {
+                                        handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion(excursion))
+                                    }
+
+                                    SnackbarResult.Dismissed -> {
+                                    }
+                                }
+
+                            }
                         }
                     ) {
                         Image(

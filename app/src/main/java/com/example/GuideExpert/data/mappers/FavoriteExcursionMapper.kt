@@ -7,11 +7,13 @@ import com.example.GuideExpert.data.remote.pojo.DeleteFavoriteExcursionResponseP
 import com.example.GuideExpert.data.remote.pojo.ExcursionFavoritePOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionPOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoriteResponsePOJO
+import com.example.GuideExpert.data.remote.pojo.RestoreFavoriteExcursionResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.SetFavoriteExcursionResponsePOJO
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
+import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 
 fun ExcursionFavoriteEntity.toExcursionFavorite() = ExcursionFavorite(id=id,excursionId=excursionId,timestamp=timestamp)
@@ -39,3 +41,6 @@ fun ExcursionsFavoriteWithData.toExcursion() = Excursion(id=excursion.id,title =
 fun Excursion.toExcursionsFavoriteWithData() = ExcursionsFavoriteWithData(excursion = ExcursionsFavoriteEntity(id = id,title = title,description = description,timestamp=timestamp),images = images.map { it.toImagePreviewFavoriteEntity() })
 
 fun Excursion.toExcursionsFavoriteEntity() = ExcursionsFavoriteEntity(id=id,title = title,description = description,timestamp = timestamp)
+
+
+fun RestoreFavoriteExcursionResponsePOJO.toRestoreFavoriteExcursionResponse() = RestoreFavoriteExcursionResponse(success=success,message=message,excursion=excursion.toExcursionFavorite())

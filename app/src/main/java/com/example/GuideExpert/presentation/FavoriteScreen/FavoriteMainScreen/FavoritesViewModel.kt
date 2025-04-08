@@ -5,9 +5,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.GuideExpert.data.repository.UIResources
+import com.example.GuideExpert.domain.DeleteFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.GetExcursionFavoriteUseCase
 import com.example.GuideExpert.domain.LoadExcursionFavoriteUseCase
+import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailUiEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.UpdateProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +46,11 @@ data class LoadFavoritesUIState(
 sealed interface ExcursionsFavoriteUiEvent {
     data object OnLoadExcursionsFavorite : ExcursionsFavoriteUiEvent
     data object OnLoadFavoritesUIStateSetIdle : ExcursionsFavoriteUiEvent
+    data class OnSetFavoriteExcursion(val excursion: Excursion) : ExcursionsFavoriteUiEvent
+    data object OnSetFavoriteExcursionStateSetIdle : ExcursionsFavoriteUiEvent
+    data class OnDeleteFavoriteExcursion(val excursion: Excursion) : ExcursionsFavoriteUiEvent
+    data object OnDeleteFavoriteExcursionStateSetIdle : ExcursionsFavoriteUiEvent
+
 }
 
 
@@ -46,7 +58,9 @@ sealed interface ExcursionsFavoriteUiEvent {
 class FavoritesViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val loadExcursionFavoriteUseCase: LoadExcursionFavoriteUseCase,
-    val getExcursionFavoriteUseCase: GetExcursionFavoriteUseCase
+    val getExcursionFavoriteUseCase: GetExcursionFavoriteUseCase,
+    val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
+    val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
 
     val excursions: Flow<List<Excursion>> = getExcursionFavoriteUseCase()
@@ -57,12 +71,26 @@ class FavoritesViewModel @Inject constructor(
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
+    private val _stateSetFavoriteExcursion = MutableStateFlow<SetFavoriteExcursionUIState>(
+        SetFavoriteExcursionUIState()
+    )
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState> = _stateSetFavoriteExcursion.asStateFlow()
+
+    private val _stateDeleteFavoriteExcursion = MutableStateFlow<DeleteFavoriteExcursionUIState>(
+        DeleteFavoriteExcursionUIState()
+    )
+    val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState> = _stateDeleteFavoriteExcursion.asStateFlow()
 
     fun handleEvent(event: ExcursionsFavoriteUiEvent) {
         viewModelScope.launch {
             when (event) {
                 is ExcursionsFavoriteUiEvent.OnLoadExcursionsFavorite -> loadExcursionsFavorite()
                 is ExcursionsFavoriteUiEvent.OnLoadFavoritesUIStateSetIdle -> setIdleLoadFavoritesUIState()
+                is ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion -> {deleteFavoriteExcursion(event.excursion)}
+                is ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursionStateSetIdle -> {setIdleDeleteFavoriteExcursionUIState()}
+                is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursion -> {setFavoriteExcursion(event.excursion)}
+                is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleUpdateProfileUIState()}
+
             }
         }
     }
@@ -98,6 +126,69 @@ class FavoritesViewModel @Inject constructor(
             }
         }
     }
+
+    private fun setFavoriteExcursion(excursion :Excursion) {
+        viewModelScope.launch(Dispatchers.IO) {
+            setFavoriteExcursionUseCase(excursion).collectLatest { resources ->
+                when (resources) {
+                    is UIResources.Error -> withContext(Dispatchers.Main){
+                        _stateSetFavoriteExcursion.update {
+                            it.copy(
+                                contentState = SetFavoriteExcursionState.Error(
+                                    resources.message
+                                )
+                            )
+                        }
+                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                    }
+
+                    is UIResources.Loading -> withContext(Dispatchers.Main){
+                        _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Loading) }
+                    }
+
+                    is UIResources.Success -> withContext(Dispatchers.Main){
+                        _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Success) }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deleteFavoriteExcursion(excursion: Excursion) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteFavoriteExcursionUseCase(excursion).collectLatest { resources ->
+                when (resources) {
+                    is UIResources.Error -> withContext(Dispatchers.Main){
+                        _stateDeleteFavoriteExcursion.update {
+                            it.copy(
+                                contentState = DeleteFavoriteExcursionState.Error(
+                                    resources.message
+                                )
+                            )
+                        }
+                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                    }
+
+                    is UIResources.Loading -> withContext(Dispatchers.Main){
+                        _stateDeleteFavoriteExcursion.update { it.copy(contentState = DeleteFavoriteExcursionState.Loading) }
+                    }
+
+                    is UIResources.Success -> withContext(Dispatchers.Main){
+                        _stateDeleteFavoriteExcursion.update { it.copy(contentState = DeleteFavoriteExcursionState.Success) }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setIdleDeleteFavoriteExcursionUIState() {
+        _stateDeleteFavoriteExcursion.update { it.copy(contentState = DeleteFavoriteExcursionState.Idle) }
+    }
+
+    private fun setIdleUpdateProfileUIState() {
+        _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
+    }
+
 
     init{
         handleEvent(ExcursionsFavoriteUiEvent.OnLoadExcursionsFavorite)

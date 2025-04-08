@@ -94,6 +94,7 @@ fun FavoritesScope.ExcursionFavoriteItem(
         if(isRemoved) {
             coroutineScope.launch() {
                 delay(animationDuration.toLong())
+                handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(currentItem))
               //  onRemove(currentItem)
                 val result =
                     snackbarHostState.showSnackbar(
@@ -106,7 +107,8 @@ fun FavoritesScope.ExcursionFavoriteItem(
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
                         dismissState.reset()
-                     //   onRestore(currentItem)
+                        handleEvent(ExcursionsFavoriteUiEvent.OnSetFavoriteExcursion(currentItem))
+                        //   onRestore(currentItem)
                         Log.d("TAG", "Restore")
                     }
 
@@ -169,11 +171,13 @@ fun FavoritesScope.ExcursionFavoriteCard(
                             shape = RoundedCornerShape(15.dp)
                         }
                         .clickable {
-                    /*        if (!excursion.isFavorite) {
-                                onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
-                            } else {
-                                onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
-                            }*/
+                            handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(excursion))
+
+                            /*        if (!excursion.isFavorite) {
+                                        onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
+                                    } else {
+                                        onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
+                                    }*/
                         }
                     ) {
                         Image(

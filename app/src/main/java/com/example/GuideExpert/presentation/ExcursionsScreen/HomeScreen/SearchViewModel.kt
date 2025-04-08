@@ -170,7 +170,7 @@ class SearchViewModel @Inject constructor(
 
      private fun setFavoriteExcursion(excursion: Excursion) {
          viewModelScope.launch(Dispatchers.IO) {
-             setFavoriteExcursionUseCase(excursion.id).collectLatest { resources ->
+             setFavoriteExcursionUseCase(excursion).collectLatest { resources ->
                  when (resources) {
                      is UIResources.Error -> withContext(Dispatchers.Main){
                          _stateSetFavoriteExcursion.update {
@@ -197,7 +197,7 @@ class SearchViewModel @Inject constructor(
 
     private fun deleteFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteFavoriteExcursionUseCase(excursion.id).collectLatest { resources ->
+            deleteFavoriteExcursionUseCase(excursion).collectLatest { resources ->
                 when (resources) {
                     is UIResources.Error -> withContext(Dispatchers.Main){
                         _stateDeleteFavoriteExcursion.update {

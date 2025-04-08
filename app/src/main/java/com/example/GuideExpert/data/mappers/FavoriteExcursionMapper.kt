@@ -35,3 +35,7 @@ fun ExcursionsFavoriteWithData.toExcursionsFavoriteEntity() = ExcursionsFavorite
 
 fun ExcursionsFavoriteWithData.toExcursion() = Excursion(id=excursion.id,title = excursion.title,
     description = excursion.description, images = images.map{it.toImage()}, timestamp = excursion.timestamp)
+
+fun Excursion.toExcursionsFavoriteWithData() = ExcursionsFavoriteWithData(excursion = ExcursionsFavoriteEntity(id = id,title = title,description = description,timestamp=timestamp),images = images.map { it.toImagePreviewFavoriteEntity() })
+
+fun Excursion.toExcursionsFavoriteEntity() = ExcursionsFavoriteEntity(id=id,title = title,description = description,timestamp = timestamp)

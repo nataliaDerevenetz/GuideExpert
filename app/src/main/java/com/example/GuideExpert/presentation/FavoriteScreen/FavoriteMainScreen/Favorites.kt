@@ -141,10 +141,10 @@ fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
 
 @Composable
 fun FavoritesScope.FavoritesDataContent() {
-    val excursionsNotSorted by excursions.collectAsStateWithLifecycle(null)
-    val excursions  = excursionsNotSorted?.let {
+    val excursions by excursions.collectAsStateWithLifecycle(null)
+   /* val excursions  = excursionsNotSorted?.let {
         it.sortedBy { it.timestamp }
-    }
+    }*/
 
     val scope = rememberCoroutineScope()
 

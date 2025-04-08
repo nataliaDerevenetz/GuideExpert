@@ -224,10 +224,10 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setFavoriteExcursion(excursionId: Int): Flow<UIResources<SetFavoriteExcursionResponse>> = flow {
+    override suspend fun setFavoriteExcursion(excursion: Excursion): Flow<UIResources<SetFavoriteExcursionResponse>> = flow {
         try {
             emit(UIResources.Loading)
-            val result = profileService.setExcursionFavorite(profileFlow.value?.id!!,excursionId)
+            val result = profileService.setExcursionFavorite(profileFlow.value?.id!!,excursion.id)
             if (result.code() == 403) {
                 removeProfile()
             }
@@ -235,7 +235,8 @@ class ProfileRepositoryImpl @Inject constructor(
                 val response =
                     result.body()?.toSetFavoriteExcursionResponse() ?: SetFavoriteExcursionResponse()
                 if (response.success) {
-                    dbStorage.insertExcursionFavorite(response.excursion!!)
+                    val excursionUpdate = excursion.copy(timestamp = response.excursion?.timestamp ?:0)
+                    dbStorage.insertExcursionFavorite(response.excursion!!,excursionUpdate)
                     _profileFavoriteExcursionIdFlow.update { it + response.excursion }
                     emit(UIResources.Success(response))
                 } else {
@@ -250,10 +251,10 @@ class ProfileRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun removeFavoriteExcursion(excursionId: Int): Flow<UIResources<DeleteFavoriteExcursionResponse>> = flow{
+    override suspend fun removeFavoriteExcursion(excursion: Excursion): Flow<UIResources<DeleteFavoriteExcursionResponse>> = flow{
         try {
             emit(UIResources.Loading)
-            val result = profileService.removeExcursionFavorite(profileFlow.value?.id!!,excursionId)
+            val result = profileService.removeExcursionFavorite(profileFlow.value?.id!!,excursion.id)
             if (result.code() == 403) {
                 removeProfile()
             }
@@ -261,7 +262,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 val response =
                     result.body()?.toDeleteFavoriteExcursionResponse() ?: DeleteFavoriteExcursionResponse()
                 if (response.success) {
-                    dbStorage.deleteExcursionFavorite(response.excursion!!)
+                    dbStorage.deleteExcursionFavorite(response.excursion!!,excursion)
                     _profileFavoriteExcursionIdFlow.update {it.filter { it1 -> it1.excursionId != response.excursion.excursionId } }
                     emit(UIResources.Success(response))
                 } else {

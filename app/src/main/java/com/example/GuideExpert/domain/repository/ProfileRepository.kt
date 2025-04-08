@@ -26,7 +26,7 @@ interface ProfileRepository {
     suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date):Flow<UIResources<MessageResponse>>
     suspend fun getExcursionsFavorite()
     suspend fun updateExcursionsFavorite(excursions: List<ExcursionFavorite>)
-    suspend fun setFavoriteExcursion(excursionId: Int):Flow<UIResources<SetFavoriteExcursionResponse>>
-    suspend fun removeFavoriteExcursion(excursionId: Int):Flow<UIResources<DeleteFavoriteExcursionResponse>>
+    suspend fun setFavoriteExcursion(excursion: Excursion):Flow<UIResources<SetFavoriteExcursionResponse>>
+    suspend fun removeFavoriteExcursion(excursion: Excursion):Flow<UIResources<DeleteFavoriteExcursionResponse>>
     suspend fun fetchExcursionsFavorite():Flow<UIResources<List<Excursion>?>>
 }

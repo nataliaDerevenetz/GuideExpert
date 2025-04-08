@@ -50,9 +50,9 @@ data class UIState(
 
 sealed interface ExcursionDetailUiEvent {
     data object OnLoadExcursionInfo : ExcursionDetailUiEvent
-    data class OnSetFavoriteExcursion(val excursionId: Int) : ExcursionDetailUiEvent
+    data class OnSetFavoriteExcursion(val excursion: Excursion) : ExcursionDetailUiEvent
     data object OnSetFavoriteExcursionStateSetIdle : ExcursionDetailUiEvent
-    data class OnDeleteFavoriteExcursion(val excursionId: Int) : ExcursionDetailUiEvent
+    data class OnDeleteFavoriteExcursion(val excursion: Excursion) : ExcursionDetailUiEvent
     data object OnDeleteFavoriteExcursionStateSetIdle : ExcursionDetailUiEvent
 }
 
@@ -106,9 +106,9 @@ class ExcursionDetailViewModel @Inject constructor(
         viewModelScope.launch {
             when (event) {
                 is ExcursionDetailUiEvent.OnLoadExcursionInfo -> loadInfo()
-                is ExcursionDetailUiEvent.OnDeleteFavoriteExcursion -> {deleteFavoriteExcursion(event.excursionId)}
+                is ExcursionDetailUiEvent.OnDeleteFavoriteExcursion -> {deleteFavoriteExcursion(event.excursion)}
                 is ExcursionDetailUiEvent.OnDeleteFavoriteExcursionStateSetIdle -> {setIdleDeleteFavoriteExcursionUIState()}
-                is ExcursionDetailUiEvent.OnSetFavoriteExcursion -> {setFavoriteExcursion(event.excursionId)}
+                is ExcursionDetailUiEvent.OnSetFavoriteExcursion -> {setFavoriteExcursion(event.excursion)}
                 is ExcursionDetailUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleUpdateProfileUIState()}
             }
         }
@@ -128,9 +128,9 @@ class ExcursionDetailViewModel @Inject constructor(
         }
     }
 
-    private fun setFavoriteExcursion(excursionId: Int) {
+    private fun setFavoriteExcursion(excursion :Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
-            setFavoriteExcursionUseCase(excursionId).collectLatest { resources ->
+            setFavoriteExcursionUseCase(excursion).collectLatest { resources ->
                 when (resources) {
                     is UIResources.Error -> withContext(Dispatchers.Main){
                         _stateSetFavoriteExcursion.update {
@@ -155,9 +155,9 @@ class ExcursionDetailViewModel @Inject constructor(
         }
     }
 
-    private fun deleteFavoriteExcursion(excursionId: Int) {
+    private fun deleteFavoriteExcursion(excursion: Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteFavoriteExcursionUseCase(excursionId).collectLatest { resources ->
+            deleteFavoriteExcursionUseCase(excursion).collectLatest { resources ->
                 when (resources) {
                     is UIResources.Error -> withContext(Dispatchers.Main){
                         _stateDeleteFavoriteExcursion.update {

@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
+import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
@@ -199,9 +200,9 @@ fun ExcursionDetailScreen(
                     IconButton({
                         excursionData?.let {
                             if (!isFavorite) {
-                                scopeState.handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursion(it.excursionId))
+                                scopeState.handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursion(it.toExcursion()))
                             } else {
-                                scopeState.handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(it.excursionId))
+                                scopeState.handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(it.toExcursion()))
                             }
                         }
                     }) { Icon(

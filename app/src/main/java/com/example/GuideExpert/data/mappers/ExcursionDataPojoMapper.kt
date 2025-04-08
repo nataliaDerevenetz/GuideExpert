@@ -6,6 +6,7 @@ import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
 import com.example.GuideExpert.data.remote.pojo.ExcursionDataPOJO
 import com.example.GuideExpert.data.remote.pojo.ImagePOJO
 import com.example.GuideExpert.domain.models.Banner
+import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Image
 
@@ -26,5 +27,12 @@ fun ImagePOJO.toImagePreviewFilterEntity() = ImagePreviewFilterEntity(
 )
 
 fun ImagePOJO.toImagePreviewFavoriteEntity() = ImagePreviewFavoriteEntity(
+    id = id, excursionId = excursionId, url = url
+)
+
+fun ExcursionData.toExcursion() = Excursion(id = excursionId,title= title,description = description,
+    images= images)
+
+fun Image.toImagePreviewFavoriteEntity() = ImagePreviewFavoriteEntity(
     id = id, excursionId = excursionId, url = url
 )

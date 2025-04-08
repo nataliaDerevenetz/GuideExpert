@@ -3,10 +3,10 @@ package com.example.GuideExpert.data.repository
 import android.util.Log
 import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
-import com.example.GuideExpert.data.local.models.ExcursionFilterWithData
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toAvatar
 import com.example.GuideExpert.data.mappers.toDeleteFavoriteExcursionResponse
+import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toProfile
@@ -16,11 +16,11 @@ import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
+import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
-import com.example.GuideExpert.domain.models.ExcursionsFavorite
-import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.MessageResponse
+import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
@@ -275,7 +275,7 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchExcursionsFavorite(): Flow<UIResources<ExcursionsFavorite>> = flow  {
+    override suspend fun fetchExcursionsFavorite(): Flow<UIResources<List<Excursion>?>> = flow  {
        try{
            val result = profileService.getExcursionsFavorite(profileFlow.value?.id!!)
            if (result.code() == 403) {
@@ -284,7 +284,7 @@ class ProfileRepositoryImpl @Inject constructor(
            if (result.isSuccessful) {
                val response = result.body()?.excursions ?.map { it.toExcursionsFavoriteWithData() } ?: listOf<ExcursionsFavoriteWithData>()
                dbStorage.insertExcursionsFavorite(response)
-
+               emit(UIResources.Success( result.body()?.excursions ?.map { it.toExcursion()}))
            } else {
                emit(UIResources.Error("Error remove favorite"))
            }

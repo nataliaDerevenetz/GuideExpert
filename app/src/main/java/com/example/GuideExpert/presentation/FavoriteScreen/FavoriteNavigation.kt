@@ -9,8 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.GuideExpert.presentation.FavoriteScreen.FavotiteMainScreen.Favorites
-import com.example.GuideExpert.presentation.ProfileScreen.ProfileInfo
+import com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen.Favorites
 import kotlinx.serialization.Serializable
 
 @Serializable

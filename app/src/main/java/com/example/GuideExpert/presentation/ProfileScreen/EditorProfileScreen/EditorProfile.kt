@@ -195,7 +195,6 @@ fun EditorProfileStateScope.ContentUpdateProfile(effectFlow: SnackbarEffect?) {
 
     when(stateUpdateProfile.contentState){
         is UpdateProfileState.Success -> {
-            Log.d("UpdateProfileState","Success")
             Toast.makeText(LocalContext.current, stringResource(id = R.string.message_profile_succes_update), Toast.LENGTH_LONG).show()
             handleEvent(EditorProfileUiEvent.OnUpdateProfileUIStateSetIdle)
         }

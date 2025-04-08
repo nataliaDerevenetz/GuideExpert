@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LoadingExcursionListShimmer(
 ){
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        items(20) {
+        repeat(20) {
             ColumnExcursionShimmer()
         }
     }

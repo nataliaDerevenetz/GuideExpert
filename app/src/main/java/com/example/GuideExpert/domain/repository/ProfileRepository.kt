@@ -4,10 +4,10 @@ import com.example.GuideExpert.data.repository.ProfileResources
 import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
+import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
-import com.example.GuideExpert.domain.models.ExcursionsFavorite
-import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.MessageResponse
+import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,5 +28,5 @@ interface ProfileRepository {
     suspend fun updateExcursionsFavorite(excursions: List<ExcursionFavorite>)
     suspend fun setFavoriteExcursion(excursionId: Int):Flow<UIResources<SetFavoriteExcursionResponse>>
     suspend fun removeFavoriteExcursion(excursionId: Int):Flow<UIResources<DeleteFavoriteExcursionResponse>>
-    suspend fun fetchExcursionsFavorite():Flow<UIResources<ExcursionsFavorite>>
+    suspend fun fetchExcursionsFavorite():Flow<UIResources<List<Excursion>?>>
 }

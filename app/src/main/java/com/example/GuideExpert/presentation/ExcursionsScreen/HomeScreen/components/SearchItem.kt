@@ -1,9 +1,7 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -27,29 +24,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
-import com.example.GuideExpert.domain.models.Image
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchStateScope
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import java.util.ArrayList
 
 @Composable
-fun SearchStateScope.ExcursionListSearchItem(
+fun SearchStateScope.SearchItem(
     excursion: Excursion,
     onEvent: (SearchEvent) -> Unit,
     navigateToExcursion: (Excursion) -> Unit,
@@ -70,29 +59,24 @@ fun SearchStateScope.ExcursionListSearchItem(
             {
                 Box {
                     ExcursionImageSearch(excursion)
-                    Box(modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
-                        .graphicsLayer {
-                            clip = true
-                            shape = RoundedCornerShape(15.dp)
+                    Box(modifier = Modifier.size(48.dp).scaleEffectClickable(onClick = {
+                        if (!excursion.isFavorite) {
+                            onEvent(SearchEvent.OnSetFavoriteExcursion(excursion))
+                        } else {
+                            onEvent(SearchEvent.OnDeleteFavoriteExcursion(excursion))
                         }
-                        .clickable {
-                            if (!excursion.isFavorite) {
-                                onEvent(SearchEvent.OnSetFavoriteExcursion(excursion))
-                            } else {
-                                onEvent(SearchEvent.OnDeleteFavoriteExcursion(excursion))
-                            }
-                        }
+                    }).align(Alignment.TopEnd)
                     ) {
                         Image(
                             imageVector = Icons.Filled.Favorite,
                             contentDescription = "featured",
                             colorFilter = if (excursion.isFavorite) {ColorFilter.tint(Color.Red)} else {ColorFilter.tint(Color.Gray.copy(alpha = .3f))},
-                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                            modifier = Modifier.fillMaxSize().align(Alignment.Center))
                         Image(
                             imageVector = Icons.Filled.FavoriteBorder,
                             contentDescription = "featured",
                             colorFilter = ColorFilter.tint(Color.White),
-                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                            modifier = Modifier.fillMaxSize().align(Alignment.Center))
                     }
                 }
                 Text(text = excursion.title, style = typography.headlineSmall, fontWeight= FontWeight.Bold )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -363,7 +364,7 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                         )
                         Text(
                             text = it.description,
-                            modifier = Modifier.height(24.dp),
+                            modifier = Modifier.fillMaxHeight(),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
@@ -381,7 +382,7 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                         }
                         Text(
                             text = it.text,
-                            modifier = Modifier.height(24.dp),
+                            modifier = Modifier.fillMaxHeight(),
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 16.sp
                         )

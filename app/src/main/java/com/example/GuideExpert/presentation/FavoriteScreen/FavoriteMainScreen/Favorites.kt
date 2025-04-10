@@ -27,8 +27,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
-import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDataContent
-import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
 import kotlinx.coroutines.flow.Flow
@@ -93,16 +91,10 @@ fun Favorites(snackbarHostState: SnackbarHostState,
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
 
     when(stateLoadFavorites.contentState){
-        is LoadFavoritesState.Success -> {
-          // LoadingExcursionListShimmer()
-            scopeState.FavoritesDataContent()
-        }
+        is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent() }
         is LoadFavoritesState.Error -> { scopeState.FavoritesDataError(effectFlow) }
         is LoadFavoritesState.Idle -> {}
-        is LoadFavoritesState.Loading -> {
-            LoadingExcursionListShimmer()
-           // scopeState.LoadingFavorites()
-        }
+        is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
     }
 }
 
@@ -142,25 +134,18 @@ fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
 @Composable
 fun FavoritesScope.FavoritesDataContent() {
     val excursions by excursions.collectAsStateWithLifecycle(null)
-   /* val excursions  = excursionsNotSorted?.let {
-        it.sortedBy { it.timestamp }
-    }*/
-
     val scope = rememberCoroutineScope()
 
     excursions?.let {
         LazyColumn(
             modifier = Modifier
-                //.padding(paddingValues)
                 .fillMaxSize(),
             contentPadding = PaddingValues(vertical = 12.dp),
         ) {
             itemsIndexed(
                 items = it,
-                // Provide a unique key based on the email content
-                key = { _, item -> item.hashCode() }
+                key = { _, item -> item.id }
             ) { _, excursion ->
-                // Display each email item
                 ExcursionFavoriteItem(excursion,scope)
             }
         }

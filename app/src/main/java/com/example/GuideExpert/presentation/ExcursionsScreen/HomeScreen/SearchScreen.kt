@@ -1,7 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -51,7 +50,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -66,7 +64,7 @@ import androidx.paging.compose.itemKey
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListSearchItem
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.SearchItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -369,7 +367,7 @@ fun SearchStateScope.SearchResult() {
                         ) { index ->
                             val excursion = it[index]
                             if (excursion != null) {
-                                ExcursionListSearchItem(excursion,onEvent,navigateToExcursion)
+                                SearchItem(excursion,onEvent,navigateToExcursion)
                             }
                         }
 

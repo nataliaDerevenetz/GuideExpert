@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -40,7 +39,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,7 +54,7 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ColumnExcursionShimmer
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ExcursionListFilterItem
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
 import kotlinx.coroutines.flow.Flow
@@ -224,7 +222,7 @@ fun HomeScreenContent(
             ) { index ->
                 val excursion = excursionPagingItems[index]
                 if (excursion != null) {
-                    state.ExcursionListFilterItem(excursion)
+                    state.FilterItem(excursion)
                 }
             }
             item {

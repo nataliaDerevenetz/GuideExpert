@@ -1,14 +1,15 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components
 
-import android.util.Log
+import android.view.MotionEvent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,11 +23,17 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,7 +45,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 
 @Composable
-fun HomeScreenContentState.ExcursionListFilterItem(
+fun HomeScreenContentState.FilterItem(
     excursion: Excursion
 ) {
     val favoriteExcursions by profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
@@ -59,33 +66,28 @@ fun HomeScreenContentState.ExcursionListFilterItem(
             {
                 Box {
                     ExcursionImage(excursion)
-                    Box(modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
-                        .graphicsLayer {
-                            clip = true
-                            shape = RoundedCornerShape(15.dp)
+                    Box(modifier = Modifier.size(48.dp).scaleEffectClickable(onClick = {
+                        if (!excursion.isFavorite) {
+                            onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
+                        } else {
+                            onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
                         }
-                        .clickable {
-                            if (!excursion.isFavorite) {
-                                onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
-                            } else {
-                                onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
-                            }
-                        }
+                        }).align(Alignment.TopEnd)
                     ) {
                         Image(
                             imageVector = Icons.Filled.Favorite,
                             contentDescription = "featured",
                             colorFilter = if (excursion.isFavorite) {ColorFilter.tint(Color.Red)} else {ColorFilter.tint(Color.Gray.copy(alpha = .3f))},
-                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                            modifier = Modifier.fillMaxSize().align(Alignment.Center))
                         Image(
                             imageVector = Icons.Filled.FavoriteBorder,
                             contentDescription = "featured",
                             colorFilter = ColorFilter.tint(Color.White),
-                            modifier = Modifier.size(48.dp).align(Alignment.Center))
+                            modifier = Modifier.fillMaxSize().align(Alignment.Center))
                     }
                 }
                 Text(text = excursion.title, style = typography.headlineSmall,fontWeight= FontWeight.Bold)
-                Text(text = excursion.description,  modifier = Modifier.height(24.dp),
+                Text(text = excursion.description,  modifier = Modifier,
                     style = typography.titleMedium)
             }
         }
@@ -121,3 +123,38 @@ private fun ExcursionImage(excursion: Excursion) {
         }
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun Modifier.scaleEffectClickable(
+    pressValue: Float = 0.75f,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) =
+    composed {
+        val selected = remember { mutableStateOf(false) }
+        val scale = animateFloatAsState(targetValue = if (selected.value) pressValue else 1f)
+        this
+            .scale(scale.value)
+            .pointerInteropFilter {
+                when (it.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if (enabled) {
+                            selected.value = true
+                        }
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        if (enabled) {
+                            selected.value = false
+                            onClick()
+                        }
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        if (enabled) {
+                            selected.value = false
+                        }
+                    }
+                }
+                true
+            }
+
+    }

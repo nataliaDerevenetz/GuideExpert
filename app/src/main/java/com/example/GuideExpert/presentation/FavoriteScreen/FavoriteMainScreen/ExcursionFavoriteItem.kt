@@ -1,7 +1,6 @@
 package com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -42,10 +41,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.NetworkImage
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -90,17 +90,17 @@ fun FavoritesScope.ExcursionFavoriteItem(
         }
     }
 
-
+    val cancelStr = stringResource(id = R.string.cancel)
+    val cancelDeletingStr = stringResource(id = R.string.cancel_deleting)
     LaunchedEffect(key1 = isRemoved) {
         if(isRemoved) {
             coroutineScope.launch() {
                 delay(animationDuration.toLong())
                 handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(currentItem))
-              //  onRemove(currentItem)
                 val result =
                     snackbarHostState.showSnackbar(
-                        "Отменить удаление",
-                        "Отменить",
+                        cancelDeletingStr,
+                        cancelStr,
                         true,
                         duration = SnackbarDuration.Short
                     )
@@ -109,17 +109,13 @@ fun FavoritesScope.ExcursionFavoriteItem(
                     SnackbarResult.ActionPerformed -> {
                         dismissState.reset()
                         handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion(currentItem))
-                        //   onRestore(currentItem)
-                        Log.d("TAG", "Restore")
                     }
-
-                    SnackbarResult.Dismissed -> {
-                        Log.d("TAG", "Remove")
-                    }
+                    SnackbarResult.Dismissed -> {}
                 }
             }
         }
     }
+
 
 
     AnimatedVisibility(
@@ -131,7 +127,7 @@ fun FavoritesScope.ExcursionFavoriteItem(
     ) {
         SwipeToDismissBox(
             state = dismissState,
-          //  modifier = Modifier.nestedScroll(),
+            modifier = Modifier,
             backgroundContent = { DismissBackground(dismissState)},
             content = {
                 ExcursionFavoriteCard(excursion,coroutineScope)
@@ -147,7 +143,8 @@ fun FavoritesScope.ExcursionFavoriteCard(
     excursion: Excursion,
     coroutineScope: CoroutineScope
 ) {
-  
+    val cancelStr = stringResource(id = R.string.cancel)
+    val cancelDeletingStr = stringResource(id = R.string.cancel_deleting)
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -174,7 +171,7 @@ fun FavoritesScope.ExcursionFavoriteCard(
                             coroutineScope.launch() {
                                 handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(excursion))
 
-                                val result = snackbarHostState.showSnackbar("Отменить удаление", "Отменить", true, duration = SnackbarDuration.Short)
+                                val result = snackbarHostState.showSnackbar(cancelDeletingStr, cancelStr, true, duration = SnackbarDuration.Short)
 
                                 when (result) {
                                     SnackbarResult.ActionPerformed -> {

@@ -9,6 +9,18 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.presentation.ExcursionsScreen.AlbumExcursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen.AlbumExcursionScreen
+import com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen.ImageExcursionScreen
+import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScreen
+import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
+import com.example.GuideExpert.presentation.ExcursionsScreen.ImageExcursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToAlbum
+import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToExcursionDetail
+import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToImage
 import com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen.Favorites
 import kotlinx.serialization.Serializable
 
@@ -25,17 +37,42 @@ fun NavigationFavoriteScreen(snackbarHostState: SnackbarHostState,
     }
 
     NavHost(navController = navController, startDestination = FavoriteList) {
-        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar)
+        val onNavigateToExcursion = { it: Excursion -> navController.navigateToExcursionDetail(excursion = it) }
+        val onNavigateToAlbum = { excursionId: Int -> navController.navigateToAlbum(excursionId = excursionId) }
+        val onNavigateToImage = { imageId: Int, excursionImages: List<Image>, indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
+            indexImage=indexImage) }
+        val onNavigateToBack = {navController.popBackStack() }
+        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onNavigateToBack)
     }
 }
 
 fun NavGraphBuilder.favoriteDestination(snackbarHostState : SnackbarHostState,
-                                       viewModelStoreOwner: ViewModelStoreOwner,
-                                       onChangeVisibleBottomBar: (Boolean) -> Unit,
+                                        viewModelStoreOwner: ViewModelStoreOwner,
+                                        onChangeVisibleBottomBar: (Boolean) -> Unit,
+                                        onNavigateToExcursion: (Excursion) -> Unit,
+                                        onNavigateToAlbum: (Int) -> Unit,
+                                        onNavigateToImage: (Int,List<Image>,Int) -> Unit,
+                                        onNavigateToBack:() -> Boolean,
 )
 {
     composable<FavoriteList> {
         onChangeVisibleBottomBar(true)
-        Favorites(snackbarHostState,viewModel = hiltViewModel(viewModelStoreOwner))
+        Favorites(snackbarHostState,onNavigateToExcursion,viewModel = hiltViewModel(viewModelStoreOwner))
+    }
+    composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
+        onChangeVisibleBottomBar(false)
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState)
+    }
+    composable<AlbumExcursion> {
+            backStackEntry ->
+        onChangeVisibleBottomBar(false)
+        val excursion = backStackEntry.toRoute<AlbumExcursion>()
+        AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
+    }
+    composable<ImageExcursion>(typeMap = ImageExcursion.typeMap) {
+            backStackEntry ->
+        onChangeVisibleBottomBar(false)
+        val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
+        ImageExcursionScreen(imageExcursion = imageExcursion)
     }
 }

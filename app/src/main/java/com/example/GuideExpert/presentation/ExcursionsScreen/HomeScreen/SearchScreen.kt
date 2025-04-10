@@ -436,7 +436,7 @@ private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState) {
             FloatingActionButton(
                 onClick = {
                     scope.launch {
-                        listState.animateScrollToItem(0)
+                        listState.scrollToItem(0)
                     }
                 },
                 shape = CircleShape,

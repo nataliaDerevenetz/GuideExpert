@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -47,7 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.NetworkImage
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.scaleEffectClickable
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -57,16 +59,13 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun FavoritesScope.ExcursionFavoriteItem(
+fun FavoritesScope.FavoriteItem(
     excursion: Excursion,
     coroutineScope: CoroutineScope,
     animationDuration: Int = 100,
 ) {
-    val context = LocalContext.current
     val currentItem by rememberUpdatedState(excursion)
-
     var isRemoved by remember { mutableStateOf(false) }
-
     var stateToMaintain by remember { mutableStateOf<SwipeToDismissBoxValue?>(null) }
 
     val dismissState = rememberSwipeToDismissBoxState(
@@ -153,7 +152,7 @@ fun FavoritesScope.ExcursionFavoriteCard(
         shape = RoundedCornerShape(15.dp),
     ){
         Row( modifier = Modifier.clickable{
-          //  navigateToExcursion(excursion)
+            navigateToExcursion(excursion)
         }){
             Column ( modifier = Modifier
                 .padding(8.dp)
@@ -162,28 +161,23 @@ fun FavoritesScope.ExcursionFavoriteCard(
             {
                 Box {
                     ExcursionImage(excursion)
-                    Box(modifier = Modifier.size(48.dp).align(Alignment.TopEnd)
-                        .graphicsLayer {
-                            clip = true
-                            shape = RoundedCornerShape(15.dp)
-                        }
-                        .clickable {
-                            coroutineScope.launch() {
-                                handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(excursion))
+                    Box(modifier = Modifier.size(48.dp).scaleEffectClickable(onClick = {
+                        coroutineScope.launch() {
+                            handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(excursion))
 
-                                val result = snackbarHostState.showSnackbar(cancelDeletingStr, cancelStr, true, duration = SnackbarDuration.Short)
+                            val result = snackbarHostState.showSnackbar(cancelDeletingStr, cancelStr, true, duration = SnackbarDuration.Short)
 
-                                when (result) {
-                                    SnackbarResult.ActionPerformed -> {
-                                        handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion(excursion))
-                                    }
-
-                                    SnackbarResult.Dismissed -> {
-                                    }
+                            when (result) {
+                                SnackbarResult.ActionPerformed -> {
+                                    handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion(excursion))
                                 }
 
+                                SnackbarResult.Dismissed -> {
+                                }
                             }
+
                         }
+                    }).align(Alignment.TopEnd)
                     ) {
                         Image(
                             imageVector = Icons.Filled.Favorite,
@@ -198,7 +192,7 @@ fun FavoritesScope.ExcursionFavoriteCard(
                     }
                 }
                 Text(text = excursion.title, style = typography.headlineSmall,fontWeight= FontWeight.Bold)
-                Text(text = excursion.description,  modifier = Modifier.height(24.dp),
+                Text(text = excursion.description,  modifier = Modifier.fillMaxHeight(),
                     style = typography.titleMedium)
             }
         }

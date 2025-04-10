@@ -1,6 +1,8 @@
 package com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +44,7 @@ interface FavoritesScope {
     val effectFlow: Flow<SnackbarEffect>
     val snackbarHostState: SnackbarHostState
     val excursions: Flow<List<Excursion>>
+    val navigateToExcursion: (Excursion) -> Unit
 }
 
 fun DefaultFavoritesScope(
@@ -47,7 +52,8 @@ fun DefaultFavoritesScope(
     stateLoadFavorites:  StateFlow<LoadFavoritesUIState>,
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
-    excursions: Flow<List<Excursion>>
+    excursions: Flow<List<Excursion>>,
+    navigateToExcursion: (Excursion) -> Unit
 ): FavoritesScope {
     return object : FavoritesScope {
         override val handleEvent: (ExcursionsFavoriteUiEvent) -> Unit
@@ -60,6 +66,8 @@ fun DefaultFavoritesScope(
             get() = snackbarHostState
         override val excursions:Flow<List<Excursion>>
             get() = excursions
+        override val navigateToExcursion:(Excursion) -> Unit
+            get() = navigateToExcursion
     }
 }
 
@@ -69,21 +77,24 @@ fun rememberDefaultFavoritesScope(
     stateLoadFavorites:  StateFlow<LoadFavoritesUIState>,
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
-    excursions: Flow<List<Excursion>>
-): FavoritesScope = remember(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions) {
-    DefaultFavoritesScope(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions)
+    excursions: Flow<List<Excursion>>,
+    navigateToExcursion: (Excursion) -> Unit
+): FavoritesScope = remember(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion) {
+    DefaultFavoritesScope(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion)
 }
 
 
 @Composable
 fun Favorites(snackbarHostState: SnackbarHostState,
+              navigateToExcursion: (Excursion) -> Unit,
               viewModel: FavoritesViewModel = hiltViewModel(),
               scopeState:FavoritesScope = rememberDefaultFavoritesScope(
                   handleEvent = viewModel::handleEvent,
                   stateLoadFavorites = viewModel.stateLoadFavorites,
                   effectFlow = viewModel.effectFlow,
                   snackbarHostState = snackbarHostState,
-                  excursions = viewModel.excursions
+                  excursions = viewModel.excursions,
+                  navigateToExcursion = navigateToExcursion
               )
 )
 {
@@ -93,7 +104,7 @@ fun Favorites(snackbarHostState: SnackbarHostState,
     when(stateLoadFavorites.contentState){
         is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent() }
         is LoadFavoritesState.Error -> { scopeState.FavoritesDataError(effectFlow) }
-        is LoadFavoritesState.Idle -> {}
+        is LoadFavoritesState.Idle -> { scopeState.FavoritesDataContent()}
         is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
     }
 }
@@ -146,10 +157,22 @@ fun FavoritesScope.FavoritesDataContent() {
                 items = it,
                 key = { _, item -> item.id }
             ) { _, excursion ->
-                ExcursionFavoriteItem(excursion,scope)
+                FavoriteItem(excursion,scope)
             }
         }
+        if (it.isEmpty()) FavoritesEmpty()
     }
-
 }
 
+@Composable
+private fun FavoritesEmpty(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
+        Text(
+            modifier = Modifier.align(Alignment.Center),
+            text = stringResource(R.string.not_excursions),
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 27.sp,
+            textAlign = TextAlign.Center,
+        )
+    }
+}

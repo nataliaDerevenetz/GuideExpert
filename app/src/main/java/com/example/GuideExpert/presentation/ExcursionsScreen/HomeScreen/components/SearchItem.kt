@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,7 +81,7 @@ fun SearchStateScope.SearchItem(
                     }
                 }
                 Text(text = excursion.title, style = typography.headlineSmall, fontWeight= FontWeight.Bold )
-                Text(text = excursion.description, modifier = Modifier.height(24.dp),
+                Text(text = excursion.description, modifier = Modifier.fillMaxHeight(),
                     style = typography.titleMedium)
             }
         }

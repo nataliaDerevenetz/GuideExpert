@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -31,12 +33,54 @@ fun ImageExcursionScreen(
     var scale by remember { mutableStateOf(1f) }
     val pagerState = rememberPagerState(initialPage = imageExcursion.indexImage)
 
-    imageExcursion.excursionImages?.let {
+    val minScale = 1f
+    val maxScale = 3f
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
+    val slowMovement = 0.5f
+    var initialOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+
+    imageExcursion.excursionImages.let {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
             .pointerInput(Unit) {
-                detectTransformGestures { centroid, pan, zoom, rotation ->
-                    scale *= zoom
+                detectTransformGestures { _, pan, zoom, _ ->
+                    val newScale = scale * zoom
+                    scale = newScale.coerceIn(minScale, maxScale)
+
+                    val centerX = size.width / 2
+                    val centerY = size.height / 2
+                    val offsetXChange = (centerX - offsetX) * (newScale / scale - 1)
+                    val offsetYChange = (centerY - offsetY) * (newScale / scale - 1)
+
+                    val maxOffsetX = (size.width / 2) * (scale - 1)
+                    val minOffsetX = -maxOffsetX
+                    val maxOffsetY = (size.height / 2) * (scale - 1)
+                    val minOffsetY = -maxOffsetY
+
+                    if (scale * zoom <= maxScale) {
+                        offsetX = (offsetX + pan.x * scale * slowMovement + offsetXChange)
+                            .coerceIn(minOffsetX, maxOffsetX)
+                        offsetY = (offsetY + pan.y * scale * slowMovement + offsetYChange)
+                            .coerceIn(minOffsetY, maxOffsetY)
+                    }
+
+                    if (pan != Offset(0f, 0f) && initialOffset == Offset(0f, 0f)) {
+                        initialOffset = Offset(offsetX, offsetY)
+                    }
                 }
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onDoubleTap = {
+                        if (scale != 1f) {
+                            scale = 1f
+                            offsetX = initialOffset.x
+                            offsetY = initialOffset.y
+                        } else {
+                            scale = 2f
+                        }
+                    }
+                )
             }
         ) {
             HorizontalPager(
@@ -47,16 +91,18 @@ fun ImageExcursionScreen(
                     .height(300.dp)
                     .fillMaxWidth()
                     .graphicsLayer(
-                        scaleX = maxOf(1f, minOf(3f, scale)),
-                        scaleY = maxOf(1f, minOf(3f, scale)),
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = offsetX,
+                        translationY = offsetY,
                     )
             ) { page ->
-                    NetworkImage(
-                        contentDescription = "",
-                        url = imageExcursion.excursionImages[page].url,
-                        width = 350,
-                        height = 450
-                    )
+                NetworkImage(
+                    contentDescription = "",
+                    url = imageExcursion.excursionImages[page].url,
+                    width = 350,
+                    height = 450
+                )
 
             }
         }

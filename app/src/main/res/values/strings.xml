@@ -32,6 +32,6 @@
     <string name="exit">Выйти</string>
     <string name="remove_avatar">Удалить изображение</string>
     <string name="message_profile_succes_update">Данные успешно обновлены</string>
-    <string name="cancel_deleting">Отменить удаление</string>
+    <string name="message_deleting_excursion">Экскурсия была удалена из избранного</string>
     <string name="not_excursions">Нет экскурсий</string>
 </resources>

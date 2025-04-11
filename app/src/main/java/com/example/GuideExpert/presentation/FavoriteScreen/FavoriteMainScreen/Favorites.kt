@@ -18,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -128,18 +129,10 @@ fun Favorites(snackbarHostState: SnackbarHostState,
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
 
     when(stateLoadFavorites.contentState){
-        is LoadFavoritesState.Success -> {
-            Log.d("TAG","Success")
-            scopeState.FavoritesDataContent(effectFlow) }
-        is LoadFavoritesState.Error -> {
-            Log.d("TAG","ERROREE")
-            scopeState.FavoritesDataError(effectFlow) }
-        is LoadFavoritesState.Idle -> {
-            Log.d("TAG","Idle")
-            scopeState.FavoritesDataContent(effectFlow)}
-        is LoadFavoritesState.Loading -> {
-            Log.d("TAG","Loading")
-            LoadingExcursionListShimmer() }
+        is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent(effectFlow) }
+        is LoadFavoritesState.Error -> { scopeState.FavoritesDataError(effectFlow) }
+        is LoadFavoritesState.Idle -> { scopeState.FavoritesDataContent(effectFlow)}
+        is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
     }
 }
 
@@ -184,7 +177,7 @@ fun FavoritesScope.FavoritesDataContent(effectFlow: SnackbarEffect?) {
     ContentDeleteFavoriteContent(effectFlow)
     ContentSetFavoriteContent(effectFlow)
     ContentRestoreFavoriteContent(effectFlow)
-    
+
     excursions?.let {
         LazyColumn(
             modifier = Modifier

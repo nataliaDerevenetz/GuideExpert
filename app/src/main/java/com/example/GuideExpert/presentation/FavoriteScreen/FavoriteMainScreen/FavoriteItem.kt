@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,13 +41,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.NetworkImage
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.scaleEffectClickable
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -82,6 +80,7 @@ fun FavoritesScope.FavoriteItem(
         positionalThreshold = { it * .35f }
     )
 
+
     LaunchedEffect(stateToMaintain) {
         stateToMaintain?.let {
             dismissState.snapTo(it)
@@ -90,12 +89,11 @@ fun FavoritesScope.FavoriteItem(
     }
 
     val cancelStr = stringResource(id = R.string.cancel)
-    val cancelDeletingStr = stringResource(id = R.string.cancel_deleting)
+    val cancelDeletingStr = stringResource(id = R.string.message_deleting_excursion)
     LaunchedEffect(key1 = isRemoved) {
         if(isRemoved) {
             coroutineScope.launch() {
                 delay(animationDuration.toLong())
-                handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(currentItem))
                 val result =
                     snackbarHostState.showSnackbar(
                         cancelDeletingStr,
@@ -105,17 +103,17 @@ fun FavoritesScope.FavoriteItem(
                     )
 
                 when (result) {
-                    SnackbarResult.ActionPerformed -> {
-                        dismissState.reset()
-                        handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion(currentItem))
+                    SnackbarResult.ActionPerformed -> {}
+                    SnackbarResult.Dismissed -> {
+                        handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(currentItem))
                     }
-                    SnackbarResult.Dismissed -> {}
                 }
+                isRemoved = false
             }
+        } else {
+            dismissState.reset()
         }
     }
-
-
 
     AnimatedVisibility(
         visible = !isRemoved,
@@ -134,7 +132,6 @@ fun FavoritesScope.FavoriteItem(
 
     }
 
-
 }
 
 @Composable
@@ -143,7 +140,7 @@ fun FavoritesScope.ExcursionFavoriteCard(
     coroutineScope: CoroutineScope
 ) {
     val cancelStr = stringResource(id = R.string.cancel)
-    val cancelDeletingStr = stringResource(id = R.string.cancel_deleting)
+    val cancelDeletingStr = stringResource(id = R.string.message_deleting_excursion)
     Card(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(

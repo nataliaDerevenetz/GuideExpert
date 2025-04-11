@@ -11,16 +11,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -169,6 +173,7 @@ fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScope.FavoritesDataContent(effectFlow: SnackbarEffect?) {
     val excursions by excursions.collectAsStateWithLifecycle(null)
@@ -178,17 +183,25 @@ fun FavoritesScope.FavoritesDataContent(effectFlow: SnackbarEffect?) {
     ContentSetFavoriteContent(effectFlow)
     ContentRestoreFavoriteContent(effectFlow)
 
+    var isRefreshing by remember { mutableStateOf(false) }
+    val state = rememberPullToRefreshState()
     excursions?.let {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 8.dp),
+        PullToRefreshBox(
+            state = state,
+            isRefreshing = isRefreshing,
+            onRefresh = {handleEvent(ExcursionsFavoriteUiEvent.OnLoadExcursionsFavorite)}
         ) {
-            itemsIndexed(
-                items = it,
-                key = { _, item -> item.id }
-            ) { _, excursion ->
-                FavoriteItem(excursion,scope)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(vertical = 8.dp),
+            ) {
+                itemsIndexed(
+                    items = it,
+                    key = { _, item -> item.id }
+                ) { _, excursion ->
+                    FavoriteItem(excursion, scope)
+                }
             }
         }
         if (it.isEmpty()) FavoritesEmpty()

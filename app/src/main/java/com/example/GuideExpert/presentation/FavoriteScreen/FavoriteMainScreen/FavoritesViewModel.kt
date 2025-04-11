@@ -116,7 +116,6 @@ class FavoritesViewModel @Inject constructor(
         loadExcursionFavoriteUseCase().flowOn(Dispatchers.IO).collectLatest { resources ->
             when(resources) {
                 is UIResources.Success -> withContext(Dispatchers.Main){
-                    Log.d("FAVORITES","111")
                     _stateLoadFavorites.update { it.copy(contentState = LoadFavoritesState.Success) }
                 }
                 is UIResources.Error -> withContext(Dispatchers.Main){

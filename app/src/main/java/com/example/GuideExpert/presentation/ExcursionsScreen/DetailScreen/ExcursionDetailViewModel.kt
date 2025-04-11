@@ -109,7 +109,7 @@ class ExcursionDetailViewModel @Inject constructor(
                 is ExcursionDetailUiEvent.OnDeleteFavoriteExcursion -> {deleteFavoriteExcursion(event.excursion)}
                 is ExcursionDetailUiEvent.OnDeleteFavoriteExcursionStateSetIdle -> {setIdleDeleteFavoriteExcursionUIState()}
                 is ExcursionDetailUiEvent.OnSetFavoriteExcursion -> {setFavoriteExcursion(event.excursion)}
-                is ExcursionDetailUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleUpdateProfileUIState()}
+                is ExcursionDetailUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleSetFavoriteExcursionUIState()}
             }
         }
     }
@@ -186,7 +186,7 @@ class ExcursionDetailViewModel @Inject constructor(
         _stateDeleteFavoriteExcursion.update { it.copy(contentState = DeleteFavoriteExcursionState.Idle) }
     }
 
-    private fun setIdleUpdateProfileUIState() {
+    private fun setIdleSetFavoriteExcursionUIState() {
         _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
     }
 

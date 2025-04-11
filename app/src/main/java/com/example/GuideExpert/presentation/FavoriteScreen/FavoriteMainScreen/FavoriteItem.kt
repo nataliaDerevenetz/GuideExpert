@@ -145,7 +145,7 @@ fun FavoritesScope.ExcursionFavoriteCard(
     val cancelStr = stringResource(id = R.string.cancel)
     val cancelDeletingStr = stringResource(id = R.string.cancel_deleting)
     Card(
-        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent,
         ),

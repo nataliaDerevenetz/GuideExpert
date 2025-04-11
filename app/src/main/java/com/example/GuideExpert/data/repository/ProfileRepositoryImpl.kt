@@ -280,6 +280,7 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun fetchExcursionsFavorite(): Flow<UIResources<List<Excursion>?>> = flow  {
        try{
+           emit(UIResources.Loading)
            val result = profileService.getExcursionsFavorite(profileFlow.value?.id!!)
            if (result.code() == 403) {
                removeProfile()

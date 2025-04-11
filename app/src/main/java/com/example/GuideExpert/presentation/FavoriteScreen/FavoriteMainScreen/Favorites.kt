@@ -31,6 +31,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScope
+import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailUiEvent
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreFavoriteExcursionUIState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +53,9 @@ interface FavoritesScope {
     val snackbarHostState: SnackbarHostState
     val excursions: Flow<List<Excursion>>
     val navigateToExcursion: (Excursion) -> Unit
+    val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
+    val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+    val stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
 }
 
 fun DefaultFavoritesScope(
@@ -53,8 +64,11 @@ fun DefaultFavoritesScope(
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
     excursions: Flow<List<Excursion>>,
-    navigateToExcursion: (Excursion) -> Unit
-): FavoritesScope {
+    navigateToExcursion: (Excursion) -> Unit,
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
+    ): FavoritesScope {
     return object : FavoritesScope {
         override val handleEvent: (ExcursionsFavoriteUiEvent) -> Unit
             get() = handleEvent
@@ -68,6 +82,12 @@ fun DefaultFavoritesScope(
             get() = excursions
         override val navigateToExcursion:(Excursion) -> Unit
             get() = navigateToExcursion
+        override val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
+            get() = stateSetFavoriteExcursion
+        override val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+            get() = stateDeleteFavoriteExcursion
+        override val stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
+            get() = stateRestoreFavoriteExcursion
     }
 }
 
@@ -78,9 +98,12 @@ fun rememberDefaultFavoritesScope(
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
     excursions: Flow<List<Excursion>>,
-    navigateToExcursion: (Excursion) -> Unit
-): FavoritesScope = remember(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion) {
-    DefaultFavoritesScope(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion)
+    navigateToExcursion: (Excursion) -> Unit,
+    stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
+): FavoritesScope = remember(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,stateRestoreFavoriteExcursion) {
+    DefaultFavoritesScope(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,stateRestoreFavoriteExcursion)
 }
 
 
@@ -94,7 +117,10 @@ fun Favorites(snackbarHostState: SnackbarHostState,
                   effectFlow = viewModel.effectFlow,
                   snackbarHostState = snackbarHostState,
                   excursions = viewModel.excursions,
-                  navigateToExcursion = navigateToExcursion
+                  navigateToExcursion = navigateToExcursion,
+                  stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
+                  stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion,
+                  stateRestoreFavoriteExcursion = viewModel.stateRestoreFavoriteExcursion
               )
 )
 {
@@ -102,16 +128,24 @@ fun Favorites(snackbarHostState: SnackbarHostState,
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
 
     when(stateLoadFavorites.contentState){
-        is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent() }
-        is LoadFavoritesState.Error -> { scopeState.FavoritesDataError(effectFlow) }
-        is LoadFavoritesState.Idle -> { scopeState.FavoritesDataContent()}
-        is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
+        is LoadFavoritesState.Success -> {
+            Log.d("TAG","Success")
+            scopeState.FavoritesDataContent(effectFlow) }
+        is LoadFavoritesState.Error -> {
+            Log.d("TAG","ERROREE")
+            scopeState.FavoritesDataError(effectFlow) }
+        is LoadFavoritesState.Idle -> {
+            Log.d("TAG","Idle")
+            scopeState.FavoritesDataContent(effectFlow)}
+        is LoadFavoritesState.Loading -> {
+            Log.d("TAG","Loading")
+            LoadingExcursionListShimmer() }
     }
 }
 
 @Composable
 fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
-    val scope = rememberCoroutineScope()
+  /*  val scope = rememberCoroutineScope()
     effectFlow?.let {
         when (it) {
             is SnackbarEffect.ShowSnackbar -> {
@@ -120,8 +154,8 @@ fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
                 }
             }
         }
-    }
-    handleEvent(ExcursionsFavoriteUiEvent.OnLoadFavoritesUIStateSetIdle)
+    }*/
+ //   handleEvent(ExcursionsFavoriteUiEvent.OnLoadFavoritesUIStateSetIdle)
 
     Column (Modifier.padding(0.dp).fillMaxSize()){
         Row(
@@ -137,21 +171,25 @@ fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
             }
         }
         Row {
-            FavoritesDataContent()
+            FavoritesDataContent(effectFlow)
         }
     }
 }
 
 @Composable
-fun FavoritesScope.FavoritesDataContent() {
+fun FavoritesScope.FavoritesDataContent(effectFlow: SnackbarEffect?) {
     val excursions by excursions.collectAsStateWithLifecycle(null)
     val scope = rememberCoroutineScope()
 
+    ContentDeleteFavoriteContent(effectFlow)
+    ContentSetFavoriteContent(effectFlow)
+    ContentRestoreFavoriteContent(effectFlow)
+    
     excursions?.let {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 12.dp),
+            contentPadding = PaddingValues(vertical = 8.dp),
         ) {
             itemsIndexed(
                 items = it,
@@ -161,6 +199,84 @@ fun FavoritesScope.FavoritesDataContent() {
             }
         }
         if (it.isEmpty()) FavoritesEmpty()
+    }
+
+    if (excursions == null) {
+        LoadingExcursionListShimmer()
+    }
+}
+
+@Composable
+fun FavoritesScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateDeleteFavoriteExcursion by stateDeleteFavoriteExcursion.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    when(stateDeleteFavoriteExcursion.contentState){
+        is DeleteFavoriteExcursionState.Success -> {
+            handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        is DeleteFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
+}
+
+@Composable
+fun FavoritesScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateSetFavoriteExcursion by stateSetFavoriteExcursion.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    when(stateSetFavoriteExcursion.contentState){
+        is SetFavoriteExcursionState.Success -> {
+            handleEvent(ExcursionsFavoriteUiEvent.OnSetFavoriteExcursionStateSetIdle)
+        }
+        is SetFavoriteExcursionState.Error -> {
+            effectFlow?.let { it1->
+                when (it1) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it1.message)
+                        }
+                    }
+                }
+            }
+            handleEvent(ExcursionsFavoriteUiEvent.OnSetFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
+    }
+}
+
+@Composable
+fun FavoritesScope.ContentRestoreFavoriteContent(effectFlow: SnackbarEffect?) {
+    val stateRestoreFavoriteExcursion by stateRestoreFavoriteExcursion.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    when(stateRestoreFavoriteExcursion.contentState){
+        is RestoreFavoriteExcursionState.Success -> {
+            handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursionStateSetIdle)
+        }
+        is RestoreFavoriteExcursionState.Error -> {
+            effectFlow?.let {
+                when (it) {
+                    is SnackbarEffect.ShowSnackbar -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(it.message)
+                        }
+                    }
+                }
+            }
+            handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursionStateSetIdle)
+        }
+        else -> {}
     }
 }
 

@@ -11,7 +11,6 @@ import com.example.GuideExpert.domain.LoadExcursionFavoriteUseCase
 import com.example.GuideExpert.domain.RestoreFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Excursion
-import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreFavoriteExcursionState
@@ -19,7 +18,6 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreF
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
-import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.UpdateProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -54,6 +52,7 @@ sealed interface ExcursionsFavoriteUiEvent {
     data class OnDeleteFavoriteExcursion(val excursion: Excursion) : ExcursionsFavoriteUiEvent
     data object OnDeleteFavoriteExcursionStateSetIdle : ExcursionsFavoriteUiEvent
     data class OnRestoreFavoriteExcursion(val excursion: Excursion): ExcursionsFavoriteUiEvent
+    data object OnRestoreFavoriteExcursionStateSetIdle : ExcursionsFavoriteUiEvent
 }
 
 
@@ -98,8 +97,9 @@ class FavoritesViewModel @Inject constructor(
                 is ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion -> {deleteFavoriteExcursion(event.excursion)}
                 is ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursionStateSetIdle -> {setIdleDeleteFavoriteExcursionUIState()}
                 is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursion -> {setFavoriteExcursion(event.excursion)}
-                is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleUpdateProfileUIState()}
+                is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleSetFavoriteExcursionUIState()}
                 is ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion -> {restoreFavoriteExcursion(event.excursion)}
+                is ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursionStateSetIdle -> {setIdleRestoreFavoriteExcursionUIState()}
             }
         }
     }
@@ -176,7 +176,7 @@ class FavoritesViewModel @Inject constructor(
                                 )
                             )
                         }
-                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                        sendEffectFlow("Error insertion favorite excursion : ${resources.message}")
                     }
 
                     is UIResources.Loading -> withContext(Dispatchers.Main){
@@ -203,7 +203,7 @@ class FavoritesViewModel @Inject constructor(
                                 )
                             )
                         }
-                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                        sendEffectFlow("Error deletion favorite excursion : ${resources.message}")
                     }
 
                     is UIResources.Loading -> withContext(Dispatchers.Main){
@@ -222,10 +222,13 @@ class FavoritesViewModel @Inject constructor(
         _stateDeleteFavoriteExcursion.update { it.copy(contentState = DeleteFavoriteExcursionState.Idle) }
     }
 
-    private fun setIdleUpdateProfileUIState() {
+    private fun setIdleSetFavoriteExcursionUIState() {
         _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
     }
 
+    private fun setIdleRestoreFavoriteExcursionUIState() {
+        _stateRestoreFavoriteExcursion.update { it.copy(contentState = RestoreFavoriteExcursionState.Idle) }
+    }
 
     init{
         handleEvent(ExcursionsFavoriteUiEvent.OnLoadExcursionsFavorite)

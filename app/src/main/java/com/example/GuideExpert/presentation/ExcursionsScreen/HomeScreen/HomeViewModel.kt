@@ -134,7 +134,7 @@ class HomeViewModel @Inject constructor(
                 is ExcursionsUiEvent.OnChangeFilters -> changedFilters()
                 is ExcursionsUiEvent.OnLoadConfig -> loadConfig()
                 is ExcursionsUiEvent.OnSetFavoriteExcursionStateSetIdle -> {
-                    setIdleSelectFavoriteExcursionUIState()
+                    setIdleSetFavoriteExcursionUIState()
                 }
                 is ExcursionsUiEvent.OnDeleteFavoriteExcursionStateSetIdle -> {setIdleDeleteFavoriteExcursionUIState()}
                 is ExcursionsUiEvent.OnDeleteFavoriteExcursion -> deleteFavoriteExcursion(event.excursion)
@@ -147,7 +147,7 @@ class HomeViewModel @Inject constructor(
         _stateDeleteFavoriteExcursion.update { it.copy(contentState = DeleteFavoriteExcursionState.Idle) }
     }
 
-    private fun setIdleSelectFavoriteExcursionUIState() {
+    private fun setIdleSetFavoriteExcursionUIState() {
         _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
     }
 
@@ -245,7 +245,7 @@ class HomeViewModel @Inject constructor(
                                 )
                             )
                         }
-                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                        sendEffectFlow("Error deletion favorite excursion : ${resources.message}")
                     }
 
                     is UIResources.Loading -> withContext(Dispatchers.Main){
@@ -272,7 +272,7 @@ class HomeViewModel @Inject constructor(
                                 )
                             )
                         }
-                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                        sendEffectFlow("Error insertion favorite excursion : ${resources.message}")
                     }
 
                     is UIResources.Loading -> withContext(Dispatchers.Main){

@@ -115,7 +115,7 @@ class SearchViewModel @Inject constructor(
                 is SearchEvent.SetSearchText -> { setCurrentText(event.text) }
                 is SearchEvent.SetStateListSearch -> { updateExcursionListSearchUIState(event.state) }
                 is SearchEvent.OnSetFavoriteExcursion -> setFavoriteExcursion(event.excursion)
-                is SearchEvent.OnSetFavoriteExcursionStateSetIdle -> { setIdleUpdateProfileUIState() }
+                is SearchEvent.OnSetFavoriteExcursionStateSetIdle -> { setIdleSetFavoriteExcursionUIState() }
                 is SearchEvent.OnDeleteFavoriteExcursionStateSetIdle -> {setIdleDeleteFavoriteExcursionUIState()}
                 is SearchEvent.OnDeleteFavoriteExcursion -> deleteFavoriteExcursion(event.excursion)
 
@@ -127,7 +127,7 @@ class SearchViewModel @Inject constructor(
         _stateDeleteFavoriteExcursion.update { it.copy(contentState = DeleteFavoriteExcursionState.Idle) }
     }
 
-    private fun setIdleUpdateProfileUIState() {
+    private fun setIdleSetFavoriteExcursionUIState() {
         _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
     }
 
@@ -180,7 +180,7 @@ class SearchViewModel @Inject constructor(
                                  )
                              )
                          }
-                         sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                         sendEffectFlow("Error insertion favorite excursion : ${resources.message}")
                      }
 
                      is UIResources.Loading -> withContext(Dispatchers.Main){
@@ -207,7 +207,7 @@ class SearchViewModel @Inject constructor(
                                 )
                             )
                         }
-                        sendEffectFlow("Error updating favorite excursion : ${resources.message}")
+                        sendEffectFlow("Error deletion favorite excursion : ${resources.message}")
                     }
 
                     is UIResources.Loading -> withContext(Dispatchers.Main){

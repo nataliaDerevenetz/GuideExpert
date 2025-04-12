@@ -317,7 +317,7 @@ fun HomeScreenContentState.ContentDeleteFavoriteContent(effectFlow: SnackbarEffe
 
 @Composable
 private fun HomeScreenEmpty(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.padding(top=10.dp).fillMaxSize()) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = stringResource(R.string.no_excursions_found),

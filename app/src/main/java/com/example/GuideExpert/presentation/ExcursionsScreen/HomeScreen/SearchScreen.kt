@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -402,9 +404,9 @@ fun SearchStateScope.SearchResult() {
 
 @Composable
 private fun SearchScreenEmpty(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.padding(top = 10.dp)) {
         Text(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             text = stringResource(R.string.no_excursions_found),
             color = MaterialTheme.colorScheme.primary,
             fontSize = 27.sp,

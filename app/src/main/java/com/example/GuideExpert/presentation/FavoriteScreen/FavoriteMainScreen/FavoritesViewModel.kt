@@ -11,6 +11,7 @@ import com.example.GuideExpert.domain.LoadExcursionFavoriteUseCase
 import com.example.GuideExpert.domain.RestoreFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreFavoriteExcursionState
@@ -63,10 +64,12 @@ class FavoritesViewModel @Inject constructor(
     val getExcursionFavoriteUseCase: GetExcursionFavoriteUseCase,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase,
-    val restoreFavoriteExcursionUseCase: RestoreFavoriteExcursionUseCase
-) : ViewModel() {
+    val restoreFavoriteExcursionUseCase: RestoreFavoriteExcursionUseCase,
+    private val profileRepository: ProfileRepository,
+    ) : ViewModel() {
 
     val excursions: Flow<List<Excursion>> = getExcursionFavoriteUseCase()
+    val profileFlow = profileRepository.profileFlow
 
     private val _stateLoadFavorites = MutableStateFlow<LoadFavoritesUIState>(LoadFavoritesUIState())
     val stateLoadFavorites: StateFlow<LoadFavoritesUIState> = _stateLoadFavorites.asStateFlow()

@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScope
 import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
@@ -61,6 +62,7 @@ interface FavoritesScope {
     val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
     val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
     val stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
+    val profile: StateFlow<Profile?>
 }
 
 fun DefaultFavoritesScope(
@@ -72,7 +74,8 @@ fun DefaultFavoritesScope(
     navigateToExcursion: (Excursion) -> Unit,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
-    stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
+    stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>,
+    profile: StateFlow<Profile?>
     ): FavoritesScope {
     return object : FavoritesScope {
         override val handleEvent: (ExcursionsFavoriteUiEvent) -> Unit
@@ -93,6 +96,8 @@ fun DefaultFavoritesScope(
             get() = stateDeleteFavoriteExcursion
         override val stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
             get() = stateRestoreFavoriteExcursion
+        override val profile: StateFlow<Profile?>
+            get() = profile
     }
 }
 
@@ -106,9 +111,10 @@ fun rememberDefaultFavoritesScope(
     navigateToExcursion: (Excursion) -> Unit,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
-    stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
-): FavoritesScope = remember(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,stateRestoreFavoriteExcursion) {
-    DefaultFavoritesScope(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,stateRestoreFavoriteExcursion)
+    stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>,
+    profile: StateFlow<Profile?>
+): FavoritesScope = remember(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,stateRestoreFavoriteExcursion,profile) {
+    DefaultFavoritesScope(handleEvent,stateLoadFavorites,effectFlow,snackbarHostState,excursions,navigateToExcursion,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,stateRestoreFavoriteExcursion,profile)
 }
 
 
@@ -125,18 +131,19 @@ fun Favorites(snackbarHostState: SnackbarHostState,
                   navigateToExcursion = navigateToExcursion,
                   stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
                   stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion,
-                  stateRestoreFavoriteExcursion = viewModel.stateRestoreFavoriteExcursion
+                  stateRestoreFavoriteExcursion = viewModel.stateRestoreFavoriteExcursion,
+                  profile = viewModel.profileFlow
               )
 )
 {
     val stateLoadFavorites by viewModel.stateLoadFavorites.collectAsStateWithLifecycle()
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
+    val profile by scopeState.profile.collectAsStateWithLifecycle(null)
 
     when(stateLoadFavorites.contentState){
         is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent(effectFlow) }
-        is LoadFavoritesState.Error -> { scopeState.FavoritesDataError(effectFlow) }
-        is LoadFavoritesState.Idle -> { //scopeState.FavoritesDataContent(effectFlow)
-        }
+        is LoadFavoritesState.Error -> { if (profile == null)  scopeState.FavoritesDataContent(effectFlow) else scopeState.FavoritesDataError(effectFlow) }
+        is LoadFavoritesState.Idle -> {}
         is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
     }
 }

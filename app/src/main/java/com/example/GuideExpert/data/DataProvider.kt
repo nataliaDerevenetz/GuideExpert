@@ -24,8 +24,8 @@ object DataProvider {
     )
 
     val filtersDuration = listOf(
-        Filter(id = 1, name = "Короткие",type = FilterType.Duration, description = "Короткая"),
-        Filter(id = 2, name = "Вечерние",type = FilterType.Duration, description = "Вечерняя"),
+        Filter(id = 1, name = "Короткие (1-3 часа)",type = FilterType.Duration, description = "Короткая"),
+        Filter(id = 2, name = "Длинные (4-6 часов)",type = FilterType.Duration, description = "Длинная"),
         Filter(id = 3, name = "Весь день",type = FilterType.Duration, description = "Весь день")
     )
 

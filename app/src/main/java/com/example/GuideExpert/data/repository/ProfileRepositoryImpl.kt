@@ -200,6 +200,7 @@ class ProfileRepositoryImpl @Inject constructor(
             val result = profileService.getExcursionsFavoriteId(profileFlow.value?.id!!)
             if (result.code() == 403) {
                 removeProfile()
+                return
             }
             if (result.isSuccessful) {
                 val response =
@@ -290,7 +291,7 @@ class ProfileRepositoryImpl @Inject constructor(
                dbStorage.insertExcursionsFavorite(response)
                emit(UIResources.Success( result.body()?.excursions ?.map { it.toExcursion()}))
            } else {
-               emit(UIResources.Error("Error remove favorite"))
+               emit(UIResources.Error("Error fetch favorites"))
            }
        } catch (e: Exception) {
            emit(UIResources.Error(e.message.toString()))

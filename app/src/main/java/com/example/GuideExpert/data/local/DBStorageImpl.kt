@@ -103,4 +103,8 @@ class DBStorageImpl @Inject constructor(
            favorite -> favorite.map {  it.toExcursion() }
         }
     }
+
+    override suspend fun clearAll() {
+        excursionsFavoriteDao.clearAll()
+    }
 }

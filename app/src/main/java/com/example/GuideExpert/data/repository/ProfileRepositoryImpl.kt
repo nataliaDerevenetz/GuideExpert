@@ -135,6 +135,7 @@ class ProfileRepositoryImpl @Inject constructor(
         _profileFlow.update { null }
         _profileStateFlow.update { ProfileResources.Idle }
         _profileFavoriteExcursionIdFlow.update { listOf() }
+        dbStorage.clearAll()
     }
 
     override suspend fun updateProfile(firstName: String, lastName: String, sex: String?, email:String, birthday: Date): Flow<UIResources<MessageResponse>> = flow {

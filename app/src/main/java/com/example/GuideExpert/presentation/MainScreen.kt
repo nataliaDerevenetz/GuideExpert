@@ -1,5 +1,8 @@
 package com.example.GuideExpert.presentation
 
+import android.content.Context
+import android.content.res.Resources
+import android.content.res.Resources.getSystem
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -14,11 +17,13 @@ import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Cake
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
@@ -35,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -44,6 +51,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.GuideExpert.R
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionsScreen
 import com.example.GuideExpert.presentation.FavoriteScreen.FavoriteScreen
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileScreen
@@ -66,10 +74,10 @@ data class TopLevelRoute<T : Any>(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector)
 
-val topLevelRoutes = listOf(
-    TopLevelRoute("Home", Home, Icons.Filled.Home,Icons.Outlined.Home),
-    TopLevelRoute("Favorite", Favorite, Icons.Filled.Favorite,Icons.Outlined.FavoriteBorder),
-    TopLevelRoute("Person", Profile, Icons.Filled.Person,Icons.Outlined.Person)
+val Context.topLevelRoutes get() =  listOf(
+    TopLevelRoute( getString(R.string.search), Home, Icons.Filled.Search,Icons.Outlined.Search),
+    TopLevelRoute(getString(R.string.favorites), Favorite, Icons.Filled.Favorite,Icons.Outlined.FavoriteBorder),
+    TopLevelRoute(getString(R.string.person), Profile, Icons.Filled.Person,Icons.Outlined.Person)
 )
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -136,7 +144,7 @@ fun BottomBar(navController: NavController, bottomBarState: Boolean) {
             BottomNavigation(backgroundColor = Purple80){
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
-                topLevelRoutes.forEach { topLevelRoute ->
+                LocalContext.current.topLevelRoutes.forEach { topLevelRoute ->
                     val selected = currentDestination?.hierarchy?.any { it.hasRoute(topLevelRoute.route::class) } == true
                     NavigationBarItem(
                         selected = selected,

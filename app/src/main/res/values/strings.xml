@@ -34,4 +34,7 @@
     <string name="message_profile_succes_update">Данные успешно обновлены</string>
     <string name="message_deleting_excursion">Экскурсия была удалена из избранного</string>
     <string name="not_excursions">Нет экскурсий</string>
+    <string name="search">Поиск</string>
+    <string name="favorites">Избранное</string>
+    <string name="person">Профиль</string>
 </resources>

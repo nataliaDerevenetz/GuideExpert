@@ -135,7 +135,8 @@ fun Favorites(snackbarHostState: SnackbarHostState,
     when(stateLoadFavorites.contentState){
         is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent(effectFlow) }
         is LoadFavoritesState.Error -> { scopeState.FavoritesDataError(effectFlow) }
-        is LoadFavoritesState.Idle -> { scopeState.FavoritesDataContent(effectFlow)}
+        is LoadFavoritesState.Idle -> { //scopeState.FavoritesDataContent(effectFlow)
+        }
         is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
     }
 }

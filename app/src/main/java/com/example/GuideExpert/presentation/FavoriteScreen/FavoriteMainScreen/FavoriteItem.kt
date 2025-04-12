@@ -94,6 +94,7 @@ fun FavoritesScope.FavoriteItem(
         if(isRemoved) {
             coroutineScope.launch() {
                 delay(animationDuration.toLong())
+                handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(currentItem))
                 val result =
                     snackbarHostState.showSnackbar(
                         cancelDeletingStr,
@@ -103,10 +104,11 @@ fun FavoritesScope.FavoriteItem(
                     )
 
                 when (result) {
-                    SnackbarResult.ActionPerformed -> {}
-                    SnackbarResult.Dismissed -> {
-                        handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursion(currentItem))
+                    SnackbarResult.ActionPerformed -> {
+                        handleEvent(ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion(currentItem))
+
                     }
+                    SnackbarResult.Dismissed -> {}
                 }
                 isRemoved = false
             }

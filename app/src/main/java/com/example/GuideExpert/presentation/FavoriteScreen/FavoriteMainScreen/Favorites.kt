@@ -143,24 +143,13 @@ fun Favorites(snackbarHostState: SnackbarHostState,
     when(stateLoadFavorites.contentState){
         is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent(effectFlow) }
         is LoadFavoritesState.Error -> { if (profile == null)  scopeState.FavoritesDataContent(effectFlow) else scopeState.FavoritesDataError(effectFlow) }
-        is LoadFavoritesState.Idle -> {}
+        is LoadFavoritesState.Idle -> {FavoritesEmpty()}
         is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
     }
 }
 
 @Composable
 fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
-  /*  val scope = rememberCoroutineScope()
-    effectFlow?.let {
-        when (it) {
-            is SnackbarEffect.ShowSnackbar -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(it.message)
-                }
-            }
-        }
-    }*/
- //   handleEvent(ExcursionsFavoriteUiEvent.OnLoadFavoritesUIStateSetIdle)
 
     Column (Modifier.padding(0.dp).fillMaxSize()){
         Row(

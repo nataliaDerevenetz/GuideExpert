@@ -21,13 +21,18 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavor
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,6 +52,7 @@ data class LoadFavoritesUIState(
 
 sealed interface ExcursionsFavoriteUiEvent {
     data object OnLoadExcursionsFavorite : ExcursionsFavoriteUiEvent
+    data object OnGetExcursionsFavorite : ExcursionsFavoriteUiEvent
     data object OnLoadFavoritesUIStateSetIdle : ExcursionsFavoriteUiEvent
     data class OnSetFavoriteExcursion(val excursion: Excursion) : ExcursionsFavoriteUiEvent
     data object OnSetFavoriteExcursionStateSetIdle : ExcursionsFavoriteUiEvent
@@ -68,7 +74,11 @@ class FavoritesViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     ) : ViewModel() {
 
-    val excursions: Flow<List<Excursion>> = getExcursionFavoriteUseCase()
+   // val excursions: Flow<List<Excursion>> = getExcursionFavoriteUseCase()
+
+    private val _excursions = MutableStateFlow(emptyList<Excursion>())
+    val excursions = _excursions.asStateFlow()
+
     val profileFlow = profileRepository.profileFlow
 
     private val _stateLoadFavorites = MutableStateFlow<LoadFavoritesUIState>(LoadFavoritesUIState())
@@ -103,6 +113,7 @@ class FavoritesViewModel @Inject constructor(
                 is ExcursionsFavoriteUiEvent.OnSetFavoriteExcursionStateSetIdle -> {setIdleSetFavoriteExcursionUIState()}
                 is ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursion -> {restoreFavoriteExcursion(event.excursion)}
                 is ExcursionsFavoriteUiEvent.OnRestoreFavoriteExcursionStateSetIdle -> {setIdleRestoreFavoriteExcursionUIState()}
+                is ExcursionsFavoriteUiEvent.OnGetExcursionsFavorite -> {getFavoriteExcursion()}
             }
         }
     }
@@ -115,8 +126,14 @@ class FavoritesViewModel @Inject constructor(
         _stateLoadFavorites.update { it.copy(contentState = LoadFavoritesState.Idle) }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun loadExcursionsFavorite() {
-        loadExcursionFavoriteUseCase().flowOn(Dispatchers.IO).collectLatest { resources ->
+        profileFlow.onEach {  if (it == null || it.id ==0)  handleEvent(ExcursionsFavoriteUiEvent.OnLoadFavoritesUIStateSetIdle)}
+            .filter { it != null && it.id !=0 }
+            .distinctUntilChanged()
+            .flatMapLatest {
+                loadExcursionFavoriteUseCase()
+            }.flowOn(Dispatchers.IO).collectLatest { resources ->
             when(resources) {
                 is UIResources.Success -> withContext(Dispatchers.Main){
                     _stateLoadFavorites.update { it.copy(contentState = LoadFavoritesState.Success) }
@@ -232,7 +249,21 @@ class FavoritesViewModel @Inject constructor(
         _stateRestoreFavoriteExcursion.update { it.copy(contentState = RestoreFavoriteExcursionState.Idle) }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun  getFavoriteExcursion() {
+        viewModelScope.launch {
+            profileFlow.filter { it != null && it.id !=0 }
+                .distinctUntilChanged()
+                .flatMapLatest {
+                    getExcursionFavoriteUseCase()
+                }.flowOn(Dispatchers.IO).collect { excursions: List<Excursion> ->
+                _excursions.update { excursions }
+            }
+        }
+    }
+
     init{
         handleEvent(ExcursionsFavoriteUiEvent.OnLoadExcursionsFavorite)
+        handleEvent(ExcursionsFavoriteUiEvent.OnGetExcursionsFavorite)
     }
 }

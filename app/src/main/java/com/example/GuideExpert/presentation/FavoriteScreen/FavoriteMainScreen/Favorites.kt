@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,8 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScope
-import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.RestoreFavoriteExcursionState

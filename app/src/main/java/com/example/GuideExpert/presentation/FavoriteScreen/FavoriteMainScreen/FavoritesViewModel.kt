@@ -74,8 +74,6 @@ class FavoritesViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     ) : ViewModel() {
 
-   // val excursions: Flow<List<Excursion>> = getExcursionFavoriteUseCase()
-
     private val _excursions = MutableStateFlow(emptyList<Excursion>())
     val excursions = _excursions.asStateFlow()
 
@@ -118,7 +116,7 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {
+    private suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {
         _effectChannel.send(SnackbarEffect.ShowSnackbar(message))
     }
 

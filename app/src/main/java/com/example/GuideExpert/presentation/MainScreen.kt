@@ -121,7 +121,16 @@ fun MainScreen(onSetLightStatusBar: (Boolean) -> Unit,viewModel: MainViewModel =
                 FavoriteScreen(snackbarHostState = snackbarHostState,
                     onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
                     innerPadding,
-                    onSetLightStatusBar
+                    onSetLightStatusBar,
+                    onNavigateToProfile = {
+                        navController.navigate(Profile){
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 )
             }
         }

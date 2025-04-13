@@ -99,6 +99,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
+    val profileFlow = profileRepository.profileFlow
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()

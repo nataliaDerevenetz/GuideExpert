@@ -9,8 +9,9 @@ fun FavoriteScreen(
     snackbarHostState: SnackbarHostState,
     onChangeVisibleBottomBar: (Boolean) -> Unit,
     innerPadding: PaddingValues,
-    onSetLightStatusBar: (Boolean) -> Unit
+    onSetLightStatusBar: (Boolean) -> Unit,
+    onNavigateToProfile: () -> Unit,
 ) {
     NavigationFavoriteScreen(snackbarHostState,onChangeVisibleBottomBar = onChangeVisibleBottomBar,
-        innerPadding =innerPadding,onSetLightStatusBar=onSetLightStatusBar)
+        innerPadding =innerPadding,onSetLightStatusBar=onSetLightStatusBar,onNavigateToProfile=onNavigateToProfile)
 }

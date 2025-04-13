@@ -32,7 +32,8 @@ object FavoriteList
 fun NavigationFavoriteScreen(snackbarHostState: SnackbarHostState,
                              onChangeVisibleBottomBar: (Boolean) -> Unit,
                              innerPadding: PaddingValues,
-                             onSetLightStatusBar: (Boolean) -> Unit
+                             onSetLightStatusBar: (Boolean) -> Unit,
+                             onNavigateToProfile: () -> Unit,
 )  {
     val navController = rememberNavController()
 
@@ -41,12 +42,13 @@ fun NavigationFavoriteScreen(snackbarHostState: SnackbarHostState,
     }
 
     NavHost(navController = navController, startDestination = FavoriteList) {
+        val onNavigateToProfileInfo = {onNavigateToProfile() }
         val onNavigateToExcursion = { it: Excursion -> navController.navigateToExcursionDetail(excursion = it) }
         val onNavigateToAlbum = { excursionId: Int -> navController.navigateToAlbum(excursionId = excursionId) }
         val onNavigateToImage = { imageId: Int, excursionImages: List<Image>, indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
         val onNavigateToBack = {navController.popBackStack() }
-        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onNavigateToBack,innerPadding,onSetLightStatusBar)
+        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onNavigateToBack,innerPadding,onSetLightStatusBar,onNavigateToProfileInfo)
     }
 }
 
@@ -59,7 +61,8 @@ fun NavGraphBuilder.favoriteDestination(
     onNavigateToImage: (Int, List<Image>, Int) -> Unit,
     onNavigateToBack: () -> Boolean,
     innerPadding: PaddingValues,
-    onSetLightStatusBar: (Boolean) -> Unit
+    onSetLightStatusBar: (Boolean) -> Unit,
+    onNavigateToProfile: () -> Unit
 )
 {
     composable<FavoriteList> {
@@ -70,7 +73,7 @@ fun NavGraphBuilder.favoriteDestination(
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
         onSetLightStatusBar(true)
-        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding)
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding,onNavigateToProfile)
     }
     composable<AlbumExcursion> {
         backStackEntry ->

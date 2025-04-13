@@ -111,7 +111,8 @@ fun HomeScreen(
                     toolbarHeightDp = toolbarHeight
                     toolbarOffsetHeightPx = 0f
                 },
-                onScrollingColumn = {isCantScrollingColumn = it}
+                onScrollingColumn = {isCantScrollingColumn = it},
+                navigateToProfileInfo = navigateToProfileInfo
             )
 
 

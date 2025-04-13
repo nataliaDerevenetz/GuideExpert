@@ -49,6 +49,7 @@ fun HomeScreenContentState.FilterItem(
     excursion: Excursion
 ) {
     val favoriteExcursions by profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
+    val profile by profile.collectAsStateWithLifecycle(null)
     if (favoriteExcursions.any { it.excursionId == excursion.id }) {excursion.isFavorite = true} else {excursion.isFavorite = false}
 
     Card(
@@ -67,11 +68,15 @@ fun HomeScreenContentState.FilterItem(
                 Box {
                     ExcursionImage(excursion)
                     Box(modifier = Modifier.size(48.dp).scaleEffectClickable(onClick = {
-                        if (!excursion.isFavorite) {
-                            onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
-                        } else {
-                            onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
-                        }
+                            if (profile!= null && profile?.id !=0) {
+                                if (!excursion.isFavorite) {
+                                    onEvent(ExcursionsUiEvent.OnSetFavoriteExcursion(excursion))
+                                } else {
+                                    onEvent(ExcursionsUiEvent.OnDeleteFavoriteExcursion(excursion))
+                                }
+                            } else {
+                                navigateToProfileInfo()
+                            }
                         }).align(Alignment.TopEnd)
                     ) {
                         Image(

@@ -63,7 +63,8 @@ fun MainTopBar(modifier: Modifier = Modifier,
                 navigateToExcursion = navigateToExcursion,
                 scrollingOn = scrollingOn,
                 scrollingOff = scrollingOff,
-                onActiveChanged = { boxVisible = !it }
+                onActiveChanged = { boxVisible = !it },
+                navigateToProfileInfo = navigateToProfileInfo
             ){
                 SearchResult()
             }

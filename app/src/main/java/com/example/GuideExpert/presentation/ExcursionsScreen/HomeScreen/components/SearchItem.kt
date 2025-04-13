@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchStateScope
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -43,8 +44,11 @@ fun SearchStateScope.SearchItem(
     excursion: Excursion,
     onEvent: (SearchEvent) -> Unit,
     navigateToExcursion: (Excursion) -> Unit,
-    ) {
+    )
+{
     val favoriteExcursions by profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
+    val profile by profile.collectAsStateWithLifecycle(null)
+
     if (favoriteExcursions.any { it.excursionId == excursion.id }) {excursion.isFavorite = true} else {excursion.isFavorite = false}
 
     Card(
@@ -61,10 +65,14 @@ fun SearchStateScope.SearchItem(
                 Box {
                     ExcursionImageSearch(excursion)
                     Box(modifier = Modifier.size(48.dp).scaleEffectClickable(onClick = {
-                        if (!excursion.isFavorite) {
-                            onEvent(SearchEvent.OnSetFavoriteExcursion(excursion))
+                        if (profile!= null && profile?.id !=0) {
+                            if (!excursion.isFavorite) {
+                                onEvent(SearchEvent.OnSetFavoriteExcursion(excursion))
+                            } else {
+                                onEvent(SearchEvent.OnDeleteFavoriteExcursion(excursion))
+                            }
                         } else {
-                            onEvent(SearchEvent.OnDeleteFavoriteExcursion(excursion))
+                            navigateToProfileInfo()
                         }
                     }).align(Alignment.TopEnd)
                     ) {

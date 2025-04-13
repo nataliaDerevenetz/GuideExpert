@@ -72,6 +72,7 @@ class ExcursionDetailViewModel @Inject constructor(
     val excursionDetail = ExcursionDetail.from(savedStateHandle)
 
     val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
+    val profileFlow = profileRepository.profileFlow
 
     private val _stateView = MutableStateFlow<UIState>(UIState())
     val stateView: StateFlow<UIState> = _stateView.asStateFlow()

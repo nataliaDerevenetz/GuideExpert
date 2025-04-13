@@ -66,6 +66,7 @@ import androidx.paging.compose.itemKey
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
+import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.SearchItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
 import kotlinx.coroutines.flow.Flow
@@ -85,6 +86,8 @@ interface SearchStateScope {
     val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
     val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
     val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+    val navigateToProfileInfo: () -> Unit
+    val profile: StateFlow<Profile?>
 }
 
 fun DefaultSearchStateScope(
@@ -97,7 +100,9 @@ fun DefaultSearchStateScope(
     navigateToExcursion : (Excursion) -> Unit,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
-    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    navigateToProfileInfo: () -> Unit,
+    profile: StateFlow<Profile?>
 ): SearchStateScope {
     return object : SearchStateScope {
         override val searchListState: StateFlow<PagingData<Excursion>>
@@ -120,6 +125,10 @@ fun DefaultSearchStateScope(
             get() = stateSetFavoriteExcursion
         override val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
             get() = stateDeleteFavoriteExcursion
+        override val navigateToProfileInfo: () -> Unit
+            get() = navigateToProfileInfo
+        override val profile: StateFlow<Profile?>
+            get() = profile
     }
 }
 
@@ -135,9 +144,11 @@ fun rememberDefaultSearchStateScope(
     navigateToExcursion : (Excursion) -> Unit,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
-    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
-): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion) {
-    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion)
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    navigateToProfileInfo: () -> Unit,
+    profile: StateFlow<Profile?>
+): SearchStateScope = remember(searchListState,stateView,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,navigateToProfileInfo,profile) {
+    DefaultSearchStateScope(searchListState,stateView,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,navigateToProfileInfo,profile)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,6 +160,7 @@ fun SearchScreen(modifier: Modifier = Modifier,
                  scrollingOn:()->Unit,
                  scrollingOff:()->Unit,
                  onActiveChanged: (Boolean) -> Unit,
+                 navigateToProfileInfo:()->Unit,
                  scopeState:SearchStateScope = rememberDefaultSearchStateScope(searchListState = viewModel.uiPagingState,
                             stateView = viewModel.stateView,
                             effectFlow = viewModel.effectFlow,
@@ -158,7 +170,9 @@ fun SearchScreen(modifier: Modifier = Modifier,
                             navigateToExcursion = navigateToExcursion,
                             profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow,
                             stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
-                            stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion
+                            stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion,
+                            navigateToProfileInfo = navigateToProfileInfo,
+                            profile = viewModel.profileFlow
                      ),
                  searchContent: @Composable SearchStateScope.() -> Unit,
 ){

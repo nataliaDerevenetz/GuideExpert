@@ -60,6 +60,7 @@ import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
@@ -88,6 +89,8 @@ interface ExcursionDetailScope {
     val effectFlow: Flow<SnackbarEffect>
     val snackbarHostState: SnackbarHostState
     val excursionDetail: ExcursionDetail
+    val navigateToProfileInfo: () -> Unit
+    val profile: StateFlow<Profile?>
 }
 
 fun DefaultExcursionDetailScope(
@@ -104,7 +107,9 @@ fun DefaultExcursionDetailScope(
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
-    excursionDetail: ExcursionDetail
+    excursionDetail: ExcursionDetail,
+    navigateToProfileInfo: () -> Unit,
+    profile: StateFlow<Profile?>
 ): ExcursionDetailScope {
     return object : ExcursionDetailScope {
         override val excursionData: Flow<ExcursionData?>
@@ -135,6 +140,10 @@ fun DefaultExcursionDetailScope(
             get() = snackbarHostState
         override val excursionDetail: ExcursionDetail
             get() = excursionDetail
+        override val navigateToProfileInfo: () -> Unit
+            get() = navigateToProfileInfo
+        override val profile: StateFlow<Profile?>
+            get() = profile
     }
 }
 
@@ -153,9 +162,11 @@ fun rememberDefaultExcursionDetailScope(
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
-    excursionDetail: ExcursionDetail
-): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail) {
-    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail)
+    excursionDetail: ExcursionDetail,
+    navigateToProfileInfo: () -> Unit,
+    profile: StateFlow<Profile?>
+): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail,navigateToProfileInfo,profile) {
+    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail,navigateToProfileInfo,profile)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -166,6 +177,7 @@ fun ExcursionDetailScreen(
     onNavigateToBack:() -> Boolean,
     snackbarHostState: SnackbarHostState,
     innerPaddingMain: PaddingValues,
+    navigateToProfileInfo: () -> Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel(),
     scopeState:ExcursionDetailScope = rememberDefaultExcursionDetailScope(
         excursionData = viewModel.excursion,
@@ -181,7 +193,9 @@ fun ExcursionDetailScreen(
         stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion,
         effectFlow = viewModel.effectFlow,
         snackbarHostState = snackbarHostState,
-        excursionDetail = viewModel.excursionDetail
+        excursionDetail = viewModel.excursionDetail,
+        navigateToProfileInfo = navigateToProfileInfo,
+        profile = viewModel.profileFlow
         ),
   //  dataContent: @Composable ExcursionDetailScope.() -> Unit ={},
 ) {
@@ -189,6 +203,8 @@ fun ExcursionDetailScreen(
     val excursionData by scopeState.excursionData.collectAsStateWithLifecycle(null)
     val favoriteExcursions by scopeState.profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
+    val profile by scopeState.profile.collectAsStateWithLifecycle(null)
+
 
     var isFavorite = false
     excursionData?.let {
@@ -204,10 +220,22 @@ fun ExcursionDetailScreen(
                 actions={
                     IconButton({
                         excursionData?.let {
-                            if (!isFavorite) {
-                                scopeState.handleEvent(ExcursionDetailUiEvent.OnSetFavoriteExcursion(scopeState.excursionDetail.excursion))
+                            if (profile!= null && profile?.id !=0) {
+                                if (!isFavorite) {
+                                    scopeState.handleEvent(
+                                        ExcursionDetailUiEvent.OnSetFavoriteExcursion(
+                                            scopeState.excursionDetail.excursion
+                                        )
+                                    )
+                                } else {
+                                    scopeState.handleEvent(
+                                        ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(
+                                            scopeState.excursionDetail.excursion
+                                        )
+                                    )
+                                }
                             } else {
-                                scopeState.handleEvent(ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(scopeState.excursionDetail.excursion))
+                                navigateToProfileInfo()
                             }
                         }
                     }) { Icon(

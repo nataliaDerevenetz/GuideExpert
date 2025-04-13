@@ -78,6 +78,7 @@ class SearchViewModel @Inject constructor(
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
     val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
+    val profileFlow = profileRepository.profileFlow
 
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())
     val uiPagingState: StateFlow<PagingData<Excursion>> = _uiPagingState.asStateFlow()

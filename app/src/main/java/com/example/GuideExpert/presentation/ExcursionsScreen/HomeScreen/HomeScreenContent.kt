@@ -53,6 +53,7 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
+import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ColumnExcursionShimmer
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
@@ -75,7 +76,9 @@ class HomeScreenContentState(
     val getFiltersBar:() -> List<Filter>,
     val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
     val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
-    val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
+    val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    val navigateToProfileInfo: () -> Unit,
+    val profile: StateFlow<Profile?>
 )
 
 @Composable
@@ -89,9 +92,11 @@ fun rememberHomeScreenContentState(
     getFiltersBar:() -> List<Filter>,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
-    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
-): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion) {
-    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion)
+    stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
+    navigateToProfileInfo: () -> Unit,
+    profile: StateFlow<Profile?>
+): HomeScreenContentState = remember(filterListState,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,navigateToProfileInfo,profile) {
+    HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,navigateToProfileInfo,profile)
 }
 
 context(SharedTransitionScope)
@@ -108,6 +113,7 @@ fun HomeScreenContent(
     stopRefreshing:() -> Unit,
     showTopBar:() -> Unit,
     onScrollingColumn: (Boolean) -> Unit,
+    navigateToProfileInfo: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
     state: HomeScreenContentState = rememberHomeScreenContentState(
         filterListState = viewModel.uiPagingState,
@@ -119,7 +125,9 @@ fun HomeScreenContent(
         getFiltersBar = viewModel::getFiltersBar,
         profileFavoriteExcursionIdFlow = viewModel.profileFavoriteExcursionIdFlow,
         stateSetFavoriteExcursion = viewModel.stateSetFavoriteExcursion,
-        stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion
+        stateDeleteFavoriteExcursion = viewModel.stateDeleteFavoriteExcursion,
+        navigateToProfileInfo = navigateToProfileInfo,
+        profile = viewModel.profileFlow
     )
 ) {
 

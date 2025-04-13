@@ -118,6 +118,7 @@ fun rememberDefaultFavoritesScope(
 @Composable
 fun Favorites(snackbarHostState: SnackbarHostState,
               navigateToExcursion: (Excursion) -> Unit,
+              innerPadding: PaddingValues,
               viewModel: FavoritesViewModel = hiltViewModel(),
               scopeState:FavoritesScope = rememberDefaultFavoritesScope(
                   handleEvent = viewModel::handleEvent,
@@ -138,17 +139,19 @@ fun Favorites(snackbarHostState: SnackbarHostState,
     val profile by scopeState.profile.collectAsStateWithLifecycle(null)
 
     when(stateLoadFavorites.contentState){
-        is LoadFavoritesState.Success -> { scopeState.FavoritesDataContent(effectFlow) }
-        is LoadFavoritesState.Error -> { if (profile == null)  scopeState.FavoritesDataContent(effectFlow) else scopeState.FavoritesDataError(effectFlow) }
-        is LoadFavoritesState.Idle -> {FavoritesEmpty()}
-        is LoadFavoritesState.Loading -> { LoadingExcursionListShimmer() }
+        is LoadFavoritesState.Success -> {
+            scopeState.FavoritesDataContent(innerPadding,effectFlow)
+        }
+        is LoadFavoritesState.Error -> { if (profile == null)  scopeState.FavoritesDataContent(innerPadding,effectFlow) else scopeState.FavoritesDataError(innerPadding,effectFlow) }
+        is LoadFavoritesState.Idle -> {FavoritesEmpty(innerPadding)}
+        is LoadFavoritesState.Loading -> { scopeState.FavoritesDataLoading(innerPadding) }
     }
 }
 
 @Composable
-fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
+fun FavoritesScope.FavoritesDataError(innerPadding: PaddingValues,effectFlow: SnackbarEffect?) {
 
-    Column (Modifier.padding(0.dp).fillMaxSize()){
+    Column (Modifier.padding(innerPadding).fillMaxSize()){
         Row(
             Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -162,14 +165,14 @@ fun FavoritesScope.FavoritesDataError(effectFlow: SnackbarEffect?) {
             }
         }
         Row {
-            FavoritesDataContent(effectFlow)
+            FavoritesDataContent(innerPadding,effectFlow)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScope.FavoritesDataContent(effectFlow: SnackbarEffect?) {
+fun FavoritesScope.FavoritesDataContent(innerPadding: PaddingValues,effectFlow: SnackbarEffect?) {
     val excursions by excursions.collectAsStateWithLifecycle(null)
     val scope = rememberCoroutineScope()
 
@@ -186,7 +189,7 @@ fun FavoritesScope.FavoritesDataContent(effectFlow: SnackbarEffect?) {
             onRefresh = {handleEvent(ExcursionsFavoriteUiEvent.OnLoadExcursionsFavorite)}
         ) {
             LazyColumn(
-                modifier = Modifier
+                modifier = Modifier.padding(innerPadding)
                     .fillMaxSize(),
                 contentPadding = PaddingValues(vertical = 8.dp),
             ) {
@@ -198,11 +201,13 @@ fun FavoritesScope.FavoritesDataContent(effectFlow: SnackbarEffect?) {
                 }
             }
         }
-        if (it.isEmpty()) FavoritesEmpty()
+        if (it.isEmpty()) FavoritesEmpty(innerPadding)
     }
 
     if (excursions == null) {
-        LoadingExcursionListShimmer()
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()){
+            LoadingExcursionListShimmer()
+        }
     }
 }
 
@@ -227,6 +232,14 @@ fun FavoritesScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
             handleEvent(ExcursionsFavoriteUiEvent.OnDeleteFavoriteExcursionStateSetIdle)
         }
         else -> {}
+    }
+}
+
+@Composable
+fun FavoritesScope.FavoritesDataLoading(innerPadding: PaddingValues) {
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize(),
+    ) {
+        LoadingExcursionListShimmer()
     }
 }
 
@@ -281,8 +294,8 @@ fun FavoritesScope.ContentRestoreFavoriteContent(effectFlow: SnackbarEffect?) {
 }
 
 @Composable
-private fun FavoritesEmpty(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
+private fun FavoritesEmpty(innerPadding: PaddingValues,modifier: Modifier = Modifier) {
+    Box(modifier = modifier.padding(innerPadding).fillMaxSize()) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = stringResource(R.string.not_excursions),

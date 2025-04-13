@@ -47,7 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,7 +56,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.example.GuideExpert.R
-import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
@@ -65,9 +63,6 @@ import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.ExcursionsUiEvent
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchStateScope
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
@@ -170,6 +165,7 @@ fun ExcursionDetailScreen(
     navigateToImage: (Int,List<Image>,Int) -> Unit,
     onNavigateToBack:() -> Boolean,
     snackbarHostState: SnackbarHostState,
+    innerPaddingMain: PaddingValues,
     viewModel: ExcursionDetailViewModel = hiltViewModel(),
     scopeState:ExcursionDetailScope = rememberDefaultExcursionDetailScope(
         excursionData = viewModel.excursion,
@@ -200,6 +196,7 @@ fun ExcursionDetailScreen(
     }
 
     Scaffold(
+        modifier = Modifier.padding(innerPaddingMain),
         topBar = {
             TopAppBar(
                 title = { Text("") },

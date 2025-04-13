@@ -33,7 +33,6 @@ class ProfileViewModel @Inject constructor(
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
     suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {
-        Log.d("MODEL", message)
         _effectChannel.send(SnackbarEffect.ShowSnackbar(message))
     }
 

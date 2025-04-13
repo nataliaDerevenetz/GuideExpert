@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,7 +36,7 @@ fun AlbumExcursionScreen(
             columns = StaggeredGridCells.Adaptive(200.dp),
             verticalItemSpacing = 4.dp,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.fillMaxSize().imePadding()
+            modifier = Modifier.background(Color.Black).fillMaxSize().imePadding()
         ) {
             itemsIndexed(excursionImages!!) { index, item ->
                 NetworkImageCarousel(

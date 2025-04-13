@@ -115,6 +115,7 @@ import java.util.Locale
 @Composable
 fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                         onNavigateToProfile: () -> Boolean,
+                        innerPaddingMain: PaddingValues,
                         viewModel: EditorProfileViewModel = hiltViewModel(),
                         scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
                             viewStateFlow = viewModel.viewStateFlow,
@@ -131,7 +132,7 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
     val effectFlow by scopeState.effectFlow.collectAsStateWithLifecycle(null)
     val scope = rememberCoroutineScope()
 
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.padding(innerPaddingMain).fillMaxSize()) {
          Scaffold(
              topBar = {
                  TopAppBar(

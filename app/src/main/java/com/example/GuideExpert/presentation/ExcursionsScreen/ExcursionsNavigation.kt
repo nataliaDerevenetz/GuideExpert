@@ -1,8 +1,10 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen
 
 import android.util.Log
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -52,9 +54,11 @@ class ExcursionDetail(val excursion : Excursion) {
 
 @Composable
 fun NavigationHomeScreen(
-    snackbarHostState : SnackbarHostState,
+    snackbarHostState: SnackbarHostState,
     onChangeVisibleBottomBar: (Boolean) -> Unit,
-    onNavigateToProfile : () -> Unit
+    onNavigateToProfile: () -> Unit,
+    innerPadding: PaddingValues,
+    isLight: MutableState<Boolean>,
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = ExcursionSearchScreen) {
@@ -64,34 +68,42 @@ fun NavigationHomeScreen(
         val onNavigateToImage = { imageId: Int,excursionImages: List<Image>,indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
         val onNavigateToBack = {navController.popBackStack() }
-        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack,onNavigateToProfileInfo)
+        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack,onNavigateToProfileInfo,innerPadding,isLight)
     }
 }
 
-fun NavGraphBuilder.excursionsDestination(snackbarHostState :SnackbarHostState,
-                                          onNavigateToExcursion: (Excursion) -> Unit,
-                                          onNavigateToAlbum: (Int) -> Unit,
-                                          onNavigateToImage: (Int,List<Image>,Int) -> Unit,
-                                          onChangeVisibleBottomBar: (Boolean) -> Unit,
-                                          onNavigateToBack:() -> Boolean,
-                                          onNavigateToProfileInfo:() -> Unit) {
+fun NavGraphBuilder.excursionsDestination(
+    snackbarHostState: SnackbarHostState,
+    onNavigateToExcursion: (Excursion) -> Unit,
+    onNavigateToAlbum: (Int) -> Unit,
+    onNavigateToImage: (Int, List<Image>, Int) -> Unit,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
+    onNavigateToBack: () -> Boolean,
+    onNavigateToProfileInfo: () -> Unit,
+    innerPadding: PaddingValues,
+    isLight: MutableState<Boolean>,
+) {
     composable<ExcursionSearchScreen> {
         onChangeVisibleBottomBar(true)
-        HomeScreen(snackbarHostState,onNavigateToExcursion,onNavigateToProfileInfo)
+        if (!isLight.value) isLight.value = true
+        HomeScreen(snackbarHostState,onNavigateToExcursion,onNavigateToProfileInfo,innerPadding)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
-        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState)
+        if (!isLight.value) isLight.value = true
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding)
     }
     composable<AlbumExcursion> {
         backStackEntry ->
         onChangeVisibleBottomBar(false)
+        if (!isLight.value) isLight.value = true
         val excursion = backStackEntry.toRoute<AlbumExcursion>()
         AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
     }
     composable<ImageExcursion>(typeMap = ImageExcursion.typeMap) {
         backStackEntry ->
         onChangeVisibleBottomBar(false)
+        if (isLight.value) isLight.value = false
         val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
         ImageExcursionScreen(imageExcursion = imageExcursion)
     }

@@ -2,6 +2,7 @@ package com.example.GuideExpert.presentation.ProfileScreen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,7 +29,9 @@ object EditorProfile
 @Composable
 fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,
                             onChangeVisibleBottomBar: (Boolean) -> Unit,
-                            onNavigateToHome:()->Unit)  {
+                            onNavigateToHome:()->Unit,
+                            innerPadding: PaddingValues
+)  {
     val navController = rememberNavController()
 
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
@@ -40,7 +43,7 @@ fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,
         val onNavigateToYandex = { navController.navigateToYandex()}
         val onNavigateToBack = { onNavigateToHome() }
         val onNavigateToProfile = {navController.popBackStack()}
-        profileDestination(snackbarHostState,onNavigateEditorProfile,onNavigateToYandex,onNavigateToBack, onNavigateToProfile,viewModelStoreOwner,onChangeVisibleBottomBar)
+        profileDestination(snackbarHostState,onNavigateEditorProfile,onNavigateToYandex,onNavigateToBack, onNavigateToProfile,viewModelStoreOwner,onChangeVisibleBottomBar,innerPadding)
     }
 }
 
@@ -52,14 +55,15 @@ fun NavGraphBuilder.profileDestination(snackbarHostState :SnackbarHostState,
                                        onNavigateToProfile: () -> Boolean,
                                        viewModelStoreOwner: ViewModelStoreOwner,
                                        onChangeVisibleBottomBar: (Boolean) -> Unit,
+                                       innerPadding: PaddingValues
 )
 {
     composable<ProfileInfo> {
         onChangeVisibleBottomBar(true)
-        ProfileInfo(snackbarHostState,onNavigateToYandex,onNavigateToEditorProfile, onNavigateToBack,viewModel = hiltViewModel(viewModelStoreOwner)) }
+        ProfileInfo(snackbarHostState,onNavigateToYandex,onNavigateToEditorProfile, onNavigateToBack,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner)) }
     composable<EditorProfile> {
         onChangeVisibleBottomBar(false)
-        EditorProfileScreen(snackbarHostState,onNavigateToProfile) }
+        EditorProfileScreen(snackbarHostState,onNavigateToProfile,innerPadding) }
     activity("loginYandex") { activityClass = ProfileYandexActivity::class }
 }
 

@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.FavoriteScreen
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,7 +30,8 @@ object FavoriteList
 
 @Composable
 fun NavigationFavoriteScreen(snackbarHostState: SnackbarHostState,
-                            onChangeVisibleBottomBar: (Boolean) -> Unit)  {
+                            onChangeVisibleBottomBar: (Boolean) -> Unit, innerPadding: PaddingValues
+)  {
     val navController = rememberNavController()
 
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
@@ -42,26 +44,28 @@ fun NavigationFavoriteScreen(snackbarHostState: SnackbarHostState,
         val onNavigateToImage = { imageId: Int, excursionImages: List<Image>, indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
         val onNavigateToBack = {navController.popBackStack() }
-        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onNavigateToBack)
+        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onNavigateToBack,innerPadding)
     }
 }
 
-fun NavGraphBuilder.favoriteDestination(snackbarHostState : SnackbarHostState,
-                                        viewModelStoreOwner: ViewModelStoreOwner,
-                                        onChangeVisibleBottomBar: (Boolean) -> Unit,
-                                        onNavigateToExcursion: (Excursion) -> Unit,
-                                        onNavigateToAlbum: (Int) -> Unit,
-                                        onNavigateToImage: (Int,List<Image>,Int) -> Unit,
-                                        onNavigateToBack:() -> Boolean,
+fun NavGraphBuilder.favoriteDestination(
+    snackbarHostState: SnackbarHostState,
+    viewModelStoreOwner: ViewModelStoreOwner,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
+    onNavigateToExcursion: (Excursion) -> Unit,
+    onNavigateToAlbum: (Int) -> Unit,
+    onNavigateToImage: (Int, List<Image>, Int) -> Unit,
+    onNavigateToBack: () -> Boolean,
+    innerPadding: PaddingValues,
 )
 {
     composable<FavoriteList> {
         onChangeVisibleBottomBar(true)
-        Favorites(snackbarHostState,onNavigateToExcursion,viewModel = hiltViewModel(viewModelStoreOwner))
+        Favorites(snackbarHostState,onNavigateToExcursion,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner))
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
-        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState)
+        ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding)
     }
     composable<AlbumExcursion> {
             backStackEntry ->

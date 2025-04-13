@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -24,12 +23,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -73,7 +72,7 @@ val Context.topLevelRoutes get() =  listOf(
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(isLight: MutableState<Boolean>,viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
@@ -84,7 +83,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             BottomBar(navController,bottomBarState)
         }
     ) { innerPadding ->
-        NavHost(navController, startDestination = Home, Modifier.padding(innerPadding)) {
+        NavHost(navController, startDestination = Home) {
             composable<Home> {
                 ExcursionsScreen(snackbarHostState = snackbarHostState,
                     onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
@@ -96,7 +95,9 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
+                    innerPadding,
+                    isLight
                 )
             }
             composable<Profile> {
@@ -114,11 +115,13 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                                 restoreState = true
                             }
                         }
-                    })
+                    },
+                    innerPadding)
             }
             composable<Favorite> {
                 FavoriteScreen(snackbarHostState = snackbarHostState,
                     onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
+                    innerPadding
                 )
             }
         }

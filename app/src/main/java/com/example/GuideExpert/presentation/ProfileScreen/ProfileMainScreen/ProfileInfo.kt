@@ -140,6 +140,7 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
                 onNavigateToYandex: () -> Unit,
                 onNavigateToEditorProfile: () -> Unit,
                 onNavigateToBack: () -> Unit,
+                innerPaddingMain: PaddingValues,
                 viewModel: ProfileViewModel = hiltViewModel(),
                 scopeState: ProfileStateScope = rememberDefaultProfileStateScope(profile = viewModel.profileFlow,
                     profileStateFlow = viewModel.profileStateFlow,
@@ -152,16 +153,12 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
                     logout = viewModel::logout),
 ) {
 
-    Log.d("MODEL", "000")
-
     val profileState = scopeState.profileStateFlow.collectAsStateWithLifecycle()
 
     var expandedDropdownMenu by remember { mutableStateOf(false) }
 
-
     val effectFlow by viewModel.effectFlow.collectAsStateWithLifecycle(null)
     LaunchedEffect(effectFlow) {
-        Log.d("MODEL", "888")
         effectFlow?.let {
             when (it) {
                 is SnackbarEffect.ShowSnackbar -> {
@@ -172,11 +169,11 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
     }
 
     Scaffold(
+        modifier = Modifier.padding(innerPaddingMain),
         topBar = {
             TopAppBar(
                 title = { Text("") },
                 navigationIcon={ IconButton({
-                    Log.d("CLICK","BACK")
                     scopeState.navigateToBack()}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") } },
                 actions = {
                     if (profileState.value is ProfileResources.Success) {

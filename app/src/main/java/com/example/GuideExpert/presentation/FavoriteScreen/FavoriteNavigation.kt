@@ -30,7 +30,9 @@ object FavoriteList
 
 @Composable
 fun NavigationFavoriteScreen(snackbarHostState: SnackbarHostState,
-                            onChangeVisibleBottomBar: (Boolean) -> Unit, innerPadding: PaddingValues
+                             onChangeVisibleBottomBar: (Boolean) -> Unit,
+                             innerPadding: PaddingValues,
+                             onSetLightStatusBar: (Boolean) -> Unit
 )  {
     val navController = rememberNavController()
 
@@ -44,7 +46,7 @@ fun NavigationFavoriteScreen(snackbarHostState: SnackbarHostState,
         val onNavigateToImage = { imageId: Int, excursionImages: List<Image>, indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
         val onNavigateToBack = {navController.popBackStack() }
-        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onNavigateToBack,innerPadding)
+        favoriteDestination(snackbarHostState,viewModelStoreOwner,onChangeVisibleBottomBar,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onNavigateToBack,innerPadding,onSetLightStatusBar)
     }
 }
 
@@ -57,26 +59,31 @@ fun NavGraphBuilder.favoriteDestination(
     onNavigateToImage: (Int, List<Image>, Int) -> Unit,
     onNavigateToBack: () -> Boolean,
     innerPadding: PaddingValues,
+    onSetLightStatusBar: (Boolean) -> Unit
 )
 {
     composable<FavoriteList> {
         onChangeVisibleBottomBar(true)
+        onSetLightStatusBar(true)
         Favorites(snackbarHostState,onNavigateToExcursion,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner))
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
+        onSetLightStatusBar(true)
         ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding)
     }
     composable<AlbumExcursion> {
-            backStackEntry ->
-        onChangeVisibleBottomBar(false)
-        val excursion = backStackEntry.toRoute<AlbumExcursion>()
-        AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
+        backStackEntry ->
+            onChangeVisibleBottomBar(false)
+            onSetLightStatusBar(true)
+            val excursion = backStackEntry.toRoute<AlbumExcursion>()
+            AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
     }
     composable<ImageExcursion>(typeMap = ImageExcursion.typeMap) {
-            backStackEntry ->
-        onChangeVisibleBottomBar(false)
-        val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
-        ImageExcursionScreen(imageExcursion = imageExcursion)
+        backStackEntry ->
+            onChangeVisibleBottomBar(false)
+            onSetLightStatusBar(false)
+            val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
+            ImageExcursionScreen(imageExcursion = imageExcursion)
     }
 }

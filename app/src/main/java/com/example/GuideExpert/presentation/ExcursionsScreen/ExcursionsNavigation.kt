@@ -58,7 +58,7 @@ fun NavigationHomeScreen(
     onChangeVisibleBottomBar: (Boolean) -> Unit,
     onNavigateToProfile: () -> Unit,
     innerPadding: PaddingValues,
-    isLight: MutableState<Boolean>,
+    onSetLightStatusBar: (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = ExcursionSearchScreen) {
@@ -68,7 +68,7 @@ fun NavigationHomeScreen(
         val onNavigateToImage = { imageId: Int,excursionImages: List<Image>,indexImage:Int -> navController.navigateToImage(imageId = imageId,excursionImages=excursionImages,
             indexImage=indexImage) }
         val onNavigateToBack = {navController.popBackStack() }
-        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack,onNavigateToProfileInfo,innerPadding,isLight)
+        excursionsDestination(snackbarHostState,onNavigateToExcursion,onNavigateToAlbum,onNavigateToImage,onChangeVisibleBottomBar,onNavigateToBack,onNavigateToProfileInfo,innerPadding,onSetLightStatusBar)
     }
 }
 
@@ -81,31 +81,31 @@ fun NavGraphBuilder.excursionsDestination(
     onNavigateToBack: () -> Boolean,
     onNavigateToProfileInfo: () -> Unit,
     innerPadding: PaddingValues,
-    isLight: MutableState<Boolean>,
+    onSetLightStatusBar: (Boolean) -> Unit,
 ) {
     composable<ExcursionSearchScreen> {
         onChangeVisibleBottomBar(true)
-        if (!isLight.value) isLight.value = true
+        onSetLightStatusBar(true)
         HomeScreen(snackbarHostState,onNavigateToExcursion,onNavigateToProfileInfo,innerPadding)
     }
     composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
-        if (!isLight.value) isLight.value = true
+        onSetLightStatusBar(true)
         ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding)
     }
     composable<AlbumExcursion> {
         backStackEntry ->
-        onChangeVisibleBottomBar(false)
-        if (!isLight.value) isLight.value = true
-        val excursion = backStackEntry.toRoute<AlbumExcursion>()
-        AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
+            onChangeVisibleBottomBar(false)
+            onSetLightStatusBar(true)
+            val excursion = backStackEntry.toRoute<AlbumExcursion>()
+            AlbumExcursionScreen(excursionId = excursion.excursionId,navigateToImage=onNavigateToImage)
     }
     composable<ImageExcursion>(typeMap = ImageExcursion.typeMap) {
         backStackEntry ->
-        onChangeVisibleBottomBar(false)
-        if (isLight.value) isLight.value = false
-        val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
-        ImageExcursionScreen(imageExcursion = imageExcursion)
+            onChangeVisibleBottomBar(false)
+            onSetLightStatusBar(false)
+            val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
+            ImageExcursionScreen(imageExcursion = imageExcursion)
     }
 }
 

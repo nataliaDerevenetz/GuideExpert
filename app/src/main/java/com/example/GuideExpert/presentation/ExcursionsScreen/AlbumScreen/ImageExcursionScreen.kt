@@ -1,7 +1,5 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen
 
-import android.util.Log
-import android.view.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,34 +20,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.NetworkImage
 import com.example.GuideExpert.presentation.ExcursionsScreen.ImageExcursion
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 
-fun setStatusBarColor(window: Window, isLight: MutableState<Boolean>) {
-    Log.d("UUU","III")
-    val windowInsetsController =
-        WindowCompat.getInsetsController(window, window.decorView)
-
-    windowInsetsController.isAppearanceLightStatusBars = isLight.value
-   /* ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, windowInsets ->
-      //  windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-        windowInsetsController.isAppearanceLightStatusBars = isLight.value
-        ViewCompat.onApplyWindowInsets(view, windowInsets)
-    }*/
-}
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImageExcursionScreen(
     imageExcursion: ImageExcursion,
 ) {
-
-
     var scale by remember { mutableStateOf(1f) }
     val pagerState = rememberPagerState(initialPage = imageExcursion.indexImage)
 

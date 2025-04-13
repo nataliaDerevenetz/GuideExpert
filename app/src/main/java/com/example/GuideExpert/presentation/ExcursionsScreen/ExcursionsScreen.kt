@@ -12,8 +12,8 @@ fun ExcursionsScreen(
     onChangeVisibleBottomBar: (Boolean) -> Unit,
     onNavigateToProfile: () -> Unit,
     innerPadding: PaddingValues,
-    isLight: MutableState<Boolean>
+    onSetLightStatusBar: (Boolean) -> Unit
 ) {
     NavigationHomeScreen(snackbarHostState = snackbarHostState,onChangeVisibleBottomBar =onChangeVisibleBottomBar,
-        onNavigateToProfile = onNavigateToProfile,innerPadding = innerPadding,isLight= isLight)
+        onNavigateToProfile = onNavigateToProfile,innerPadding = innerPadding,onSetLightStatusBar= onSetLightStatusBar)
 }

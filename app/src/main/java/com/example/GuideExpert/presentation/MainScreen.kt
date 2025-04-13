@@ -23,7 +23,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,7 +71,7 @@ val Context.topLevelRoutes get() =  listOf(
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun MainScreen(isLight: MutableState<Boolean>,viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(onSetLightStatusBar: (Boolean) -> Unit,viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
@@ -97,7 +96,7 @@ fun MainScreen(isLight: MutableState<Boolean>,viewModel: MainViewModel = hiltVie
                         }
                     },
                     innerPadding,
-                    isLight
+                    onSetLightStatusBar
                 )
             }
             composable<Profile> {
@@ -121,7 +120,8 @@ fun MainScreen(isLight: MutableState<Boolean>,viewModel: MainViewModel = hiltVie
             composable<Favorite> {
                 FavoriteScreen(snackbarHostState = snackbarHostState,
                     onChangeVisibleBottomBar = {visibleBottomBar:Boolean -> bottomBarState = visibleBottomBar},
-                    innerPadding
+                    innerPadding,
+                    onSetLightStatusBar
                 )
             }
         }

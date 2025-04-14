@@ -7,7 +7,7 @@ object DataProvider {
 
     val filtersBar = listOf(
         Filter(id = 1, name = "Топ",type = FilterType.Sort, description = ""),
-        Filter(id = 2, name = "Вечерние",type = FilterType.Duration, description = ""),
+        Filter(id = 2, name = "4-6 часов",type = FilterType.Duration, description = ""),
         Filter(id = 1, name = "Обзорные",type = FilterType.Categories, description = ""),
         Filter(id = 1, name = "Групповые",type = FilterType.Groups, description = ""),
     )
@@ -25,7 +25,7 @@ object DataProvider {
 
     val filtersDuration = listOf(
         Filter(id = 1, name = "Короткие (1-3 часа)",type = FilterType.Duration, description = "Короткая"),
-        Filter(id = 2, name = "Длинные (4-6 часов)",type = FilterType.Duration, description = "Длинная"),
+        Filter(id = 2, name = "Долгие (4-6 часов)",type = FilterType.Duration, description = "Длинная"),
         Filter(id = 3, name = "Весь день",type = FilterType.Duration, description = "Весь день")
     )
 

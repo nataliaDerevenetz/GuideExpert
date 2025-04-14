@@ -84,7 +84,6 @@ class ExcursionDetailViewModel @Inject constructor(
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
-
     private val _stateSetFavoriteExcursion = MutableStateFlow<SetFavoriteExcursionUIState>(
         SetFavoriteExcursionUIState()
     )

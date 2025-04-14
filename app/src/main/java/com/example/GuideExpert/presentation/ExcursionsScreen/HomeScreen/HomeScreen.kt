@@ -1,5 +1,6 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -90,7 +91,8 @@ fun HomeScreen(
 
     SharedTransitionLayout {
         Box(
-            Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
+            if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
+            else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)
         ) {
 
             HomeScreenContent(

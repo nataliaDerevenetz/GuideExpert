@@ -33,10 +33,10 @@ class SessionManager (val context: Context) {
     fun getAuthToken(): Flow<String> = read(AUTH_TOKEN, "")
 
 
-    private val PROFILE_ID = intPreferencesKey("profile_id")
-    suspend fun setProfileId(value: Int) = save(PROFILE_ID, value)
+    private val PROFILE_ID = stringPreferencesKey("profile_id")
+    suspend fun setProfileId(value: String) = save(PROFILE_ID, value)
 
-    fun getProfileId(): Flow<Int> = read(PROFILE_ID, 0)
+    fun getProfileId(): Flow<String> = read(PROFILE_ID, "")
 
     private val PROFILE_TIME = intPreferencesKey("profile_time")
     suspend fun setProfileTime(value: Int) = save(PROFILE_TIME, value)

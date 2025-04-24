@@ -93,9 +93,10 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun fetchProfile() {
         try {
-            val profileId = runBlocking {
+            val id = runBlocking {
                 sessionManager.getProfileId().first()
             }
+            val profileId = if (id.isNotEmpty()) id.toInt() else 0
 
             if (profileId != 0) {
                 _profileStateFlow.update { ProfileResources.Loading }
@@ -128,7 +129,7 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun removeProfile() {
         sessionManager.setAuthToken("")
-        sessionManager.setProfileId(0)
+        sessionManager.setProfileId("")
         sessionManager.setProfileTime(0)
         _profileFlow.update { null }
         _profileStateFlow.update { ProfileResources.Idle }

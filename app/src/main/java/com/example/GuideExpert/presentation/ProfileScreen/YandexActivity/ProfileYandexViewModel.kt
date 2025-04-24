@@ -36,7 +36,7 @@ class ProfileYandexViewModel @Inject constructor(
                         is UIResources.Loading -> { }
                         is UIResources.Success -> {
                             resource.data.authToken?.let { sessionManager.setAuthToken(it) }
-                            resource.data.id?.let { sessionManager.setProfileId(it) }
+                            resource.data.id?.let { sessionManager.setProfileId(it.toString()) }
                             resource.data.time?.let { sessionManager.setProfileTime(it) }
                             _isClosed.update { true }
                         }

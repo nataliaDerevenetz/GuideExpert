@@ -76,7 +76,7 @@ composeCompiler {
 dependencies {
 
     implementation ("androidx.exifinterface:exifinterface:1.4.1")
-    implementation ("androidx.datastore:datastore-preferences:1.1.5")
+    implementation ("androidx.datastore:datastore-preferences:1.1.0")
 
     implementation ("com.yandex.android:authsdk:3.1.3")
 

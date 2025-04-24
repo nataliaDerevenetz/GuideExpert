@@ -5,9 +5,9 @@ plugins {
 
     kotlin("plugin.serialization") version "2.0.21"
 
-    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
+    id("com.google.devtools.ksp")
 
 }
 
@@ -61,27 +61,28 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    packaging {
+        jniLibs.keepDebugSymbols.add("**/libandroidx.graphics.path.so")
+        jniLibs.keepDebugSymbols.add("**/libdatastore_shared_counter.so")
+    }
 }
 
 composeCompiler {
     enableStrongSkippingMode = true
 }
 
-kapt {
-    correctErrorTypes = true
-}
-
 
 dependencies {
 
-    implementation ("androidx.exifinterface:exifinterface:1.4.0")
-    implementation ("androidx.datastore:datastore-preferences:1.1.3")
+    implementation ("androidx.exifinterface:exifinterface:1.4.1")
+    implementation ("androidx.datastore:datastore-preferences:1.1.5")
 
     implementation ("com.yandex.android:authsdk:3.1.3")
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
-    implementation("androidx.compose.animation:animation:1.7.8")
+    implementation("androidx.compose.animation:animation:1.8.0")
 
     implementation("com.google.accompanist:accompanist-pager:0.28.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
@@ -103,22 +104,16 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.material3:material3:1.3.2")
 
-    // ksp(libs.hilt.compiler)
 
 
     implementation("androidx.room:room-runtime:$room_version")
 
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See Add the KSP plugin to your project
-    //ksp("androidx.room:room-compiler:$room_version")
-     kapt("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
 
-
-    // If this project only uses Java source, use the Java annotationProcessor
-    // No additional plugins are necessary
-    annotationProcessor("androidx.room:room-compiler:$room_version")
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
@@ -127,14 +122,18 @@ dependencies {
     val nav_version = "2.8.3"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    //kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+   // ksp("com.google.dagger:hilt-android-compiler:2.51.1")
+
+    ksp("com.google.dagger:hilt-compiler:2.51.1")
+
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation ("androidx.appcompat:appcompat:1.3.1")
-    implementation("androidx.compose.material:material:1.7.5")
+    implementation("androidx.compose.material:material:1.8.0")
 
     implementation(libs.kotlinx.serialization.json)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.savedstate:savedstate-ktx:1.2.1")
 
     implementation(libs.androidx.navigation.compose)

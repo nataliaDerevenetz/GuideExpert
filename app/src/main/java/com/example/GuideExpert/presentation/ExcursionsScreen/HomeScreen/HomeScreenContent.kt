@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -55,8 +57,8 @@ import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ColumnExcursionShimmer
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterBar
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.FilterItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.ImageSlider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -170,7 +172,7 @@ fun HomeScreenContent(
     state.ContentSetFavoriteContent(effectFlow)
     state.ContentDeleteFavoriteContent(effectFlow)
 
-    val listState = rememberLazyListState()
+    val listState = rememberLazyStaggeredGridState()
     val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
     val isCantScrollForwardColumn by remember { derivedStateOf {!listState.canScrollForward && !listState.canScrollBackward} }
 
@@ -182,16 +184,16 @@ fun HomeScreenContent(
         }
     }
 
-    LazyColumn(
+    LazyVerticalStaggeredGrid(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        columns = StaggeredGridCells.Adaptive(300.dp),
         contentPadding = PaddingValues(top = toolbarHeightDp.dp),
         state = listState,
     ) {
-        item {
+        item(span = StaggeredGridItemSpan.FullLine) {
             ImageSlider(navigateToExcursion = state.navigateToExcursion)
         }
-        item {
+        item(span = StaggeredGridItemSpan.FullLine) {
             FilterBar(
                 filters,
                 filterScreenVisible = filterScreenVisible,
@@ -202,11 +204,18 @@ fun HomeScreenContent(
 
         if (excursionPagingItems.loadState.refresh is LoadState.Error) {
             item {
-                Row(Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically){
-                    Text(stringResource(id = R.string.failedload),color=Color.Gray)
-                    TextButton({excursionPagingItems.retry()}) {
-                        Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+                Row(
+                    Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(stringResource(id = R.string.failedload), color = Color.Gray)
+                    TextButton({ excursionPagingItems.retry() }) {
+                        Text(
+                            stringResource(id = R.string.update),
+                            fontSize = 15.sp,
+                            color = Color.Blue
+                        )
                     }
                 }
             }
@@ -248,11 +257,18 @@ fun HomeScreenContent(
 
             item {
                 if (excursionPagingItems.loadState.append is LoadState.Error) {
-                    Row(Modifier.padding(start = 15.dp, end = 15.dp, bottom = 150.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically){
-                        Text(stringResource(id = R.string.failedload),color=Color.Gray)
-                        TextButton({excursionPagingItems.retry()}) {
-                            Text(stringResource(id = R.string.update), fontSize = 15.sp, color = Color.Blue)
+                    Row(
+                        Modifier.padding(start = 15.dp, end = 15.dp, bottom = 150.dp)
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(id = R.string.failedload), color = Color.Gray)
+                        TextButton({ excursionPagingItems.retry() }) {
+                            Text(
+                                stringResource(id = R.string.update),
+                                fontSize = 15.sp,
+                                color = Color.Blue
+                            )
                         }
                     }
                 }
@@ -337,7 +353,7 @@ private fun HomeScreenEmpty(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState, showTopBar: ()->Unit) {
+private fun FloatButtonUp(displayButton: Boolean, listState : LazyStaggeredGridState, showTopBar: ()->Unit) {
     val scope = rememberCoroutineScope()
     AnimatedVisibility(visible = displayButton,
         enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(400)),
@@ -354,7 +370,7 @@ private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState, sho
                 onClick = {
                     showTopBar()
                     scope.launch {
-                        listState.animateScrollToItem(0)
+                        listState.scrollToItem(0)
                     }
                 },
                 shape = CircleShape,

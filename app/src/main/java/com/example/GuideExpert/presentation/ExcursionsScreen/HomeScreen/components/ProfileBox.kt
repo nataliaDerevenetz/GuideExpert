@@ -184,7 +184,7 @@ fun ProfileBoxStateScope.ProfileBoxContent(){
 
                     }
                 }
-                Icon( Icons.Filled.Notifications, modifier = Modifier.size(38.dp)
+               /* Icon( Icons.Filled.Notifications, modifier = Modifier.size(38.dp)
                     .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                     .drawWithCache {
                         onDrawWithContent {
@@ -193,6 +193,8 @@ fun ProfileBoxStateScope.ProfileBoxContent(){
                         }
                     },
                     contentDescription = null)
+
+                */
             }
         }
 

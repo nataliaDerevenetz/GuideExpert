@@ -6,9 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.GuideExpert.domain.models.Excursion
@@ -18,12 +21,38 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen.AlbumEx
 import com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen.ImageExcursionScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
+import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionSearchScreen
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeBaseRoute
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeRoute
 import com.example.GuideExpert.presentation.ExcursionsScreen.ImageExcursion
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToAlbum
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToImage
 import com.example.GuideExpert.presentation.FavoriteScreen.FavoriteMainScreen.Favorites
 import kotlinx.serialization.Serializable
+
+
+@Serializable object FavoritesRoute
+
+fun NavController.navigateToFavorites(navOptions: NavOptions) =
+    navigate(route = FavoritesRoute, navOptions)
+
+fun NavGraphBuilder.favoritesScreen(
+   // onTopicClick: (String) -> Unit,
+   // onShowSnackbar: suspend (String, String?) -> Boolean,
+) {
+    composable<FavoritesRoute> {
+       // BookmarksRoute(onTopicClick, onShowSnackbar)
+   //     Favorites(snackbarHostState,onNavigateToExcursion,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner))
+
+    }
+}
+
+
+
+
+
+
 
 @Serializable
 object FavoriteList
@@ -70,7 +99,7 @@ fun NavGraphBuilder.favoriteDestination(
         onSetLightStatusBar(true)
         Favorites(snackbarHostState,onNavigateToExcursion,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner))
     }
-    composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
+  /*  composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
         onChangeVisibleBottomBar(false)
         onSetLightStatusBar(true)
         ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding,onNavigateToProfile)
@@ -88,5 +117,5 @@ fun NavGraphBuilder.favoriteDestination(
             onSetLightStatusBar(false)
             val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
             ImageExcursionScreen(imageExcursion = imageExcursion)
-    }
+    }*/
 }

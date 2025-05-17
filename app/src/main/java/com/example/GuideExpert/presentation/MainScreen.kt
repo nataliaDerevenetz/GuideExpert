@@ -2,11 +2,20 @@ package com.example.GuideExpert.presentation
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -19,20 +28,30 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration.Short
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult.ActionPerformed
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -46,6 +65,7 @@ import com.example.GuideExpert.presentation.FavoriteScreen.FavoriteScreen
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileScreen
 import com.example.GuideExpert.ui.theme.Purple80
 import kotlinx.serialization.Serializable
+import kotlin.reflect.KClass
 
 
 @Serializable
@@ -69,9 +89,71 @@ val Context.topLevelRoutes get() =  listOf(
     TopLevelRoute(getString(R.string.person), Profile, Icons.Filled.Person,Icons.Outlined.Person)
 )
 
+private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
+    this?.hierarchy?.any {
+        it.hasRoute(route)
+    } ?: false
+
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun MainScreen(onSetLightStatusBar: (Boolean) -> Unit,viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(appState: AppState,viewModel: MainViewModel = hiltViewModel()) {
+
+    val currentDestination = appState.currentDestination
+    val snackbarHostState = remember { SnackbarHostState() }
+   // var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
+
+    NavigationSuiteScaffold(
+        modifier = Modifier.fillMaxSize(),
+        navigationSuiteItems = {
+            appState.topLevelDestinations.forEach { destination ->
+                val selected = currentDestination
+                    .isRouteInHierarchy(destination.baseRoute)
+                item(
+                    selected = selected,
+                    onClick = { appState.navigateToTopLevelDestination(destination) },
+                    icon = {
+                        Icon(
+                            imageVector = if (selected) {
+                                destination.selectedIcon
+                            } else destination.unselectedIcon,
+                            contentDescription = null,
+                        )
+                    },
+                    label = { Text(stringResource(destination.iconTextId)) },
+
+                    )
+            }
+        },
+        layoutType =  if (appState.bottomBarState.value) NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
+            currentWindowAdaptiveInfo()
+        ) else NavigationSuiteType.None
+    ) {
+
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ) { innerPadding ->
+            Box{
+                AppNavHost(appState = appState,innerPadding,snackbarHostState)
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
@@ -134,7 +216,7 @@ fun MainScreen(onSetLightStatusBar: (Boolean) -> Unit,viewModel: MainViewModel =
                 )
             }
         }
-    }
+    }*/
 }
 
 @Composable
@@ -178,3 +260,6 @@ fun BottomBar(navController: NavController, bottomBarState: Boolean) {
         }
     )
 }
+
+
+

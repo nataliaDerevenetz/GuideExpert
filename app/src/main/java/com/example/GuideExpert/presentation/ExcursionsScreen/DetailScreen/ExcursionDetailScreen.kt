@@ -77,7 +77,7 @@ import kotlin.reflect.KFunction1
 interface ExcursionDetailScope {
     val excursionData: Flow<ExcursionData?>
     val excursionImages: Flow<List<Image>>
-    val onNavigateToBack: () -> Boolean
+    val onNavigateToBack: () -> Unit
     val getFiltersGroups: List<Filter>
     val stateView: StateFlow<UIState>
     val navigateToAlbum: (Int) -> Unit
@@ -96,7 +96,7 @@ interface ExcursionDetailScope {
 fun DefaultExcursionDetailScope(
     excursionData: Flow<ExcursionData?>,
     excursionImages: Flow<List<Image>>,
-    onNavigateToBack: () -> Boolean,
+    onNavigateToBack: () -> Unit,
     getFiltersGroups: List<Filter>,
     stateView: StateFlow<UIState>,
     navigateToAlbum: (Int) -> Unit,
@@ -116,7 +116,7 @@ fun DefaultExcursionDetailScope(
             get() = excursionData
         override val excursionImages: Flow<List<Image>>
             get() = excursionImages
-        override val onNavigateToBack: () -> Boolean
+        override val onNavigateToBack: () -> Unit
             get() = onNavigateToBack
         override val getFiltersGroups: List<Filter>
             get() = getFiltersGroups
@@ -151,7 +151,7 @@ fun DefaultExcursionDetailScope(
 fun rememberDefaultExcursionDetailScope(
     excursionData: Flow<ExcursionData?>,
     excursionImages: Flow<List<Image>>,
-    onNavigateToBack: () -> Boolean,
+    onNavigateToBack: () -> Unit,
     getFiltersGroups: List<Filter>,
     stateView: StateFlow<UIState>,
     navigateToAlbum: (Int) -> Unit,
@@ -174,7 +174,7 @@ fun rememberDefaultExcursionDetailScope(
 fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
-    onNavigateToBack:() -> Boolean,
+    onNavigateToBack:() -> Unit,
     snackbarHostState: SnackbarHostState,
     innerPaddingMain: PaddingValues,
     navigateToProfileInfo: () -> Unit,
@@ -241,7 +241,7 @@ fun ExcursionDetailScreen(
                     }) { Icon(
                             imageVector =  if (isFavorite) Icons.Filled.Favorite else  Icons.Filled.FavoriteBorder,
                             contentDescription = "featured",
-                            tint = if (isFavorite)  Color.Red else MaterialTheme.typography.labelMedium.color,
+                            tint = if (isFavorite)  Color.Red else MaterialTheme.colorScheme.inverseSurface,
                         )}
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

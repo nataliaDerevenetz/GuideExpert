@@ -189,7 +189,7 @@ fun SearchScreen(modifier: Modifier = Modifier,
 
     SearchBar(
         colors = colors(
-            containerColor = Color(color),
+         //   containerColor = Color(color),
             dividerColor = MaterialTheme.colorScheme.primary
         ),
         inputField = {
@@ -272,7 +272,7 @@ fun SearchScreen(modifier: Modifier = Modifier,
         modifier = if(expanded){
             Modifier.fillMaxWidth()
         } else{ Modifier.padding(bottom = 8.dp, start = 8.dp, end = 8.dp).fillMaxWidth()},
-        windowInsets = WindowInsets(0)
+        windowInsets = if (!expanded)  WindowInsets(0) else SearchBarDefaults.windowInsets
     ) {
 
         when(uiState.contentState){

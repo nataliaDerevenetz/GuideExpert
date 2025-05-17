@@ -10,14 +10,39 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeRoute
+import com.example.GuideExpert.presentation.FavoriteScreen.FavoritesRoute
 import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.EditorProfileScreen
 import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.ProfileInfo
 import com.example.GuideExpert.presentation.ProfileScreen.YandexActivity.ProfileYandexActivity
 import kotlinx.serialization.Serializable
+
+@Serializable object ProfileRoute
+
+fun NavController.navigateToProfile(navOptions: NavOptions? = null) = navigate(route = ProfileRoute, navOptions)
+
+fun NavGraphBuilder.profileScreen(
+    // onTopicClick: (String) -> Unit,
+    // onShowSnackbar: suspend (String, String?) -> Boolean,
+) {
+    composable<ProfileRoute> {
+        // BookmarksRoute(onTopicClick, onShowSnackbar)
+        //     Favorites(snackbarHostState,onNavigateToExcursion,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner))
+
+    }
+}
+
+
+
+
+
+
+
 
 @Serializable
 object ProfileInfo

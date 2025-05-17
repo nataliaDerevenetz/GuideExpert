@@ -89,10 +89,35 @@ fun HomeScreen(
         }
     )
 
+    val padding = if (filtersVisible)  innerPadding else if (scrolling) innerPadding  else PaddingValues(0.dp)
+    var defaultModifier = Modifier.padding(padding).fillMaxSize().nestedScroll(nestedScrollConnection)
+    if (!filtersVisible) defaultModifier =  defaultModifier.then(Modifier.pullRefresh(pullRefreshState))
+
     SharedTransitionLayout {
         Box(
-            if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
-            else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)
+          /*  if (scrolling){
+                if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
+                else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)}
+            else {
+                if (!filtersVisible) Modifier.fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
+                else Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
+            }
+           */
+
+/*
+            if (scrolling){
+                if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
+                else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)}
+            else {
+                if (!filtersVisible) Modifier.fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
+                else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)
+            }*/
+
+         //   if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
+         //   else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)
+
+
+      Modifier.then(defaultModifier)
         ) {
 
             HomeScreenContent(

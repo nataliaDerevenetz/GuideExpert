@@ -1,6 +1,5 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -94,31 +93,8 @@ fun HomeScreen(
     if (!filtersVisible) defaultModifier =  defaultModifier.then(Modifier.pullRefresh(pullRefreshState))
 
     SharedTransitionLayout {
-        Box(
-          /*  if (scrolling){
-                if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
-                else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)}
-            else {
-                if (!filtersVisible) Modifier.fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
-                else Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)
-            }
-           */
-
-/*
-            if (scrolling){
-                if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
-                else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)}
-            else {
-                if (!filtersVisible) Modifier.fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
-                else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)
-            }*/
-
-         //   if (!filtersVisible) Modifier.padding(innerPadding).fillMaxSize().pullRefresh(pullRefreshState).nestedScroll(nestedScrollConnection)
-         //   else Modifier.padding(innerPadding).fillMaxSize().nestedScroll(nestedScrollConnection)
-
-
-      Modifier.then(defaultModifier)
-        ) {
+        Box(Modifier.then(defaultModifier))
+        {
 
             HomeScreenContent(
                 snackbarHostState = snackbarHostState,

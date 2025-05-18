@@ -9,12 +9,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.example.GuideExpert.domain.models.Excursion
+import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeBaseRoute
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeRoute
 import com.example.GuideExpert.presentation.FavoriteScreen.FavoritesRoute
 import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.EditorProfileScreen
@@ -22,18 +27,48 @@ import com.example.GuideExpert.presentation.ProfileScreen.ProfileMainScreen.Prof
 import com.example.GuideExpert.presentation.ProfileScreen.YandexActivity.ProfileYandexActivity
 import kotlinx.serialization.Serializable
 
-@Serializable object ProfileRoute
+@Serializable data object ProfileRoute
+
+@Serializable data object ProfileBaseRoute
+
 
 fun NavController.navigateToProfile(navOptions: NavOptions? = null) = navigate(route = ProfileRoute, navOptions)
+/*
+fun NavController.navigateToProfile2() {
+    navigate(route = ProfileRoute) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }}
+*/
 
+@RequiresApi(Build.VERSION_CODES.P)
 fun NavGraphBuilder.profileScreen(
-    // onTopicClick: (String) -> Unit,
-    // onShowSnackbar: suspend (String, String?) -> Boolean,
+    innerPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
+    onChangeVisibleBottomBar: (Boolean) -> Unit,
+    onNavigateToEditorProfile: () -> Unit,
+    onNavigateToYandex: () -> Unit,
+    onNavigateToBack: () -> Unit,
+    onNavigateToProfile: () -> Unit,
 ) {
-    composable<ProfileRoute> {
-        // BookmarksRoute(onTopicClick, onShowSnackbar)
-        //     Favorites(snackbarHostState,onNavigateToExcursion,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner))
-
+    navigation<ProfileBaseRoute>(startDestination = ProfileRoute) {
+        composable<ProfileRoute> {
+            onChangeVisibleBottomBar(true)
+            ProfileInfo(
+                snackbarHostState,
+                onNavigateToYandex,
+                onNavigateToEditorProfile,
+                onNavigateToBack,
+                innerPadding
+            )
+        }
+        composable<EditorProfile> {
+            onChangeVisibleBottomBar(false)
+            EditorProfileScreen(snackbarHostState,onNavigateToProfile,innerPadding) }
+        activity("loginYandex") { activityClass = ProfileYandexActivity::class }
     }
 }
 
@@ -57,7 +92,7 @@ fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,
                             onNavigateToHome:()->Unit,
                             innerPadding: PaddingValues
 )  {
-    val navController = rememberNavController()
+   /* val navController = rememberNavController()
 
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
@@ -67,9 +102,10 @@ fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,
         val onNavigateEditorProfile = { navController.navigateToEditorProfile()}
         val onNavigateToYandex = { navController.navigateToYandex()}
         val onNavigateToBack = { onNavigateToHome() }
-        val onNavigateToProfile = {navController.popBackStack()}
+        val onNavigateToProfile = {navController.popBackStack()
+        Unit}
         profileDestination(snackbarHostState,onNavigateEditorProfile,onNavigateToYandex,onNavigateToBack, onNavigateToProfile,viewModelStoreOwner,onChangeVisibleBottomBar,innerPadding)
-    }
+    }*/
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -77,7 +113,7 @@ fun NavGraphBuilder.profileDestination(snackbarHostState :SnackbarHostState,
                                        onNavigateToEditorProfile: () -> Unit,
                                        onNavigateToYandex: () -> Unit,
                                        onNavigateToBack: () -> Unit,
-                                       onNavigateToProfile: () -> Boolean,
+                                       onNavigateToProfile: () -> Unit,
                                        viewModelStoreOwner: ViewModelStoreOwner,
                                        onChangeVisibleBottomBar: (Boolean) -> Unit,
                                        innerPadding: PaddingValues

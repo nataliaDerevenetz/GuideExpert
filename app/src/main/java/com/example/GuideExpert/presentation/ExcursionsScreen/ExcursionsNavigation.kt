@@ -1,10 +1,8 @@
 package com.example.GuideExpert.presentation.ExcursionsScreen
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -13,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Image
@@ -55,8 +52,7 @@ fun NavGraphBuilder.homeScreen(
         composable<HomeRoute> {
             onChangeVisibleBottomBar(true)
             onSetLightStatusBar(true)
-            //HomeScreen(snackbarHostState,onNavigateToExcursion,onNavigateToProfileInfo,innerPadding)
-            HomeScreen(snackbarHostState = snackbarHostState,navigateToExcursion = onNavigateToExcursion,{},innerPadding = innerPadding)
+            HomeScreen(snackbarHostState = snackbarHostState,navigateToExcursion = onNavigateToExcursion,navigateToProfileInfo = onNavigateToProfileInfo,innerPadding = innerPadding)
         }
 
         composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
@@ -92,8 +88,8 @@ fun NavGraphBuilder.homeScreen(
 
 
 
-@Serializable
-object ExcursionSearchScreen
+//@Serializable
+//object ExcursionSearchScreen
 
 @Serializable
 data class AlbumExcursion(
@@ -120,7 +116,7 @@ class ExcursionDetail(val excursion : Excursion) {
             savedStateHandle.toRoute<ExcursionDetail>(typeMap)
     }
 }
-
+/*
 @Composable
 fun NavigationHomeScreen(
     snackbarHostState: SnackbarHostState,
@@ -152,7 +148,7 @@ fun NavGraphBuilder.excursionsDestination(
     innerPadding: PaddingValues,
     onSetLightStatusBar: (Boolean) -> Unit,
 ) {
-   /* composable<ExcursionSearchScreen> {
+    composable<ExcursionSearchScreen> {
         onChangeVisibleBottomBar(true)
         onSetLightStatusBar(true)
         HomeScreen(snackbarHostState,onNavigateToExcursion,onNavigateToProfileInfo,innerPadding)
@@ -175,9 +171,9 @@ fun NavGraphBuilder.excursionsDestination(
             onSetLightStatusBar(false)
             val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
             ImageExcursionScreen(imageExcursion = imageExcursion)
-    }*/
+    }
 }
-
+*/
 fun NavController.navigateToAlbum(excursionId: Int) {
     navigate(route = AlbumExcursion(excursionId)){
         launchSingleTop=true

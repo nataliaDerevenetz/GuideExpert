@@ -1,19 +1,26 @@
 package com.example.GuideExpert.presentation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeBaseRoute
 import com.example.GuideExpert.presentation.ExcursionsScreen.homeScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToAlbum
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToImage
 import com.example.GuideExpert.presentation.FavoriteScreen.favoritesScreen
+import com.example.GuideExpert.presentation.ProfileScreen.navigateToEditorProfile
 import com.example.GuideExpert.presentation.ProfileScreen.navigateToProfile
+import com.example.GuideExpert.presentation.ProfileScreen.navigateToYandex
 import com.example.GuideExpert.presentation.ProfileScreen.profileScreen
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun AppNavHost(
     appState: AppState,
@@ -34,18 +41,35 @@ fun AppNavHost(
             onNavigateToAlbum =  navController::navigateToAlbum,
             onNavigateToImage = navController::navigateToImage,
             onNavigateToBack = navController::popBackStack,
-            onNavigateToProfileInfo = navController::navigateToProfile,
-            onChangeVisibleBottomBar = {visible:Boolean -> appState.changeVisibleBottomBar(visible)},
-            onSetLightStatusBar = {isLight:Boolean -> appState.setLightStatusBar(isLight)}
+            //onNavigateToProfileInfo = navController::navigateToProfile2,
+            onNavigateToProfileInfo = {navController.navigateToProfile(navOptions {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            })},
+            onChangeVisibleBottomBar = { visible: Boolean -> appState.changeVisibleBottomBar(visible) },
+            onSetLightStatusBar = { isLight: Boolean -> appState.setLightStatusBar(isLight) }
         )
         favoritesScreen(
-          // onTopicClick = navController::navigateToInterests,
-          //  onShowSnackbar = onShowSnackbar,
+            innerPadding = innerPadding,
+            snackbarHostState = snackbarHostState,
+            onChangeVisibleBottomBar = { visible: Boolean -> appState.changeVisibleBottomBar(visible) },
+            onNavigateToExcursion = navController::navigateToExcursionDetail
         )
         profileScreen(
-          //  onBackClick = navController::popBackStack,
-          //  onInterestsClick = { appState.navigateToTopLevelDestination(INTERESTS) },
-          //  onTopicClick = navController::navigateToInterests,
+            innerPadding = innerPadding,
+            snackbarHostState = snackbarHostState,
+            onChangeVisibleBottomBar = { visible: Boolean ->
+                appState.changeVisibleBottomBar(
+                    visible
+                )
+            },
+            onNavigateToEditorProfile = navController::navigateToEditorProfile,
+            onNavigateToYandex = navController::navigateToYandex,
+            onNavigateToBack = navController::popBackStack,
+            onNavigateToProfile = navController::navigateToProfile
         )
 
     }

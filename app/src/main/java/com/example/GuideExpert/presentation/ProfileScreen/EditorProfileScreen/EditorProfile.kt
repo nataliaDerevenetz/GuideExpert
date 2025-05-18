@@ -114,7 +114,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
-                        onNavigateToProfile: () -> Boolean,
+                        onNavigateToProfile: () -> Unit,
                         innerPaddingMain: PaddingValues,
                         viewModel: EditorProfileViewModel = hiltViewModel(),
                         scopeState: EditorProfileStateScope = rememberDefaultEditorProfileStateScope(profile = viewModel.profileFlow,
@@ -342,7 +342,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
     }
 
     Box(modifier = Modifier
-        .padding(innerPadding)
+        .padding(top = innerPadding.calculateTopPadding())
         .fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),

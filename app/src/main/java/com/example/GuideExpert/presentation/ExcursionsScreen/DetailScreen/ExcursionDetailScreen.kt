@@ -345,13 +345,13 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
     val excursionImages by excursionImages.collectAsStateWithLifecycle(null)
     val scrollState = rememberScrollState()
 
-    Column(Modifier.padding(innerPadding).fillMaxSize()
+    Column(Modifier.padding(top = innerPadding.calculateTopPadding()).fillMaxSize()
         .verticalScroll(scrollState)) {
         excursionImages?.let {
             if (it.isNotEmpty()){
                 HorizontalMultiBrowseCarousel(
                     state = rememberCarouselState { it.count() },
-                    modifier = Modifier.padding(top = 5.dp).fillMaxWidth().height(250.dp),
+                    modifier = Modifier.padding(top = 5.dp, start = 5.dp,end = 5.dp).fillMaxWidth().height(250.dp),
                     preferredItemWidth = 350.dp,
                     itemSpacing = 1.dp,
                     contentPadding = PaddingValues(horizontal = 0.dp)

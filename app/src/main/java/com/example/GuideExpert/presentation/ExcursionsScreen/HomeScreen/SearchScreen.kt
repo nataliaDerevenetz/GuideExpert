@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -51,7 +49,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -67,8 +64,8 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.SearchItem
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
+import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.SearchItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -183,13 +180,8 @@ fun SearchScreen(modifier: Modifier = Modifier,
     val keyboardController = LocalSoftwareKeyboardController.current
     val coroutineScope = rememberCoroutineScope()
 
-    val colorDefault = SearchBarDefaults.colors().containerColor
-
-    var color by rememberSaveable { mutableStateOf(colorDefault.toArgb()) }
-
     SearchBar(
         colors = colors(
-         //   containerColor = Color(color),
             dividerColor = MaterialTheme.colorScheme.primary
         ),
         inputField = {
@@ -208,10 +200,8 @@ fun SearchScreen(modifier: Modifier = Modifier,
                     expanded = it
 
                     if (expanded) {
-                        color = Color.Transparent.toArgb()
                         scrollingOn()
                     } else {
-                        color = colorDefault.toArgb()
                         scrollingOff()
                     }
                 },
@@ -220,7 +210,6 @@ fun SearchScreen(modifier: Modifier = Modifier,
                     if (expanded){
                         IconButton(onClick = {
                             expanded = false
-                            color = colorDefault.toArgb()
                             onActiveChanged(expanded)
                             text = ""
                             scopeState.onEvent(SearchEvent.SetSearchText(text))
@@ -246,7 +235,6 @@ fun SearchScreen(modifier: Modifier = Modifier,
                                 scopeState.onEvent(SearchEvent.SetSearchText(text))
                             } else {
                                 expanded = false
-                                color = colorDefault.toArgb()
                                 onActiveChanged(expanded)
                                 scrollingOff()
                             }
@@ -263,10 +251,8 @@ fun SearchScreen(modifier: Modifier = Modifier,
             text = ""
             scopeState.onEvent(SearchEvent.SetSearchText(text))
             if (expanded) {
-                color = Color.Transparent.toArgb()
                 scrollingOn()
             } else {
-                color = colorDefault.toArgb()
                 scrollingOff()
             }},
         modifier = if(expanded){

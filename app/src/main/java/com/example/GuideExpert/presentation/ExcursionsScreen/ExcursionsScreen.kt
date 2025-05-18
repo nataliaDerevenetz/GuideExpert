@@ -5,7 +5,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 
-
+/*
 @Composable
 fun ExcursionsScreen(
     snackbarHostState: SnackbarHostState,
@@ -14,6 +14,7 @@ fun ExcursionsScreen(
     innerPadding: PaddingValues,
     onSetLightStatusBar: (Boolean) -> Unit
 ) {
-    NavigationHomeScreen(snackbarHostState = snackbarHostState,onChangeVisibleBottomBar =onChangeVisibleBottomBar,
-        onNavigateToProfile = onNavigateToProfile,innerPadding = innerPadding,onSetLightStatusBar= onSetLightStatusBar)
+    //NavigationHomeScreen(snackbarHostState = snackbarHostState,onChangeVisibleBottomBar =onChangeVisibleBottomBar,
+    //    onNavigateToProfile = onNavigateToProfile,innerPadding = innerPadding,onSetLightStatusBar= onSetLightStatusBar)
 }
+*/

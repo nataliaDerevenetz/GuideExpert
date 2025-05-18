@@ -1,6 +1,7 @@
 package com.example.GuideExpert.presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -9,6 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -19,6 +22,8 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToHome
 import com.example.GuideExpert.presentation.FavoriteScreen.navigateToFavorites
 import com.example.GuideExpert.presentation.ProfileScreen.navigateToProfile
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 @Composable
 fun rememberAppState(
@@ -76,6 +81,5 @@ class AppState(
     fun setLightStatusBar(isLight: Boolean) {
         isLightStatusBar.value = isLight
     }
-
 
 }

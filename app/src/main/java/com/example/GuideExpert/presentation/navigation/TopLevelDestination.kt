@@ -1,4 +1,4 @@
-package com.example.GuideExpert.presentation
+package com.example.GuideExpert.presentation.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons

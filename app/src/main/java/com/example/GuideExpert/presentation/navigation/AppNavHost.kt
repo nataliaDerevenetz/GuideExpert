@@ -1,4 +1,4 @@
-package com.example.GuideExpert.presentation
+package com.example.GuideExpert.presentation.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
+import com.example.GuideExpert.presentation.AppState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeBaseRoute
 import com.example.GuideExpert.presentation.ExcursionsScreen.homeScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToAlbum

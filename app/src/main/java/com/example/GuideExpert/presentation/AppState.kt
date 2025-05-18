@@ -14,6 +14,7 @@ import androidx.navigation.navOptions
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToHome
 import com.example.GuideExpert.presentation.FavoriteScreen.navigateToFavorites
 import com.example.GuideExpert.presentation.ProfileScreen.navigateToProfile
+import com.example.GuideExpert.presentation.navigation.TopLevelDestination
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

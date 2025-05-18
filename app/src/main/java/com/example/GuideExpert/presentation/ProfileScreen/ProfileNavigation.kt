@@ -31,18 +31,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object ProfileBaseRoute
 
+@Serializable object EditorProfile
+
 
 fun NavController.navigateToProfile(navOptions: NavOptions? = null) = navigate(route = ProfileRoute, navOptions)
-/*
-fun NavController.navigateToProfile2() {
-    navigate(route = ProfileRoute) {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
-        launchSingleTop = true
-        restoreState = true
-    }}
-*/
 
 @RequiresApi(Build.VERSION_CODES.P)
 fun NavGraphBuilder.profileScreen(
@@ -70,62 +62,6 @@ fun NavGraphBuilder.profileScreen(
             EditorProfileScreen(snackbarHostState,onNavigateToProfile,innerPadding) }
         activity("loginYandex") { activityClass = ProfileYandexActivity::class }
     }
-}
-
-
-
-
-
-
-
-
-@Serializable
-object ProfileInfo
-
-@Serializable
-object EditorProfile
-
-@RequiresApi(Build.VERSION_CODES.P)
-@Composable
-fun NavigationProfileScreen(snackbarHostState: SnackbarHostState,
-                            onChangeVisibleBottomBar: (Boolean) -> Unit,
-                            onNavigateToHome:()->Unit,
-                            innerPadding: PaddingValues
-)  {
-   /* val navController = rememberNavController()
-
-    val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-    }
-
-    NavHost(navController = navController, startDestination = ProfileInfo) {
-        val onNavigateEditorProfile = { navController.navigateToEditorProfile()}
-        val onNavigateToYandex = { navController.navigateToYandex()}
-        val onNavigateToBack = { onNavigateToHome() }
-        val onNavigateToProfile = {navController.popBackStack()
-        Unit}
-        profileDestination(snackbarHostState,onNavigateEditorProfile,onNavigateToYandex,onNavigateToBack, onNavigateToProfile,viewModelStoreOwner,onChangeVisibleBottomBar,innerPadding)
-    }*/
-}
-
-@RequiresApi(Build.VERSION_CODES.P)
-fun NavGraphBuilder.profileDestination(snackbarHostState :SnackbarHostState,
-                                       onNavigateToEditorProfile: () -> Unit,
-                                       onNavigateToYandex: () -> Unit,
-                                       onNavigateToBack: () -> Unit,
-                                       onNavigateToProfile: () -> Unit,
-                                       viewModelStoreOwner: ViewModelStoreOwner,
-                                       onChangeVisibleBottomBar: (Boolean) -> Unit,
-                                       innerPadding: PaddingValues
-)
-{
-    composable<ProfileInfo> {
-        onChangeVisibleBottomBar(true)
-        ProfileInfo(snackbarHostState,onNavigateToYandex,onNavigateToEditorProfile, onNavigateToBack,innerPadding,viewModel = hiltViewModel(viewModelStoreOwner)) }
-    composable<EditorProfile> {
-        onChangeVisibleBottomBar(false)
-        EditorProfileScreen(snackbarHostState,onNavigateToProfile,innerPadding) }
-    activity("loginYandex") { activityClass = ProfileYandexActivity::class }
 }
 
 fun NavController.navigateToEditorProfile() {

@@ -41,7 +41,6 @@ fun AppNavHost(
             onNavigateToAlbum =  navController::navigateToAlbum,
             onNavigateToImage = navController::navigateToImage,
             onNavigateToBack = navController::popBackStack,
-            //onNavigateToProfileInfo = navController::navigateToProfile2,
             onNavigateToProfileInfo = {navController.navigateToProfile(navOptions {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true

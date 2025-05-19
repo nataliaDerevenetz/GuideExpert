@@ -1,6 +1,5 @@
 package com.example.GuideExpert.data.repository
 
-import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.mappers.toAvatar
 import com.example.GuideExpert.data.mappers.toProfile
@@ -13,6 +12,7 @@ import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.ProfileResources
 import com.example.GuideExpert.domain.models.UIResources
 import com.example.GuideExpert.domain.repository.ProfileRepository
+import com.example.GuideExpert.domain.repository.SessionManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -3,11 +3,11 @@ package com.example.GuideExpert.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.GuideExpert.data.SessionManager
 import com.example.GuideExpert.domain.GetExcursionsFavoriteIdUseCase
 import com.example.GuideExpert.domain.GetProfileUseCase
 import com.example.GuideExpert.domain.models.ProfileAuthYandexData
 import com.example.GuideExpert.domain.repository.ProfileRepository
+import com.example.GuideExpert.domain.repository.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,8 +30,8 @@ sealed interface MainEvent {
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    private val sessionManager: SessionManager,
-    private val profileRepository: ProfileRepository,
+    sessionManager: SessionManager,
+    profileRepository: ProfileRepository,
     private val getProfileUseCase: GetProfileUseCase,
     private val getExcursionsFavoriteIdUseCase: GetExcursionsFavoriteIdUseCase
     ) : ViewModel() {

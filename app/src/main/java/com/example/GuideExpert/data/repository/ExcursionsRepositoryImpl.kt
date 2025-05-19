@@ -27,7 +27,7 @@ import com.example.GuideExpert.domain.models.ProfileYandex
 import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.UIResources
-import com.example.GuideExpert.domain.repository.DataSourceRepository
+import com.example.GuideExpert.domain.repository.ExcursionsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,11 +40,11 @@ import kotlinx.coroutines.flow.update
 import java.io.IOException
 import javax.inject.Inject
 
-class DataSourceRepositoryImpl @Inject constructor(
+class ExcursionsRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,
     private val excursionService: ExcursionService,
     private val profileService: ProfileService
-): DataSourceRepository {
+): ExcursionsRepository {
 
     private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<ExcursionFavorite>>(listOf())
     override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>> get() = _profileFavoriteExcursionIdFlow

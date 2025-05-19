@@ -14,7 +14,7 @@ import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.UIResources
-import com.example.GuideExpert.domain.repository.DataSourceRepository
+import com.example.GuideExpert.domain.repository.ExcursionsRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
@@ -65,14 +65,14 @@ class ExcursionDetailViewModel @Inject constructor(
     getImagesExcursionDataUseCase: GetImagesExcursionDataUseCase,
     val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
     profileRepository: ProfileRepository,
-    dataSourceRepository: DataSourceRepository,
+    excursionsRepository: ExcursionsRepository,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
 
     val excursionDetail = ExcursionDetail.from(savedStateHandle)
 
-    val profileFavoriteExcursionIdFlow = dataSourceRepository.profileFavoriteExcursionIdFlow
+    val profileFavoriteExcursionIdFlow = excursionsRepository.profileFavoriteExcursionIdFlow
     val profileFlow = profileRepository.profileFlow
 
     private val _stateView = MutableStateFlow<UIState>(UIState())

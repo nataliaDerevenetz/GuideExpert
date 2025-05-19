@@ -11,7 +11,7 @@ import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.domain.models.UIResources
-import com.example.GuideExpert.domain.repository.DataSourceRepository
+import com.example.GuideExpert.domain.repository.ExcursionsRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -74,12 +74,12 @@ sealed interface SearchEvent {
 class SearchViewModel @Inject constructor(
     val getExcursionByQueryUseCase: GetExcursionByQueryUseCase,
     profileRepository: ProfileRepository,
-    dataSourceRepository: DataSourceRepository,
+    excursionsRepository: ExcursionsRepository,
     private val state: SavedStateHandle,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
-    val profileFavoriteExcursionIdFlow = dataSourceRepository.profileFavoriteExcursionIdFlow
+    val profileFavoriteExcursionIdFlow = excursionsRepository.profileFavoriteExcursionIdFlow
     val profileFlow = profileRepository.profileFlow
 
     private val _uiPagingState = MutableStateFlow<PagingData<Excursion>>(PagingData.empty())

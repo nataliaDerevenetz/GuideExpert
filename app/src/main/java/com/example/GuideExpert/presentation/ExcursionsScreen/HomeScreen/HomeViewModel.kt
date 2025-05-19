@@ -20,7 +20,7 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.models.UIResources
-import com.example.GuideExpert.domain.repository.DataSourceRepository
+import com.example.GuideExpert.domain.repository.ExcursionsRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -95,12 +95,12 @@ class HomeViewModel @Inject constructor(
     getSortDefaultUseCase: GetSortDefaultUseCase,
     val getConfigUseCase: GetConfigUseCase,
     profileRepository: ProfileRepository,
-    dataSourceRepository: DataSourceRepository,
+    excursionsRepository: ExcursionsRepository,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
 
-    val profileFavoriteExcursionIdFlow = dataSourceRepository.profileFavoriteExcursionIdFlow
+    val profileFavoriteExcursionIdFlow = excursionsRepository.profileFavoriteExcursionIdFlow
     val profileFlow = profileRepository.profileFlow
 
     private val _effectChannel = Channel<SnackbarEffect>()

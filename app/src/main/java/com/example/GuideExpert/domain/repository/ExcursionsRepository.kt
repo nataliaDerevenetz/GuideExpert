@@ -15,7 +15,7 @@ import com.example.GuideExpert.domain.models.UIResources
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface DataSourceRepository {
+interface ExcursionsRepository {
     val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>>
     suspend fun getExcursionInfo(excursionId: Int): Flow<UIResources<ExcursionData>>
     suspend fun getConfigInfo(): Flow<UIResources<Config>>

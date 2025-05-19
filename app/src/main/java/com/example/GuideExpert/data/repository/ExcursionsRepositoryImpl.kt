@@ -12,8 +12,8 @@ import com.example.GuideExpert.data.mappers.toExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toProfileYandex
 import com.example.GuideExpert.data.mappers.toRestoreFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
+import com.example.GuideExpert.data.remote.services.ExcursionAuthService
 import com.example.GuideExpert.data.remote.services.ExcursionService
-import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.ErrorExcursionsRepository
@@ -43,7 +43,7 @@ import javax.inject.Inject
 class ExcursionsRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,
     private val excursionService: ExcursionService,
-    private val profileService: ProfileService
+    private val excursionAuthService: ExcursionAuthService
 ): ExcursionsRepository {
 
     private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<ExcursionFavorite>>(listOf())
@@ -107,7 +107,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
             if (localExcursionsFavoriteId != null) {
                 _profileFavoriteExcursionIdFlow.update { localExcursionsFavoriteId }
             }
-            val result = profileService.getExcursionsFavoriteId(profile.id)
+            val result = excursionAuthService.getExcursionsFavoriteId(profile.id)
             if (result.code() == 403) {
                 return ErrorExcursionsRepository.Authorization
             }
@@ -147,7 +147,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
                 emit(UIResources.Error("Error authorization"))
                 return@flow
             }
-            val result = profileService.setExcursionFavorite(profile.id,excursion.id)
+            val result = excursionAuthService.setExcursionFavorite(profile.id,excursion.id)
             if (result.code() == 403) {
                 emit(UIResources.Error("Error authorization"))
                 return@flow
@@ -178,7 +178,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
                 emit(UIResources.Error("Error authorization"))
                 return@flow
             }
-            val result = profileService.removeExcursionFavorite(profile.id,excursion.id)
+            val result = excursionAuthService.removeExcursionFavorite(profile.id,excursion.id)
             if (result.code() == 403) {
                 emit(UIResources.Error("Error authorization"))
                 return@flow
@@ -208,7 +208,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
                 emit(UIResources.Error("Error authorization"))
                 return@flow
             }
-            val result = profileService.getExcursionsFavorite(profile.id)
+            val result = excursionAuthService.getExcursionsFavorite(profile.id)
             if (result.code() == 403) {
                 emit(UIResources.Error("Error authorization"))
                 return@flow
@@ -232,7 +232,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
                 emit(UIResources.Error("Error authorization"))
                 return@flow
             }
-            val result = profileService.restoreExcursionFavorite(profile.id,excursion.id,excursion.timestamp)
+            val result = excursionAuthService.restoreExcursionFavorite(profile.id,excursion.id,excursion.timestamp)
             if (result.code() == 403) {
                 emit(UIResources.Error("Error authorization"))
                 return@flow

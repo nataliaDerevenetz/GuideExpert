@@ -3,7 +3,6 @@ package com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.DeleteFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.GetExcursionDataUseCase
 import com.example.GuideExpert.domain.GetExcursionDetailUseCase
@@ -14,11 +13,12 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.domain.models.UIResources
+import com.example.GuideExpert.domain.repository.DataSourceRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SearchEvent
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SnackbarEffect
@@ -61,17 +61,18 @@ sealed interface ExcursionDetailUiEvent {
 class ExcursionDetailViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getExcursionDetailUseCase: GetExcursionDetailUseCase,
-    val getExcursionDataUseCase: GetExcursionDataUseCase,
-    val getImagesExcursionDataUseCase: GetImagesExcursionDataUseCase,
+    getExcursionDataUseCase: GetExcursionDataUseCase,
+    getImagesExcursionDataUseCase: GetImagesExcursionDataUseCase,
     val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
-    private val profileRepository: ProfileRepository,
+    profileRepository: ProfileRepository,
+    dataSourceRepository: DataSourceRepository,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
 
     val excursionDetail = ExcursionDetail.from(savedStateHandle)
 
-    val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
+    val profileFavoriteExcursionIdFlow = dataSourceRepository.profileFavoriteExcursionIdFlow
     val profileFlow = profileRepository.profileFlow
 
     private val _stateView = MutableStateFlow<UIState>(UIState())

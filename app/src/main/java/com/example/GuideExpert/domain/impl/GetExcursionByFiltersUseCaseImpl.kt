@@ -1,7 +1,6 @@
 package com.example.GuideExpert.domain.impl
 
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
-import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.repository.DataPagingRepository
 import javax.inject.Inject

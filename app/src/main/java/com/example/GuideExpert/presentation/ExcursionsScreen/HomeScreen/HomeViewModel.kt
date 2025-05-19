@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.GuideExpert.data.repository.UIResources
 import com.example.GuideExpert.domain.DeleteFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.GetConfigUseCase
 import com.example.GuideExpert.domain.GetExcursionByFiltersUseCase
@@ -20,6 +19,8 @@ import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
+import com.example.GuideExpert.domain.models.UIResources
+import com.example.GuideExpert.domain.repository.DataSourceRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -91,14 +92,15 @@ class HomeViewModel @Inject constructor(
     val getFiltersSortUseCase: GetFiltersSortUseCase,
     val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
     val getFiltersCategoriesUseCase: GetFiltersCategoriesUseCase,
-    val getSortDefaultUseCase: GetSortDefaultUseCase,
+    getSortDefaultUseCase: GetSortDefaultUseCase,
     val getConfigUseCase: GetConfigUseCase,
-    private val profileRepository: ProfileRepository,
+    profileRepository: ProfileRepository,
+    dataSourceRepository: DataSourceRepository,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
 
-    val profileFavoriteExcursionIdFlow = profileRepository.profileFavoriteExcursionIdFlow
+    val profileFavoriteExcursionIdFlow = dataSourceRepository.profileFavoriteExcursionIdFlow
     val profileFlow = profileRepository.profileFlow
 
     private val _effectChannel = Channel<SnackbarEffect>()

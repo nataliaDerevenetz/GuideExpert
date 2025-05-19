@@ -64,6 +64,7 @@ import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Profile
+import com.example.GuideExpert.domain.models.SnackbarEffect
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.LoadingExcursionListShimmer
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.SearchItem
 import kotlinx.coroutines.flow.Flow

@@ -19,6 +19,7 @@ import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Filters
+import com.example.GuideExpert.domain.models.SnackbarEffect
 import com.example.GuideExpert.domain.models.UIResources
 import com.example.GuideExpert.domain.repository.ExcursionsRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository

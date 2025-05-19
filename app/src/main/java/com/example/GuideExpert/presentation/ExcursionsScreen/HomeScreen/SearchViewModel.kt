@@ -10,6 +10,7 @@ import com.example.GuideExpert.domain.GetExcursionByQueryUseCase
 import com.example.GuideExpert.domain.SetFavoriteExcursionUseCase
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.FilterQuery
+import com.example.GuideExpert.domain.models.SnackbarEffect
 import com.example.GuideExpert.domain.models.UIResources
 import com.example.GuideExpert.domain.repository.ExcursionsRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository

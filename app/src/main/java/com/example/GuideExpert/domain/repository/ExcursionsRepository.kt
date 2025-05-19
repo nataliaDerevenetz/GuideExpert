@@ -1,11 +1,14 @@
 package com.example.GuideExpert.domain.repository
 
+import androidx.paging.PagingData
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.ErrorExcursionsRepository
 import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
+import com.example.GuideExpert.domain.models.FilterQuery
+import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.ProfileYandex
@@ -31,5 +34,6 @@ interface ExcursionsRepository {
     suspend fun removeFavoriteExcursion(excursion: Excursion,profile: Profile?):Flow<UIResources<DeleteFavoriteExcursionResponse>>
     suspend fun fetchExcursionsFavorite(profile: Profile?):Flow<UIResources<List<Excursion>?>>
     suspend fun restoreFavoriteExcursion(excursion: Excursion,profile: Profile?):Flow<UIResources<RestoreFavoriteExcursionResponse>>
-
+    fun getExcursionByFiltersFlow(filter: Filters): Flow<PagingData<Excursion>>
+    fun getExcursionByQueryFlow(filterQuery: FilterQuery): Flow<PagingData<Excursion>>
 }

@@ -1,6 +1,13 @@
 package com.example.GuideExpert.data.repository
 
 import android.util.Log
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.example.GuideExpert.data.ExcursionFiltersRemoteMediator
+import com.example.GuideExpert.data.ExcursionSearchRemoteMediator
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.mappers.toConfig
@@ -21,6 +28,8 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.ExcursionData
 import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
+import com.example.GuideExpert.domain.models.FilterQuery
+import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.ProfileYandex
@@ -28,6 +37,7 @@ import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.UIResources
 import com.example.GuideExpert.domain.repository.ExcursionsRepository
+import com.example.GuideExpert.utils.Constant.PAGE_SIZE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +46,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import java.io.IOException
 import javax.inject.Inject
@@ -48,6 +59,38 @@ class ExcursionsRepositoryImpl @Inject constructor(
 
     private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<ExcursionFavorite>>(listOf())
     override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>> get() = _profileFavoriteExcursionIdFlow
+
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getExcursionByFiltersFlow(filter: Filters): Flow<PagingData<Excursion>> {
+        return Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE, maxSize = 30),
+            remoteMediator = ExcursionFiltersRemoteMediator(
+                excursionService = excursionService,
+                filters = filter,
+                dbStorage = dbStorage
+            ),
+            pagingSourceFactory = {
+                dbStorage.getExcursionsFilter()
+            },
+        ).flow.map { pagingData -> pagingData.map { it.toExcursion() } }
+            .flowOn(Dispatchers.IO)
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getExcursionByQueryFlow(filterQuery: FilterQuery): Flow<PagingData<Excursion>> {
+        return Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE, maxSize = 30),
+            remoteMediator = ExcursionSearchRemoteMediator(
+                excursionService = excursionService,
+                filterQuery = filterQuery,
+                dbStorage = dbStorage
+            ),
+            pagingSourceFactory = {
+                dbStorage.getExcursionsSearch()
+            },
+        ).flow.map { pagingData -> pagingData.map { it.toExcursion() } }
+            .flowOn(Dispatchers.IO)
+    }
 
     override suspend fun getExcursionInfo(excursionId:Int): Flow<UIResources<ExcursionData>> = flow {
        try {

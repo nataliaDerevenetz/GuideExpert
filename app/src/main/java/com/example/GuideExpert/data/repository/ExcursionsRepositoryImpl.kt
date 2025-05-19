@@ -10,18 +10,15 @@ import com.example.GuideExpert.data.ExcursionFiltersRemoteMediator
 import com.example.GuideExpert.data.ExcursionSearchRemoteMediator
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
-import com.example.GuideExpert.data.mappers.toConfig
 import com.example.GuideExpert.data.mappers.toDeleteFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteWithData
-import com.example.GuideExpert.data.mappers.toProfileYandex
 import com.example.GuideExpert.data.mappers.toRestoreFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
 import com.example.GuideExpert.data.remote.services.ExcursionAuthService
 import com.example.GuideExpert.data.remote.services.ExcursionService
-import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.ErrorExcursionsRepository
 import com.example.GuideExpert.domain.models.Excursion
@@ -32,7 +29,6 @@ import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.domain.models.ProfileYandex
 import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.UIResources
@@ -42,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -104,16 +99,6 @@ class ExcursionsRepositoryImpl @Inject constructor(
        }
     }
 
-    override suspend fun getConfigInfo(): Flow<UIResources<Config>> = flow<UIResources<Config>> {
-        emit(UIResources.Loading)
-        val result = excursionService.getConfig()
-        if (result.isSuccessful) {
-            val config = result.body()?.toConfig() ?: Config()
-            emit(UIResources.Success(config))
-        }
-    }.catch { e->
-        emit(UIResources.Error(e.localizedMessage ?: "Unknown error"))
-    }
 
     override fun getExcursionData(excursionId:Int): Flow<ExcursionData?> {
         return dbStorage.getExcursionData(excursionId).flowOn(Dispatchers.IO)
@@ -125,19 +110,6 @@ class ExcursionsRepositoryImpl @Inject constructor(
 
     override fun getImageExcursion(imageId:Int): Flow<Image> {
         return dbStorage.getImageExcursion(imageId).flowOn(Dispatchers.IO)
-    }
-
-    override fun getAuthTokenByYandex(oauthToken:String): Flow<UIResources<ProfileYandex>> = flow<UIResources<ProfileYandex>>{
-        emit(UIResources.Loading)
-        val result = excursionService.loginYandex(oauthToken)
-        if (result.isSuccessful) {
-            val profile = result.body()?.toProfileYandex() ?: ProfileYandex()
-            emit(UIResources.Success(profile))
-        } else {
-            emit(UIResources.Error("Unknown error"))
-        }
-    }.catch { e->
-        emit(UIResources.Error(e.localizedMessage ?: "Unknown error"))
     }
 
     override  fun getExcursionFavoriteFlow(): Flow<List<Excursion>> {

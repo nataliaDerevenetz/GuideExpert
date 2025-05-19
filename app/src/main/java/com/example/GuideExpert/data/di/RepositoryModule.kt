@@ -1,9 +1,11 @@
 package com.example.GuideExpert.data.di
 
 import com.example.GuideExpert.data.repository.DataProviderRepositoryImpl
+import com.example.GuideExpert.data.repository.DataSourceRepositoryImpl
 import com.example.GuideExpert.data.repository.ExcursionsRepositoryImpl
 import com.example.GuideExpert.data.repository.ProfileRepositoryImpl
 import com.example.GuideExpert.domain.repository.DataProviderRepository
+import com.example.GuideExpert.domain.repository.DataSourceRepository
 import com.example.GuideExpert.domain.repository.ExcursionsRepository
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import dagger.Binds
@@ -16,6 +18,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModuleBinder {
+
+    @Singleton
+    @Binds
+    abstract fun bindDataSourceRepository(
+        dataSourceRepositoryImpl: DataSourceRepositoryImpl
+    ) : DataSourceRepository
 
     @Singleton
     @Binds

@@ -10,6 +10,7 @@ import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.MessageResponse
 import com.example.GuideExpert.domain.models.Profile
+import com.example.GuideExpert.domain.models.ProfileResources
 import com.example.GuideExpert.domain.models.UIResources
 import com.example.GuideExpert.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
@@ -25,13 +26,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.Date
 import javax.inject.Inject
-
-sealed class ProfileResources {
-    data object Success : ProfileResources()
-    data class Error(val message: String) : ProfileResources()
-    data object Loading : ProfileResources()
-    data object Idle : ProfileResources()
-}
 
 class ProfileRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,

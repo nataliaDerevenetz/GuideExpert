@@ -1,10 +1,9 @@
 package com.example.GuideExpert.domain.repository
 
-import com.example.GuideExpert.data.repository.ProfileResources
 import com.example.GuideExpert.domain.models.Avatar
-import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.MessageResponse
 import com.example.GuideExpert.domain.models.Profile
+import com.example.GuideExpert.domain.models.ProfileResources
 import com.example.GuideExpert.domain.models.UIResources
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

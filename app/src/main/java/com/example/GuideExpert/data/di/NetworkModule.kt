@@ -1,6 +1,7 @@
 package com.example.GuideExpert.data.di
 
 import com.example.GuideExpert.data.SessionManager
+import com.example.GuideExpert.data.remote.services.DataSourceService
 import com.example.GuideExpert.data.remote.services.ExcursionAuthService
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.data.remote.services.ProfileService
@@ -64,6 +65,12 @@ object NetworkModule {
     @Singleton
     fun provideExcursionService(@NoAuth retrofit: Retrofit): ExcursionService {
         return retrofit.create(ExcursionService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataSourceService(@NoAuth retrofit: Retrofit): DataSourceService {
+        return retrofit.create(DataSourceService::class.java)
     }
 
     //------------

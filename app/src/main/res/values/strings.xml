@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GuideExpert</string>
+    <string name="app_name">Гид Эксперт</string>
     <string name="no_excursions_found">Экскурсии не найдены</string>
     <string name="search_str">Поиск...</string>
     <string name="label_filters">Фильтры</string>

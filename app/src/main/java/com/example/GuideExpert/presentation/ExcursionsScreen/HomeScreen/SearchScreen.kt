@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -288,7 +293,7 @@ fun SearchStateScope.SearchResult() {
 
     val scope = rememberCoroutineScope()
 
-    val listState = rememberLazyListState()
+    val listState = rememberLazyStaggeredGridState()
     val displayButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
 
 
@@ -337,11 +342,12 @@ fun SearchStateScope.SearchResult() {
                     }
                 },
             ) {
-                LazyColumn(
+                LazyVerticalStaggeredGrid(
                     modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    columns = StaggeredGridCells.Adaptive(300.dp),
                     state = listState
-                ) {
+                )
+                {
 
                     if (excursionPagingItems.loadState.refresh is LoadState.Error) {
                         item {
@@ -423,7 +429,7 @@ private fun SearchScreenStart(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FloatButtonUp(displayButton: Boolean, listState : LazyListState) {
+private fun FloatButtonUp(displayButton: Boolean, listState : LazyStaggeredGridState) {
     val scope = rememberCoroutineScope()
     AnimatedVisibility(visible = displayButton,
         enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(400)),

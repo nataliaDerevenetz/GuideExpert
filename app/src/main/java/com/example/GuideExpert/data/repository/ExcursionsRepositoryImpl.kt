@@ -15,8 +15,10 @@ import com.example.GuideExpert.data.mappers.toExcursion
 import com.example.GuideExpert.data.mappers.toExcursionData
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
 import com.example.GuideExpert.data.mappers.toExcursionsFavoriteWithData
+import com.example.GuideExpert.data.mappers.toMessageResponse
 import com.example.GuideExpert.data.mappers.toRestoreFavoriteExcursionResponse
 import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
+import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ExcursionAuthService
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
@@ -28,6 +30,7 @@ import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
 import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.domain.models.MessageResponse
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
@@ -44,6 +47,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import java.io.IOException
+import java.util.Date
 import javax.inject.Inject
 
 class ExcursionsRepositoryImpl @Inject constructor(
@@ -85,6 +89,46 @@ class ExcursionsRepositoryImpl @Inject constructor(
             },
         ).flow.map { pagingData -> pagingData.map { it.toExcursion() } }
             .flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun bookingExcursion(
+        count: String,
+        email: String,
+        phone: String,
+        comments: String,
+        date: String,
+        time: String,
+        excursionId: Int,
+        profile: Profile?
+    ): Flow<UIResources<MessageResponse>> = flow {
+        try {
+            emit(UIResources.Loading)
+            if (profile == null){
+                emit(UIResources.Error("Error authorization"))
+                return@flow
+            }
+            val result = excursionAuthService.bookingExcursion(profile.id, excursionId,count,email,phone,comments,date,time)
+            if (result.code() == 403) {
+                emit(UIResources.Error("Error authorization"))
+                return@flow
+            }
+
+            if (result.isSuccessful) {
+                val response =
+                    result.body()?.toMessageResponse() ?: MessageResponse()
+                if (response.success) {
+                    emit(UIResources.Success(response))
+                } else {
+                    emit(UIResources.Error("Error :: ${response.message}"))
+                }
+            } else {
+                emit(UIResources.Error("Error remove favorite"))
+            }
+
+        }catch (e: Exception) {
+            emit(UIResources.Error(e.message.toString()))
+        }
+
     }
 
     override suspend fun getExcursionInfo(excursionId:Int): Flow<UIResources<ExcursionData>> = flow {

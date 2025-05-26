@@ -13,6 +13,7 @@ import com.example.GuideExpert.domain.models.Excursion
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen.AlbumExcursionScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.AlbumScreen.ImageExcursionScreen
+import com.example.GuideExpert.presentation.ExcursionsScreen.BookingScreen.BookingExcursionScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.DetailScreen.ExcursionDetailScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.HomeScreen
 import com.example.GuideExpert.utils.serializableType
@@ -26,6 +27,11 @@ import kotlin.reflect.typeOf
 
 @Serializable
 data class AlbumExcursion(
+    val excursionId:Int
+)
+
+@Serializable
+data class BookingExcursion(
     val excursionId:Int
 )
 
@@ -62,7 +68,8 @@ fun NavGraphBuilder.homeScreen(
     onNavigateToBack:() -> Unit,
     onNavigateToProfileInfo: () -> Unit,
     onChangeVisibleBottomBar: (Boolean) -> Unit,
-    onSetLightStatusBar: (Boolean) -> Unit
+    onSetLightStatusBar: (Boolean) -> Unit,
+    onNavigateToBooking: (Int) -> Unit,
 ) {
     navigation<HomeBaseRoute>(startDestination = HomeRoute) {
         composable<HomeRoute> {
@@ -74,7 +81,7 @@ fun NavGraphBuilder.homeScreen(
         composable<ExcursionDetail>(typeMap = ExcursionDetail.typeMap) {
             onChangeVisibleBottomBar(false)
             onSetLightStatusBar(true)
-            ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding,onNavigateToProfileInfo)
+            ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding,onNavigateToProfileInfo,onNavigateToBooking)
         }
 
         composable<AlbumExcursion> {
@@ -92,6 +99,14 @@ fun NavGraphBuilder.homeScreen(
             val imageExcursion = backStackEntry.toRoute<ImageExcursion>()
             ImageExcursionScreen(imageExcursion = imageExcursion)
         }
+
+        composable<BookingExcursion> {
+                backStackEntry ->
+            onChangeVisibleBottomBar(false)
+            onSetLightStatusBar(true)
+            val excursion = backStackEntry.toRoute<BookingExcursion>()
+            BookingExcursionScreen(excursionId = excursion.excursionId,innerPadding,snackbarHostState = snackbarHostState,navigateToBack = onNavigateToBack )
+        }
     }
 }
 
@@ -103,6 +118,12 @@ fun NavController.navigateToExcursionDetail(excursion: Excursion) {
 
 fun NavController.navigateToAlbum(excursionId: Int) {
     navigate(route = AlbumExcursion(excursionId)){
+        launchSingleTop=true
+    }
+}
+
+fun NavController.navigateToBooking(excursionId: Int) {
+    navigate(route = BookingExcursion(excursionId)){
         launchSingleTop=true
     }
 }

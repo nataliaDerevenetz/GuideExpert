@@ -13,6 +13,7 @@ import com.example.GuideExpert.presentation.AppState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeBaseRoute
 import com.example.GuideExpert.presentation.ExcursionsScreen.homeScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToAlbum
+import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToBooking
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToImage
 import com.example.GuideExpert.presentation.FavoriteScreen.favoritesScreen
@@ -50,7 +51,8 @@ fun AppNavHost(
                 restoreState = true
             })},
             onChangeVisibleBottomBar = { visible: Boolean -> appState.changeVisibleBottomBar(visible) },
-            onSetLightStatusBar = { isLight: Boolean -> appState.setLightStatusBar(isLight) }
+            onSetLightStatusBar = { isLight: Boolean -> appState.setLightStatusBar(isLight) },
+            onNavigateToBooking =  navController::navigateToBooking,
         )
         favoritesScreen(
             innerPadding = innerPadding,

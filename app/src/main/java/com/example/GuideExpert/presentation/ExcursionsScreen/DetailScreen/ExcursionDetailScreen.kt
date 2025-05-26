@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,12 +62,12 @@ import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.Filter
 import com.example.GuideExpert.domain.models.Image
 import com.example.GuideExpert.domain.models.Profile
+import com.example.GuideExpert.domain.models.SnackbarEffect
 import com.example.GuideExpert.presentation.ExcursionsScreen.ExcursionDetail
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.DeleteFavoriteExcursionUIState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionState
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.SetFavoriteExcursionUIState
-import com.example.GuideExpert.domain.models.SnackbarEffect
 import com.example.GuideExpert.presentation.ExcursionsScreen.HomeScreen.components.shimmerEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -90,6 +91,7 @@ interface ExcursionDetailScope {
     val snackbarHostState: SnackbarHostState
     val excursionDetail: ExcursionDetail
     val navigateToProfileInfo: () -> Unit
+    val navigateToBooking:(Int) -> Unit
     val profile: StateFlow<Profile?>
 }
 
@@ -109,6 +111,7 @@ fun DefaultExcursionDetailScope(
     snackbarHostState: SnackbarHostState,
     excursionDetail: ExcursionDetail,
     navigateToProfileInfo: () -> Unit,
+    navigateToBooking:(Int) -> Unit,
     profile: StateFlow<Profile?>
 ): ExcursionDetailScope {
     return object : ExcursionDetailScope {
@@ -142,6 +145,8 @@ fun DefaultExcursionDetailScope(
             get() = excursionDetail
         override val navigateToProfileInfo: () -> Unit
             get() = navigateToProfileInfo
+        override val navigateToBooking: (Int) -> Unit
+            get() = navigateToBooking
         override val profile: StateFlow<Profile?>
             get() = profile
     }
@@ -164,9 +169,10 @@ fun rememberDefaultExcursionDetailScope(
     snackbarHostState: SnackbarHostState,
     excursionDetail: ExcursionDetail,
     navigateToProfileInfo: () -> Unit,
+    navigateToBooking:(Int) -> Unit,
     profile: StateFlow<Profile?>
-): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail,navigateToProfileInfo,profile) {
-    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail,navigateToProfileInfo,profile)
+): ExcursionDetailScope = remember(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail,navigateToProfileInfo,navigateToBooking,profile) {
+    DefaultExcursionDetailScope(excursionData,excursionImages,onNavigateToBack,getFiltersGroups,stateView,navigateToAlbum,navigateToImage,handleEvent,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,effectFlow,snackbarHostState,excursionDetail,navigateToProfileInfo,navigateToBooking,profile)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -178,6 +184,7 @@ fun ExcursionDetailScreen(
     snackbarHostState: SnackbarHostState,
     innerPaddingMain: PaddingValues,
     navigateToProfileInfo: () -> Unit,
+    navigateToBooking:(Int) -> Unit,
     viewModel: ExcursionDetailViewModel = hiltViewModel(),
     scopeState:ExcursionDetailScope = rememberDefaultExcursionDetailScope(
         excursionData = viewModel.excursion,
@@ -195,6 +202,7 @@ fun ExcursionDetailScreen(
         snackbarHostState = snackbarHostState,
         excursionDetail = viewModel.excursionDetail,
         navigateToProfileInfo = navigateToProfileInfo,
+        navigateToBooking = navigateToBooking,
         profile = viewModel.profileFlow
         ),
   //  dataContent: @Composable ExcursionDetailScope.() -> Unit ={},
@@ -343,6 +351,8 @@ fun ExcursionDetailScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect
 fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
     val excursionData by excursionData.collectAsStateWithLifecycle(null)
     val excursionImages by excursionImages.collectAsStateWithLifecycle(null)
+    val profile by profile.collectAsStateWithLifecycle(null)
+
     val scrollState = rememberScrollState()
 
     Column(Modifier.padding(top = innerPadding.calculateTopPadding()).fillMaxSize()
@@ -414,6 +424,27 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
                     }
                 }
             }
+
+            Button(
+                onClick = {
+
+                    if (profile!= null && profile?.id !=0) {
+                        excursionData?.let { navigateToBooking(it.excursionId) }
+                    } else {
+                        navigateToProfileInfo()
+                    }
+
+
+                },
+                modifier = Modifier
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+                    .height(50.dp)
+                    .fillMaxWidth()
+
+            ) {
+                Text(stringResource(id = R.string.booking))
+            }
+
         }
 
     }

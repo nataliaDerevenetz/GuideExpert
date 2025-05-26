@@ -1,5 +1,6 @@
 package com.example.GuideExpert.data.remote.services
 
+import com.example.GuideExpert.data.remote.pojo.BookingExcursionPOJO
 import com.example.GuideExpert.data.remote.pojo.DeleteFavoriteExcursionResponsePOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoritePOJO
 import com.example.GuideExpert.data.remote.pojo.ExcursionsFavoriteResponsePOJO
@@ -24,5 +25,10 @@ interface ExcursionAuthService {
 
     @GET("restorefavoriteexcursion.php")
     suspend fun restoreExcursionFavorite(@Query("profile_id") profileId:Int, @Query("excursion_id") excursionId:Int, @Query("timestamp") timestamp:Int): Response<RestoreFavoriteExcursionResponsePOJO>
+
+    @GET("bookingexcursion.php")
+    suspend fun bookingExcursion(@Query("profile_id") profileId:Int, @Query("excursion_id") excursionId:Int,
+                                 @Query("count") count:String, @Query("email") email:String, @Query("phone") phone:String,
+                                 @Query("comments") comments:String, @Query("date") date:String, @Query("time") time:String): Response<BookingExcursionPOJO>
 
 }

@@ -9,6 +9,7 @@ import com.example.GuideExpert.domain.models.ExcursionFavorite
 import com.example.GuideExpert.domain.models.FilterQuery
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.domain.models.Image
+import com.example.GuideExpert.domain.models.MessageResponse
 import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
 import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
@@ -32,4 +33,5 @@ interface ExcursionsRepository {
     suspend fun restoreFavoriteExcursion(excursion: Excursion,profile: Profile?):Flow<UIResources<RestoreFavoriteExcursionResponse>>
     fun getExcursionByFiltersFlow(filter: Filters): Flow<PagingData<Excursion>>
     fun getExcursionByQueryFlow(filterQuery: FilterQuery): Flow<PagingData<Excursion>>
+    suspend fun bookingExcursion(count: String, email: String, phone: String, comments:String, date: String,time:String, excursionId:Int,profile: Profile?) : Flow<UIResources<MessageResponse>>
 }

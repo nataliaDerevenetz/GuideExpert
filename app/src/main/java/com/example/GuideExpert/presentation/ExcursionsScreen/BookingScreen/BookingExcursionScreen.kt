@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
@@ -30,14 +32,18 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -50,6 +56,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -65,7 +72,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.GuideExpert.R
 import com.example.GuideExpert.domain.models.SnackbarEffect
-import com.example.GuideExpert.presentation.ProfileScreen.EditorProfileScreen.isValidEmail
+import com.example.GuideExpert.utils.isValidEmail
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -74,8 +81,50 @@ import java.time.ZoneOffset
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingExcursionScreen(
+    excursionId: Int,
+    innerPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
+    navigateToBack: () -> Unit,
+){
+
+    Box(Modifier.padding(innerPadding).fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("") },
+                    navigationIcon = {
+                        IconButton({
+                            navigateToBack()
+                        }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.primary
+                    ),
+                    modifier = Modifier
+                        .height(56.dp)
+                        .shadow(6.dp),
+                    windowInsets = WindowInsets(0)
+                )
+            }
+        ) { innerPaddingMain ->
+            BookingExcursionContent(excursionId,innerPaddingMain,snackbarHostState,navigateToBack)
+        }
+    }
+
+}
+
+
+@Composable
+fun BookingExcursionContent(
     excursionId: Int,
     innerPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
@@ -195,6 +244,7 @@ fun BookingExcursionScreen(
                 OutlinedTextField(
                     email ?: "",
                     {
+                        isErrorEmail = false
                         email = it
                         viewModel.handleEvent(BookingExcursionUiEvent.OnEmailChanged(it))
                     },

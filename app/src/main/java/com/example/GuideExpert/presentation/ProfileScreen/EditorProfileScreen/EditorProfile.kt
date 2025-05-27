@@ -101,6 +101,8 @@ import com.example.GuideExpert.domain.models.Profile
 import com.example.GuideExpert.domain.models.SnackbarEffect
 import com.example.GuideExpert.ui.theme.Shadow1
 import com.example.GuideExpert.ui.theme.Shadow2
+import com.example.GuideExpert.utils.isValidBirthday
+import com.example.GuideExpert.utils.isValidEmail
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -429,6 +431,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
                 OutlinedTextField(
                     email ?: "",
                     {
+                        isErrorEmail = false
                         email = it
                         handleEvent(EditorProfileUiEvent.OnEmailChanged(it))
                     },
@@ -841,10 +844,6 @@ fun DatePickerModal(
         DatePicker(state = datePickerState)
     }
 }
-
-fun CharSequence?.isValidEmail() = !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
-
-fun Long?.isValidBirthday() =  this !== null && this < Date().time
 
 
 @OptIn(ExperimentalMaterial3Api::class)

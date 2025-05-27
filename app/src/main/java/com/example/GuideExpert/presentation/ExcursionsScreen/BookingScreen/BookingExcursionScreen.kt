@@ -314,7 +314,7 @@ fun BookingExcursionContent(
 
             }
             Button(
-                enabled = email.isValidEmail() && selectedDate.value.isValidDate(),
+                enabled = selectedDate.value.isValidDate(),
                 onClick = {
                     isErrorEmail = !email.isValidEmail()
                     if (email.isValidEmail() && selectedDate.value.isValidDate()) {

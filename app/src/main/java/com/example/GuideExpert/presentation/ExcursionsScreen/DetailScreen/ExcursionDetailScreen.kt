@@ -355,7 +355,7 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
 
     val scrollState = rememberScrollState()
 
-    Column(Modifier.padding(top = innerPadding.calculateTopPadding()).fillMaxSize()
+    Column(Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding()).fillMaxSize()
         .verticalScroll(scrollState)) {
         excursionImages?.let {
             if (it.isNotEmpty()){

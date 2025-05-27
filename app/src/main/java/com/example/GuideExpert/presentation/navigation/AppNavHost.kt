@@ -15,6 +15,7 @@ import com.example.GuideExpert.presentation.ExcursionsScreen.homeScreen
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToAlbum
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToBooking
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToExcursionDetail
+import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToHome
 import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToImage
 import com.example.GuideExpert.presentation.FavoriteScreen.favoritesScreen
 import com.example.GuideExpert.presentation.ProfileScreen.navigateToEditorProfile
@@ -70,7 +71,13 @@ fun AppNavHost(
             },
             onNavigateToEditorProfile = navController::navigateToEditorProfile,
             onNavigateToYandex = navController::navigateToYandex,
-            onNavigateToBack = navController::popBackStack,
+            onNavigateToBack = {navController.navigateToHome(navOptions {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            })},
             onNavigateToProfile = navController::navigateToProfile
         )
 

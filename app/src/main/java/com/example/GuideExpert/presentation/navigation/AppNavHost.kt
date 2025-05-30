@@ -78,7 +78,13 @@ fun AppNavHost(
                 launchSingleTop = true
                 restoreState = true
             })},
-            onNavigateToProfile = navController::navigateToProfile
+            onNavigateToProfile = {navController.navigateToProfile(navOptions {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                })}
         )
 
     }

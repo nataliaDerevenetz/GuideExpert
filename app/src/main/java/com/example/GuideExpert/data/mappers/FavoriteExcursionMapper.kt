@@ -31,10 +31,6 @@ fun DeleteFavoriteExcursionResponsePOJO.toDeleteFavoriteExcursionResponse() = De
 
 fun ExcursionPOJO.toExcursionsFavoriteWithData() = ExcursionsFavoriteWithData(ExcursionsFavoriteEntity(id = id,title = title, description = description,timestamp = timestamp?: 0), images = images.map{it.toImagePreviewFavoriteEntity()})
 
-fun ExcursionsFavoriteWithData.toExcursionsFavoriteEntity() = ExcursionsFavoriteEntity(id = excursion.id,
-    title = excursion.title, description = excursion.description, timestamp = excursion.timestamp, images = images.map { it.toImage() }
-)
-
 fun ExcursionsFavoriteWithData.toExcursion() = Excursion(id=excursion.id,title = excursion.title,
     description = excursion.description, images = images.map{it.toImage()}, timestamp = excursion.timestamp)
 

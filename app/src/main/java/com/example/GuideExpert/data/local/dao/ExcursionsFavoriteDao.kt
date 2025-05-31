@@ -9,7 +9,7 @@ import androidx.room.Transaction
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteEntity
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.local.models.ImagePreviewFavoriteEntity
-import com.example.GuideExpert.data.mappers.toExcursionsFavoriteEntity
+import com.example.GuideExpert.data.local.models.toExcursionsFavoriteEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

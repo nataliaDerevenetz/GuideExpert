@@ -9,7 +9,7 @@ import androidx.room.Transaction
 import com.example.GuideExpert.data.local.models.ExcursionFilterEntity
 import com.example.GuideExpert.data.local.models.ExcursionFilterWithData
 import com.example.GuideExpert.data.local.models.ImagePreviewFilterEntity
-import com.example.GuideExpert.data.mappers.toExcursionFilterEntity
+import com.example.GuideExpert.data.local.models.toExcursionFilterEntity
 
 @Dao
 interface ExcursionFilterDao {

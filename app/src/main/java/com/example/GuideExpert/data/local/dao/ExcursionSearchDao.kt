@@ -9,7 +9,7 @@ import androidx.room.Transaction
 import com.example.GuideExpert.data.local.models.ExcursionSearchEntity
 import com.example.GuideExpert.data.local.models.ExcursionSearchWithData
 import com.example.GuideExpert.data.local.models.ImagePreviewSearchEntity
-import com.example.GuideExpert.data.mappers.toExcursionSearchEntity
+import com.example.GuideExpert.data.local.models.toExcursionSearchEntity
 
 @Dao
 interface ExcursionSearchDao {

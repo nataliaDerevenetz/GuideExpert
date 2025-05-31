@@ -1,7 +1,7 @@
 package com.example.GuideExpert.data.repository
 
-import com.example.GuideExpert.data.mappers.toConfig
-import com.example.GuideExpert.data.mappers.toProfileYandex
+import com.example.GuideExpert.data.models.toConfig
+import com.example.GuideExpert.data.models.toProfileYandex
 import com.example.GuideExpert.data.remote.services.DataSourceService
 import com.example.GuideExpert.domain.models.Config
 import com.example.GuideExpert.domain.models.ProfileYandex

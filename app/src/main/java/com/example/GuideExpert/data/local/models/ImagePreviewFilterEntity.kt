@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.GuideExpert.domain.models.Image
 
 @Entity(
     indices = [Index(value = ["excursionId"])],
@@ -22,4 +23,8 @@ data class ImagePreviewFilterEntity(
     val id: Int,
     @ColumnInfo val excursionId: Int,
     @ColumnInfo val url: String
+)
+
+fun ImagePreviewFilterEntity.toImage() = Image(
+    id = id, excursionId = excursionId, url = url
 )

@@ -2,7 +2,6 @@ package com.example.GuideExpert.data.local.models
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.GuideExpert.data.mappers.toImage
 
 data class ExcursionFilterWithData(
     @Embedded val excursion: ExcursionFilterEntity,

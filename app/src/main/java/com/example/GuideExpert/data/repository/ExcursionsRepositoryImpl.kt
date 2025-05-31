@@ -10,15 +10,14 @@ import com.example.GuideExpert.data.ExcursionFiltersRemoteMediator
 import com.example.GuideExpert.data.ExcursionSearchRemoteMediator
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
-import com.example.GuideExpert.data.mappers.toDeleteFavoriteExcursionResponse
-import com.example.GuideExpert.data.mappers.toExcursion
-import com.example.GuideExpert.data.mappers.toExcursionData
-import com.example.GuideExpert.data.mappers.toExcursionsFavoriteResponse
-import com.example.GuideExpert.data.mappers.toExcursionsFavoriteWithData
-import com.example.GuideExpert.data.mappers.toMessageResponse
-import com.example.GuideExpert.data.mappers.toRestoreFavoriteExcursionResponse
-import com.example.GuideExpert.data.mappers.toSetFavoriteExcursionResponse
-import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
+import com.example.GuideExpert.data.models.toDeleteFavoriteExcursionResponse
+import com.example.GuideExpert.data.models.toExcursionsFavoriteWithData
+import com.example.GuideExpert.data.models.toRestoreFavoriteExcursionResponse
+import com.example.GuideExpert.data.models.toSetFavoriteExcursionResponse
+import com.example.GuideExpert.data.models.toExcursion
+import com.example.GuideExpert.data.models.toExcursionData
+import com.example.GuideExpert.data.models.toExcursionsFavoriteResponse
+import com.example.GuideExpert.data.models.toMessageResponse
 import com.example.GuideExpert.data.remote.services.ExcursionAuthService
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
@@ -47,7 +46,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import java.io.IOException
-import java.util.Date
 import javax.inject.Inject
 
 class ExcursionsRepositoryImpl @Inject constructor(

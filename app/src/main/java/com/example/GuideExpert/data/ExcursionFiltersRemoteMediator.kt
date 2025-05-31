@@ -7,7 +7,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.local.models.ExcursionFilterWithData
-import com.example.GuideExpert.data.mappers.toExcursionFilterWithData
+import com.example.GuideExpert.data.models.toExcursionFilterWithData
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.domain.models.Filters
 import com.example.GuideExpert.utils.Constant.REMOTE_KEY_FILTER_ID

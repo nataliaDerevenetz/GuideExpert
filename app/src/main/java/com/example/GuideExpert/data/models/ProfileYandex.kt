@@ -1,4 +1,4 @@
-package com.example.GuideExpert.data.mappers
+package com.example.GuideExpert.data.models
 
 import com.example.GuideExpert.data.remote.pojo.ProfileYandexPOJO
 import com.example.GuideExpert.domain.models.ProfileYandex

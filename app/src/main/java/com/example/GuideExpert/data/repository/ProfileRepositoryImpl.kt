@@ -1,10 +1,10 @@
 package com.example.GuideExpert.data.repository
 
 import com.example.GuideExpert.data.local.DBStorage
-import com.example.GuideExpert.data.mappers.toAvatar
-import com.example.GuideExpert.data.mappers.toProfile
-import com.example.GuideExpert.data.mappers.toRemoveAvatarProfileResponse
-import com.example.GuideExpert.data.mappers.toUpdateProfileResponse
+import com.example.GuideExpert.data.models.toAvatar
+import com.example.GuideExpert.data.models.toProfile
+import com.example.GuideExpert.data.models.toRemoveAvatarProfileResponse
+import com.example.GuideExpert.data.models.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
 import com.example.GuideExpert.domain.models.Avatar
 import com.example.GuideExpert.domain.models.MessageResponse

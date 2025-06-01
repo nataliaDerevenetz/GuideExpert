@@ -2,7 +2,7 @@ package com.example.GuideExpert.data.di
 
 import android.content.Context
 import com.example.GuideExpert.data.repository.SessionManagerImpl
-import com.example.GuideExpert.domain.repository.SessionManager
+import com.example.core.domain.repository.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 object ManagerModule {
     @Provides
     @Singleton
-    fun providesSessionManager(@ApplicationContext appContext: Context): SessionManager {
+    fun providesSessionManager(@ApplicationContext appContext: Context): com.example.core.domain.repository.SessionManager {
         return SessionManagerImpl(appContext)
     }
 }

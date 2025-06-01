@@ -6,13 +6,13 @@ import com.example.GuideExpert.data.models.toProfile
 import com.example.GuideExpert.data.models.toRemoveAvatarProfileResponse
 import com.example.GuideExpert.data.models.toUpdateProfileResponse
 import com.example.GuideExpert.data.remote.services.ProfileService
-import com.example.GuideExpert.domain.models.Avatar
-import com.example.GuideExpert.domain.models.MessageResponse
-import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.domain.models.ProfileResources
-import com.example.GuideExpert.domain.models.UIResources
-import com.example.GuideExpert.domain.repository.ProfileRepository
-import com.example.GuideExpert.domain.repository.SessionManager
+import com.example.core.domain.repository.ProfileRepository
+import com.example.core.domain.repository.SessionManager
+import com.example.core.models.Avatar
+import com.example.core.models.MessageResponse
+import com.example.core.models.Profile
+import com.example.core.models.ProfileResources
+import com.example.core.models.UIResources
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -92,7 +92,7 @@ class ProfileRepositoryImpl @Inject constructor(
                     val profile = result.body()?.toProfile()
                     _profileFlow.update { profile }
                     dbStorage.insertProfile(profile!!)
-                    _profileStateFlow.update { ProfileResources.Success }
+                    _profileStateFlow.update {ProfileResources.Success }
                 }
             }
         } catch (e:Exception) {

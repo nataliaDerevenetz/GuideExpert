@@ -1,11 +1,12 @@
 package com.example.GuideExpert.data.repository
 
 import com.example.GuideExpert.data.DataProvider
-import com.example.GuideExpert.domain.models.Filter
-import com.example.GuideExpert.domain.repository.DataProviderRepository
+import com.example.core.domain.repository.DataProviderRepository
+import com.example.core.models.Filter
 import javax.inject.Inject
 
-class DataProviderRepositoryImpl @Inject constructor(): DataProviderRepository {
+class DataProviderRepositoryImpl @Inject constructor():
+    DataProviderRepository {
     override fun getFiltersBar(): List<Filter> {
         return DataProvider.filtersBar
     }

@@ -3,10 +3,9 @@ package com.example.GuideExpert.data.repository
 import com.example.GuideExpert.data.models.toConfig
 import com.example.GuideExpert.data.models.toProfileYandex
 import com.example.GuideExpert.data.remote.services.DataSourceService
-import com.example.GuideExpert.domain.models.Config
-import com.example.GuideExpert.domain.models.ProfileYandex
-import com.example.GuideExpert.domain.models.UIResources
-import com.example.GuideExpert.domain.repository.DataSourceRepository
+import com.example.core.models.Config
+import com.example.core.models.ProfileYandex
+import com.example.core.models.UIResources
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -14,7 +13,7 @@ import javax.inject.Inject
 
 class DataSourceRepositoryImpl @Inject constructor(
     private val dataSourceService: DataSourceService,
-): DataSourceRepository {
+): com.example.core.domain.repository.DataSourceRepository {
     override suspend fun getConfigInfo(): Flow<UIResources<Config>> = flow<UIResources<Config>> {
         emit(UIResources.Loading)
         val result = dataSourceService.getConfig()

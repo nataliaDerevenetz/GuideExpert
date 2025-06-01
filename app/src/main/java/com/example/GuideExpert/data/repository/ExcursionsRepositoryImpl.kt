@@ -11,31 +11,30 @@ import com.example.GuideExpert.data.ExcursionSearchRemoteMediator
 import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.models.toDeleteFavoriteExcursionResponse
-import com.example.GuideExpert.data.models.toExcursionsFavoriteWithData
-import com.example.GuideExpert.data.models.toRestoreFavoriteExcursionResponse
-import com.example.GuideExpert.data.models.toSetFavoriteExcursionResponse
 import com.example.GuideExpert.data.models.toExcursion
 import com.example.GuideExpert.data.models.toExcursionData
 import com.example.GuideExpert.data.models.toExcursionsFavoriteResponse
+import com.example.GuideExpert.data.models.toExcursionsFavoriteWithData
 import com.example.GuideExpert.data.models.toMessageResponse
+import com.example.GuideExpert.data.models.toRestoreFavoriteExcursionResponse
+import com.example.GuideExpert.data.models.toSetFavoriteExcursionResponse
 import com.example.GuideExpert.data.remote.services.ExcursionAuthService
 import com.example.GuideExpert.data.remote.services.ExcursionService
-import com.example.GuideExpert.domain.models.DeleteFavoriteExcursionResponse
-import com.example.GuideExpert.domain.models.ErrorExcursionsRepository
-import com.example.GuideExpert.domain.models.Excursion
-import com.example.GuideExpert.domain.models.ExcursionData
-import com.example.GuideExpert.domain.models.ExcursionFavorite
-import com.example.GuideExpert.domain.models.ExcursionFavoriteResponse
-import com.example.GuideExpert.domain.models.FilterQuery
-import com.example.GuideExpert.domain.models.Filters
-import com.example.GuideExpert.domain.models.Image
-import com.example.GuideExpert.domain.models.MessageResponse
-import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.domain.models.RestoreFavoriteExcursionResponse
-import com.example.GuideExpert.domain.models.SetFavoriteExcursionResponse
-import com.example.GuideExpert.domain.models.UIResources
-import com.example.GuideExpert.domain.repository.ExcursionsRepository
-import com.example.GuideExpert.utils.Constant.PAGE_SIZE
+import com.example.core.models.DeleteFavoriteExcursionResponse
+import com.example.core.models.ErrorExcursionsRepository
+import com.example.core.models.Excursion
+import com.example.core.models.ExcursionData
+import com.example.core.models.ExcursionFavorite
+import com.example.core.models.ExcursionFavoriteResponse
+import com.example.core.models.FilterQuery
+import com.example.core.models.Filters
+import com.example.core.models.Image
+import com.example.core.models.MessageResponse
+import com.example.core.models.Profile
+import com.example.core.models.RestoreFavoriteExcursionResponse
+import com.example.core.models.SetFavoriteExcursionResponse
+import com.example.core.models.UIResources
+import com.example.core.utils.Constant.PAGE_SIZE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,7 +51,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,
     private val excursionService: ExcursionService,
     private val excursionAuthService: ExcursionAuthService
-): ExcursionsRepository {
+): com.example.core.domain.repository.ExcursionsRepository {
 
     private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<ExcursionFavorite>>(listOf())
     override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>> get() = _profileFavoriteExcursionIdFlow
@@ -197,7 +196,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
         _profileFavoriteExcursionIdFlow.update { listOf() }
     }
 
-    override suspend fun setFavoriteExcursion(excursion: Excursion,profile: Profile?): Flow<UIResources<SetFavoriteExcursionResponse>> = flow {
+    override suspend fun setFavoriteExcursion(excursion: Excursion, profile: Profile?): Flow<UIResources<SetFavoriteExcursionResponse>> = flow {
         try {
             emit(UIResources.Loading)
             if (profile == null){
@@ -215,7 +214,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
                 if (response.success) {
                     val excursionUpdate = excursion.copy(timestamp = response.excursion?.timestamp ?:0)
                     dbStorage.insertExcursionFavorite(response.excursion!!,excursionUpdate)
-                    _profileFavoriteExcursionIdFlow.update { it + response.excursion }
+                    _profileFavoriteExcursionIdFlow.update { it + response.excursion!! }
                     emit(UIResources.Success(response))
                 } else {
                     emit(UIResources.Error("Error :: ${response.message}"))
@@ -228,7 +227,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeFavoriteExcursion(excursion: Excursion,profile: Profile?): Flow<UIResources<DeleteFavoriteExcursionResponse>> = flow{
+    override suspend fun removeFavoriteExcursion(excursion: Excursion, profile: Profile?): Flow<UIResources<DeleteFavoriteExcursionResponse>> = flow{
         try {
             emit(UIResources.Loading)
             if (profile == null){
@@ -245,7 +244,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
                     result.body()?.toDeleteFavoriteExcursionResponse() ?: DeleteFavoriteExcursionResponse()
                 if (response.success) {
                     dbStorage.deleteExcursionFavorite(response.excursion!!,excursion)
-                    _profileFavoriteExcursionIdFlow.update {it.filter { it1 -> it1.excursionId != response.excursion.excursionId } }
+                    _profileFavoriteExcursionIdFlow.update {it.filter { it1 -> it1.excursionId != response.excursion!!.excursionId } }
                     emit(UIResources.Success(response))
                 } else {
                     emit(UIResources.Error("Error :: ${response.message}"))
@@ -282,7 +281,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun restoreFavoriteExcursion(excursion: Excursion,profile: Profile?): Flow<UIResources<RestoreFavoriteExcursionResponse>> = flow {
+    override suspend fun restoreFavoriteExcursion(excursion: Excursion, profile: Profile?): Flow<UIResources<RestoreFavoriteExcursionResponse>> = flow {
         try {
             emit(UIResources.Loading)
             if (profile == null){
@@ -300,7 +299,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
                 if (response.success) {
                     val excursionUpdate = excursion.copy(timestamp = response.excursion?.timestamp ?:0)
                     dbStorage.insertExcursionFavorite(response.excursion!!,excursionUpdate)
-                    _profileFavoriteExcursionIdFlow.update { it + response.excursion }
+                    _profileFavoriteExcursionIdFlow.update { it + response.excursion!!}
                     emit(UIResources.Success(response))
                 } else {
                     emit(UIResources.Error("Error :: ${response.message}"))

@@ -3,11 +3,11 @@ package com.example.GuideExpert.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.GuideExpert.domain.GetExcursionsFavoriteIdUseCase
-import com.example.GuideExpert.domain.GetProfileUseCase
-import com.example.GuideExpert.domain.models.ProfileAuthYandexData
-import com.example.GuideExpert.domain.repository.ProfileRepository
-import com.example.GuideExpert.domain.repository.SessionManager
+import com.example.core.domain.GetExcursionsFavoriteIdUseCase
+import com.example.core.domain.GetProfileUseCase
+import com.example.core.domain.repository.ProfileRepository
+import com.example.core.domain.repository.SessionManager
+import com.example.core.models.ProfileAuthYandexData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted

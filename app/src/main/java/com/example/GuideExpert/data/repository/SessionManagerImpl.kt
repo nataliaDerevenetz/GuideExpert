@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.GuideExpert.domain.repository.SessionManager
+import com.example.core.domain.repository.SessionManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class SessionManagerImpl @Inject constructor(
     val context: Context
-): SessionManager {
+): com.example.core.domain.repository.SessionManager {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
     private suspend fun <T> save(key: Preferences.Key<T>, value: T) {

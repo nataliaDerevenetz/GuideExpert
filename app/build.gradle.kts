@@ -5,7 +5,8 @@ plugins {
 
     kotlin("plugin.serialization") version "2.0.21"
 
-    id("com.google.dagger.hilt.android")
+    id("com.google.dagger.hilt.android") version "2.51.1" apply false
+    id ("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
 
@@ -79,8 +80,6 @@ dependencies {
 
     implementation ("androidx.exifinterface:exifinterface:1.4.1")
     implementation ("androidx.datastore:datastore-preferences:1.1.0")
-
-    implementation ("com.yandex.android:authsdk:3.1.3")
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
@@ -156,4 +155,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(project(":feature:home"))
+    implementation(project(":feature:favorites"))
+    implementation(project(":feature:profile"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:models"))
+    implementation(project(":core:utils"))
+
 }

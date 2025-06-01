@@ -8,20 +8,39 @@ import com.example.GuideExpert.data.local.models.ExcursionsFavoriteEntity
 import com.example.GuideExpert.data.local.models.ExcursionsFavoriteWithData
 import com.example.GuideExpert.data.local.models.toImage
 import com.example.GuideExpert.data.remote.pojo.ExcursionPOJO
-import com.example.GuideExpert.domain.models.Excursion
+import com.example.core.models.Excursion
 
-fun ExcursionFilterEntity.toExcursion() = Excursion(id,title, description,images,idSort)
+fun ExcursionFilterEntity.toExcursion() =
+    Excursion(id, title, description, images, idSort)
 
-fun ExcursionFilterWithData.toExcursion() = Excursion(id=excursion.id,title = excursion.title,
-    description = excursion.description, idSort = excursion.idSort,images = images.map{ it.toImage()})
+fun ExcursionFilterWithData.toExcursion() = Excursion(
+    id = excursion.id,
+    title = excursion.title,
+    description = excursion.description,
+    idSort = excursion.idSort,
+    images = images.map { it.toImage() })
 
-fun ExcursionSearchEntity.toExcursion() = Excursion(id,title, description,images,idSort)
+fun ExcursionSearchEntity.toExcursion() =
+    Excursion(id, title, description, images, idSort)
 
 
-fun ExcursionSearchWithData.toExcursion() = Excursion(id=excursion.id,title = excursion.title,
-    description = excursion.description, images = images.map{it.toImage()}, idSort = excursion.idSort)
+fun ExcursionSearchWithData.toExcursion() =
+    Excursion(
+        id = excursion.id,
+        title = excursion.title,
+        description = excursion.description,
+        images = images.map { it.toImage() },
+        idSort = excursion.idSort
+    )
 
-fun ExcursionPOJO.toExcursion() = Excursion(id = id,title = title, description = description,images =images.map { it.toImage() },idSort = idSort ?: 0, timestamp = timestamp ?: 0)
+fun ExcursionPOJO.toExcursion() = Excursion(
+    id = id,
+    title = title,
+    description = description,
+    images = images.map { it.toImage() },
+    idSort = idSort ?: 0,
+    timestamp = timestamp ?: 0
+)
 
 fun Excursion.toExcursionPOJO() = ExcursionPOJO(id,title, description,images.map{ it.toImagePOJO()},idSort ?: 0, timestamp = timestamp ?: 0)
 
@@ -43,8 +62,14 @@ fun ExcursionPOJO.toExcursionFilterWithData() = ExcursionFilterWithData(
 fun ExcursionPOJO.toExcursionsFavoriteWithData() = ExcursionsFavoriteWithData(
     ExcursionsFavoriteEntity(id = id,title = title, description = description,timestamp = timestamp?: 0), images = images.map{it.toImagePreviewFavoriteEntity()})
 
-fun ExcursionsFavoriteWithData.toExcursion() = Excursion(id=excursion.id,title = excursion.title,
-    description = excursion.description, images = images.map{it.toImage()}, timestamp = excursion.timestamp)
+fun ExcursionsFavoriteWithData.toExcursion() =
+    Excursion(
+        id = excursion.id,
+        title = excursion.title,
+        description = excursion.description,
+        images = images.map { it.toImage() },
+        timestamp = excursion.timestamp
+    )
 
 fun Excursion.toExcursionsFavoriteWithData() = ExcursionsFavoriteWithData(excursion = ExcursionsFavoriteEntity(id = id,title = title,description = description,timestamp=timestamp),images = images.map { it.toImagePreviewFavoriteEntity() })
 

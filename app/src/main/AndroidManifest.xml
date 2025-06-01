@@ -28,7 +28,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <activity
-            android:name=".presentation.ProfileScreen.YandexActivity.ProfileYandexActivity"
+            android:name="com.example.feature.profile.YandexActivity.ProfileYandexActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

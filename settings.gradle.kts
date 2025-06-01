@@ -26,4 +26,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "GuideExpert"
 include(":app")
- 
+include(":feature:home")
+include(":feature:favorites")
+include(":feature:profile")
+
+include(":core:domain")
+include(":core:models")
+include(":core:utils")

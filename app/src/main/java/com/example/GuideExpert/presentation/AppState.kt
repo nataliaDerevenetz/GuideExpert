@@ -11,9 +11,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToHome
-import com.example.GuideExpert.presentation.FavoriteScreen.navigateToFavorites
-import com.example.GuideExpert.presentation.ProfileScreen.navigateToProfile
+import com.example.feature.home.navigateToHome
+import com.example.feature.favorites.navigateToFavorites
+import com.example.feature.profile.navigateToProfile
 import com.example.GuideExpert.presentation.navigation.TopLevelDestination
 import kotlinx.coroutines.CoroutineScope
 

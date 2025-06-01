@@ -9,8 +9,8 @@ import com.example.GuideExpert.data.local.DBStorage
 import com.example.GuideExpert.data.local.models.ExcursionFilterWithData
 import com.example.GuideExpert.data.models.toExcursionFilterWithData
 import com.example.GuideExpert.data.remote.services.ExcursionService
-import com.example.GuideExpert.domain.models.Filters
-import com.example.GuideExpert.utils.Constant.REMOTE_KEY_FILTER_ID
+import com.example.core.models.Filters
+import com.example.core.utils.Constant.REMOTE_KEY_FILTER_ID
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import java.io.IOException

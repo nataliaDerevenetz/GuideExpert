@@ -4,8 +4,7 @@ import com.example.GuideExpert.data.remote.services.DataSourceService
 import com.example.GuideExpert.data.remote.services.ExcursionAuthService
 import com.example.GuideExpert.data.remote.services.ExcursionService
 import com.example.GuideExpert.data.remote.services.ProfileService
-import com.example.GuideExpert.domain.repository.SessionManager
-import com.example.GuideExpert.utils.Constant
+import com.example.core.utils.Constant
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,7 +53,7 @@ object NetworkModule {
     @NoAuth
     fun provideRetrofitNoAuth(@NoAuth okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Constant.BASE_URL)
+            .baseUrl(com.example.core.utils.Constant.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -78,7 +77,7 @@ object NetworkModule {
 
     @Provides
     @Auth
-    fun provideOkHttpClientAuth(loggingInterceptor: HttpLoggingInterceptor, sessionManager: SessionManager): OkHttpClient {
+    fun provideOkHttpClientAuth(loggingInterceptor: HttpLoggingInterceptor, sessionManager: com.example.core.domain.repository.SessionManager): OkHttpClient {
         val okHttpClient = OkHttpClient().newBuilder()
             .connectTimeout(3, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
@@ -103,7 +102,7 @@ object NetworkModule {
     @Auth
     fun provideRetrofitAuth(@Auth okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Constant.BASE_URL)
+            .baseUrl(com.example.core.utils.Constant.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -26,12 +26,12 @@ import com.example.GuideExpert.data.models.toImage
 import com.example.GuideExpert.data.models.toImageEntity
 import com.example.GuideExpert.data.models.toProfile
 import com.example.GuideExpert.data.models.toProfileWithAvatar
-import com.example.GuideExpert.domain.models.Excursion
-import com.example.GuideExpert.domain.models.ExcursionData
-import com.example.GuideExpert.domain.models.ExcursionFavorite
-import com.example.GuideExpert.domain.models.Image
-import com.example.GuideExpert.domain.models.Profile
-import com.example.GuideExpert.domain.models.RemoteKey
+import com.example.core.models.Excursion
+import com.example.core.models.ExcursionData
+import com.example.core.models.ExcursionFavorite
+import com.example.core.models.Image
+import com.example.core.models.Profile
+import com.example.core.models.RemoteKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -92,14 +92,14 @@ class DBStorageImpl @Inject constructor(
         })
     }
 
-    override suspend fun insertExcursionFavorite(excursion: ExcursionFavorite,excursionUpdate: Excursion) {
+    override suspend fun insertExcursionFavorite(excursion: ExcursionFavorite, excursionUpdate: Excursion) {
         excursionsRoomDatabase.withTransaction {
             favoriteDao.insert(excursion.toExcursionsFavoriteEntity())
             excursionsFavoriteDao.insertExcursion(excursionUpdate.toExcursionsFavoriteWithData())
         }
     }
 
-    override suspend fun deleteExcursionFavorite(excursion: ExcursionFavorite,excursionDelete: Excursion) {
+    override suspend fun deleteExcursionFavorite(excursion: ExcursionFavorite, excursionDelete: Excursion) {
         excursionsRoomDatabase.withTransaction {
             favoriteDao.delete(excursion.toExcursionsFavoriteEntity())
             excursionsFavoriteDao.deleteExcursion(excursionDelete.toExcursionsFavoriteEntity())

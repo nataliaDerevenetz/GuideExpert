@@ -2,7 +2,7 @@ package com.example.GuideExpert.data.local.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.GuideExpert.domain.models.RemoteKey
+import com.example.core.models.RemoteKey
 
 @Entity("RemoteKey")
 data class RemoteKeyEntity(

@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.example.GuideExpert.domain.models.Avatar
+import com.example.core.models.Avatar
 import java.util.Date
 
 @Entity

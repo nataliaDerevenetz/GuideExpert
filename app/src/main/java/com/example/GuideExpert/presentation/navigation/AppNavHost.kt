@@ -10,18 +10,18 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.example.GuideExpert.presentation.AppState
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeBaseRoute
-import com.example.GuideExpert.presentation.ExcursionsScreen.homeScreen
-import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToAlbum
-import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToBooking
-import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToExcursionDetail
-import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToHome
-import com.example.GuideExpert.presentation.ExcursionsScreen.navigateToImage
-import com.example.GuideExpert.presentation.FavoriteScreen.favoritesScreen
-import com.example.GuideExpert.presentation.ProfileScreen.navigateToEditorProfile
-import com.example.GuideExpert.presentation.ProfileScreen.navigateToProfile
-import com.example.GuideExpert.presentation.ProfileScreen.navigateToYandex
-import com.example.GuideExpert.presentation.ProfileScreen.profileScreen
+import com.example.feature.home.homeScreen
+import com.example.feature.home.navigateToAlbum
+import com.example.feature.home.navigateToBooking
+import com.example.feature.home.navigateToExcursionDetail
+import com.example.feature.home.navigateToHome
+import com.example.feature.home.navigateToImage
+import com.example.feature.favorites.favoritesScreen
+import com.example.feature.profile.navigateToEditorProfile
+import com.example.feature.profile.navigateToProfile
+import com.example.feature.profile.navigateToYandex
+import com.example.feature.profile.profileScreen
+import com.example.feature.home.HomeBaseRoute
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.GuideExpert.domain.models.Image
+import com.example.core.models.Image
 
 @Entity(
     indices = [Index(value = ["excursionId"])],

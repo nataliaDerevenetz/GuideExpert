@@ -10,10 +10,10 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.GuideExpert.R
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeBaseRoute
-import com.example.GuideExpert.presentation.ExcursionsScreen.HomeRoute
-import com.example.GuideExpert.presentation.FavoriteScreen.FavoritesRoute
-import com.example.GuideExpert.presentation.ProfileScreen.ProfileRoute
+import com.example.feature.favorites.FavoritesRoute
+import com.example.feature.profile.ProfileRoute
+import com.example.feature.home.HomeBaseRoute
+import com.example.feature.home.HomeRoute
 import kotlin.reflect.KClass
 
 enum class TopLevelDestination(
@@ -44,6 +44,6 @@ enum class TopLevelDestination(
         unselectedIcon = Icons.Outlined.Person,
         iconTextId = R.string.person,
         titleTextId = R.string.person,
-        route = ProfileRoute::class,
+        route = com.example.feature.profile.ProfileRoute::class,
     ),
 }

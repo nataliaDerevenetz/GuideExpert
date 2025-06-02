@@ -2,6 +2,7 @@ package com.example.core.data.repository
 
 import com.example.core.data.models.toConfig
 import com.example.core.data.models.toProfileYandex
+import com.example.core.domain.repository.DataSourceRepository
 import com.example.core.models.Config
 import com.example.core.models.ProfileYandex
 import com.example.core.models.UIResources
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 class DataSourceRepositoryImpl @Inject constructor(
     private val dataSourceService: DataSourceService,
-): com.example.core.domain.repository.DataSourceRepository {
+): DataSourceRepository {
     override suspend fun getConfigInfo(): Flow<UIResources<Config>> = flow<UIResources<Config>> {
         emit(UIResources.Loading)
         val result = dataSourceService.getConfig()

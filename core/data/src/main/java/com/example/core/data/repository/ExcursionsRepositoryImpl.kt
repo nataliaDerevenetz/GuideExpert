@@ -18,6 +18,7 @@ import com.example.core.data.models.toRestoreFavoriteExcursionResponse
 import com.example.core.data.models.toSetFavoriteExcursionResponse
 import com.example.core.data.local.DBStorage
 import com.example.core.database.models.ExcursionsFavoriteWithData
+import com.example.core.domain.repository.ExcursionsRepository
 import com.example.core.models.DeleteFavoriteExcursionResponse
 import com.example.core.models.ErrorExcursionsRepository
 import com.example.core.models.Excursion
@@ -51,7 +52,7 @@ class ExcursionsRepositoryImpl @Inject constructor(
     private val dbStorage : DBStorage,
     private val excursionService: ExcursionService,
     private val excursionAuthService: ExcursionAuthService
-): com.example.core.domain.repository.ExcursionsRepository {
+): ExcursionsRepository {
 
     private val _profileFavoriteExcursionIdFlow = MutableStateFlow<List<ExcursionFavorite>>(listOf())
     override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>> get() = _profileFavoriteExcursionIdFlow

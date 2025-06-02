@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.core.models.Excursion
 import com.example.core.models.Profile
 import com.example.core.models.SnackbarEffect
-import com.example.core.utils.ui.LoadingExcursionListShimmer
+import com.example.core.design.components.LoadingExcursionListShimmer
 import com.example.feature.favorites.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

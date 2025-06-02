@@ -44,6 +44,6 @@ enum class TopLevelDestination(
         unselectedIcon = Icons.Outlined.Person,
         iconTextId = R.string.person,
         titleTextId = R.string.person,
-        route = com.example.feature.profile.ProfileRoute::class,
+        route = ProfileRoute::class,
     ),
 }

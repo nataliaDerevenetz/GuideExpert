@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.example.core.utils.ui.NetworkImage
+import com.example.core.design.components.NetworkImage
 import com.example.feature.home.ImageExcursion
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -98,7 +98,7 @@ fun ImageExcursionScreen(
                         translationY = offsetY,
                     )
             ) { page ->
-                NetworkImage(
+                com.example.core.design.components.NetworkImage(
                     contentDescription = "",
                     url = imageExcursion.excursionImages[page].url,
                     width = 350,

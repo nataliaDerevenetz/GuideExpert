@@ -65,7 +65,7 @@ import com.example.core.models.Excursion
 import com.example.core.models.ExcursionFavorite
 import com.example.core.models.Profile
 import com.example.core.models.SnackbarEffect
-import com.example.core.utils.ui.LoadingExcursionListShimmer
+import com.example.core.design.components.LoadingExcursionListShimmer
 import com.example.feature.home.HomeScreen.components.SearchItem
 import com.example.feature.home.R
 import kotlinx.coroutines.flow.Flow
@@ -337,7 +337,7 @@ fun SearchStateScope.SearchResult() {
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (excursionPagingItems.loadState.refresh is LoadState.Loading) {
-            LoadingExcursionListShimmer()
+            com.example.core.design.components.LoadingExcursionListShimmer()
         } else {
 
             PullToRefreshBox(

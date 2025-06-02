@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import com.example.GuideExpert.presentation.MainScreen
 import com.example.GuideExpert.presentation.rememberAppState
-import com.example.GuideExpert.ui.theme.GuideExpertTheme
+import com.example.core.design.theme.GuideExpertTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val appState = rememberAppState()
-            GuideExpertTheme( isLightStatusBar = appState.isLightStatusBar.value) {
+            GuideExpertTheme(isLightStatusBar = appState.isLightStatusBar.value) {
                 MainScreen(appState)
             }
         }

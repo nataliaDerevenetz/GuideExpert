@@ -1,4 +1,4 @@
-package com.example.GuideExpert.ui.theme
+package com.example.core.design.theme
 
 import androidx.compose.ui.graphics.Color
 

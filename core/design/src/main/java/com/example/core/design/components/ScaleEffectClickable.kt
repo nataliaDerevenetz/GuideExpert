@@ -1,4 +1,4 @@
-package com.example.core.utils.ui
+package com.example.core.design.components
 
 import android.view.MotionEvent
 import androidx.compose.animation.core.animateFloatAsState

@@ -40,7 +40,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.example.core.models.Profile
 import com.example.core.models.ProfileResources
-import com.example.core.utils.ui.shimmerEffect
+import com.example.core.design.components.shimmerEffect
+import com.example.core.design.theme.Shadow1
+import com.example.core.design.theme.Shadow2
 import kotlinx.coroutines.flow.StateFlow
 
 val gradient45 = Brush.linearGradient(

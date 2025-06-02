@@ -1,4 +1,4 @@
-package com.example.core.utils.ui
+package com.example.core.design.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth

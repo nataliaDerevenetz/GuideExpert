@@ -27,7 +27,7 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import kotlin.math.absoluteValue
-import com.example.core.utils.ui.NetworkImage
+import com.example.core.design.components.NetworkImage
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -89,7 +89,7 @@ fun ImageSlider(modifier: Modifier = Modifier,
                         ))
                     }
             ) {
-                NetworkImage(
+                com.example.core.design.components.NetworkImage(
                     contentDescription = "",
                     url = configApp.value.banners[page].photo,//imageSlider[page],
                     width = 350,

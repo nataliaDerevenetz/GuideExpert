@@ -95,12 +95,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
+import com.example.core.design.theme.Shadow1
+import com.example.core.design.theme.Shadow2
 import com.example.core.models.Profile
 import com.example.core.models.SnackbarEffect
 import com.example.core.utils.isValidBirthday
 import com.example.core.utils.isValidEmail
-import com.example.feature.profile.ProfileMainScreen.Shadow1
-import com.example.feature.profile.ProfileMainScreen.Shadow2
 import com.example.feature.profile.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow

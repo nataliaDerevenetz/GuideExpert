@@ -44,8 +44,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.core.models.Excursion
-import com.example.core.utils.ui.NetworkImage
-import com.example.core.utils.ui.scaleEffectClickable
+import com.example.core.design.components.NetworkImage
+import com.example.core.design.components.scaleEffectClickable
 import com.example.feature.favorites.R
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -225,7 +225,7 @@ private fun ExcursionImage(excursion: Excursion) {
                 .heightIn(min = 100.dp, max = 200.dp)
                 .fillMaxWidth()
         ) { page ->
-           NetworkImage(
+            NetworkImage(
                 contentDescription = "",
                 url = excursion.images[page].url,
                 width = 350,

@@ -59,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
+import com.example.core.design.theme.Shadow1
+import com.example.core.design.theme.Shadow2
 import com.example.core.models.Profile
 import com.example.core.models.ProfileResources
 import com.example.core.models.SnackbarEffect
@@ -129,9 +131,6 @@ fun rememberDefaultProfileStateScope(
 ): ProfileStateScope = remember(profile,profileStateFlow,snackbarHostState,sendEffectFlow,navigateToEditorProfile,navigateToYandex,navigateToBack,logout) {
     DefaultProfileStateScope(profile,profileStateFlow,effectFlow,snackbarHostState,sendEffectFlow,navigateToEditorProfile,navigateToYandex,navigateToBack,logout)
 }
-
-val Shadow2 = Color(0xff001787)
-val Shadow1 = Color(0xff7057f5)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

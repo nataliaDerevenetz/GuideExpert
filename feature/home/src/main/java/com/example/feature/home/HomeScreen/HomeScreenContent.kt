@@ -56,7 +56,7 @@ import com.example.core.models.ExcursionFavorite
 import com.example.core.models.Filter
 import com.example.core.models.Profile
 import com.example.core.models.SnackbarEffect
-import com.example.core.utils.ui.ColumnExcursionShimmer
+import com.example.core.design.components.ColumnExcursionShimmer
 import com.example.feature.home.HomeScreen.components.FilterBar
 import com.example.feature.home.HomeScreen.components.FilterItem
 import com.example.feature.home.HomeScreen.components.ImageSlider

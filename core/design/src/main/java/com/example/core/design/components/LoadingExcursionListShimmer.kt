@@ -1,4 +1,4 @@
-package com.example.core.utils.ui
+package com.example.core.design.components
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable

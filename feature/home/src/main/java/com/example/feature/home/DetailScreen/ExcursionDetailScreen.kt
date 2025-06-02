@@ -67,7 +67,7 @@ import com.example.feature.home.HomeScreen.DeleteFavoriteExcursionState
 import com.example.feature.home.HomeScreen.DeleteFavoriteExcursionUIState
 import com.example.feature.home.HomeScreen.SetFavoriteExcursionState
 import com.example.feature.home.HomeScreen.SetFavoriteExcursionUIState
-import com.example.core.utils.ui.shimmerEffect
+import com.example.core.design.components.shimmerEffect
 import com.example.feature.home.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

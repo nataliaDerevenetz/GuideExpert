@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.design.theme.Shadow1
 import com.example.feature.home.HomeScreen.ExcursionsUiEvent
 import com.example.feature.home.HomeScreen.HomeViewModel
 import com.example.core.models.Filter

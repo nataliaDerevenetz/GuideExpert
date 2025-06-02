@@ -3,15 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
 
-    kotlin("plugin.serialization") version "2.0.21"
-    id("com.google.dagger.hilt.android") version "2.51.1" apply false
-    id ("dagger.hilt.android.plugin")
-    id("kotlin-parcelize")
-    id("com.google.devtools.ksp")
 }
 
 android {
-    namespace = "com.example.feature.profile"
+    namespace = "com.example.core.design"
     compileSdk = 35
 
     defaultConfig {
@@ -41,38 +36,21 @@ android {
 
 dependencies {
 
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-
     implementation("io.coil-kt:coil-compose:2.7.0")
-
-    implementation ("com.yandex.android:authsdk:3.1.3")
-
-    implementation("androidx.compose.material3:material3:1.3.2")
-
-
-    val nav_version = "2.8.3"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("com.google.dagger:hilt-android:2.51.1")
-
-    ksp("com.google.dagger:hilt-compiler:2.51.1")
-
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-    implementation ("androidx.appcompat:appcompat:1.3.1")
     implementation("androidx.compose.material:material:1.8.0")
 
-    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
 
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.ui.graphics.android)
+    implementation(libs.androidx.material3.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-    implementation(project(":core:domain"))
-    implementation(project(":core:models"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:design"))
 }

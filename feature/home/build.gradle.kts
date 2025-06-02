@@ -84,5 +84,6 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:models"))
     implementation(project(":core:utils"))
+    implementation(project(":core:design"))
 
 }

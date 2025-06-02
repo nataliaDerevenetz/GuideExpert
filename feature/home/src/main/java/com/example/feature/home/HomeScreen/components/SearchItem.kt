@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.core.models.Excursion
-import com.example.core.utils.ui.NetworkImage
-import com.example.core.utils.ui.scaleEffectClickable
+import com.example.core.design.components.NetworkImage
+import com.example.core.design.components.scaleEffectClickable
 import com.example.feature.home.HomeScreen.SearchEvent
 import com.example.feature.home.HomeScreen.SearchStateScope
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -115,12 +115,12 @@ private fun ExcursionImageSearch(excursion: Excursion) {
                 .heightIn(min = 100.dp, max = 200.dp)
                 .fillMaxWidth()
         ) { page ->
-                NetworkImage(
-                    contentDescription = "",
-                    url = excursion.images[page].url,
-                    width = 350,
-                    height = 450
-                )
+            com.example.core.design.components.NetworkImage(
+                contentDescription = "",
+                url = excursion.images[page].url,
+                width = 350,
+                height = 450
+            )
         }
     }
 }

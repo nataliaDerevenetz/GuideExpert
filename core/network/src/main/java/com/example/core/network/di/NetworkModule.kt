@@ -1,0 +1,122 @@
+package com.example.core.network.di
+
+import com.example.core.domain.repository.SessionManager
+import com.example.core.network.services.DataSourceService
+import com.example.core.network.services.ExcursionAuthService
+import com.example.core.network.services.ExcursionService
+import com.example.core.network.services.ProfileService
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+
+    @Provides
+    fun providesLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+    }
+
+    @Provides
+    @NoAuth
+    fun provideOkHttpClientNoAuth(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+        val okHttpClient = OkHttpClient().newBuilder()
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(25, TimeUnit.SECONDS)
+
+        okHttpClient.addInterceptor { chain ->
+            val newRequest = chain.request().newBuilder()
+                .addHeader("User-Agent","GuideExpert")
+                .build()
+            chain.proceed(newRequest)
+        }
+        okHttpClient.addInterceptor(loggingInterceptor)
+        okHttpClient.build()
+        return okHttpClient.build()
+    }
+
+    @Provides
+    @Singleton
+    @NoAuth
+    fun provideRetrofitNoAuth(@NoAuth okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(com.example.core.utils.Constant.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideExcursionService(@NoAuth retrofit: Retrofit): ExcursionService {
+        return retrofit.create(ExcursionService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataSourceService(@NoAuth retrofit: Retrofit): DataSourceService {
+        return retrofit.create(DataSourceService::class.java)
+    }
+
+    //------------
+    //------------
+    //------------
+
+    @Provides
+    @Auth
+    fun provideOkHttpClientAuth(loggingInterceptor: HttpLoggingInterceptor, sessionManager: SessionManager): OkHttpClient {
+        val okHttpClient = OkHttpClient().newBuilder()
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(25, TimeUnit.SECONDS)
+
+        okHttpClient.addInterceptor { chain ->
+            val newRequest = chain.request().newBuilder()
+            val token = runBlocking {
+                sessionManager.getAuthToken().first()
+            }
+            newRequest.addHeader("Authorization", "Bearer $token")
+            newRequest.addHeader("User-Agent","GuideExpert")
+            chain.proceed(newRequest.build())
+        }
+        okHttpClient.addInterceptor(loggingInterceptor)
+        okHttpClient.build()
+        return okHttpClient.build()
+    }
+
+    @Provides
+    @Singleton
+    @Auth
+    fun provideRetrofitAuth(@Auth okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(com.example.core.utils.Constant.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+     @Provides
+     @Singleton
+     fun provideUserService(@Auth retrofit: Retrofit): ProfileService {
+         return retrofit.create(ProfileService::class.java)
+     }
+
+    @Provides
+    @Singleton
+    fun provideExcursionAuthService(@Auth retrofit: Retrofit): ExcursionAuthService {
+        return retrofit.create(ExcursionAuthService::class.java)
+    }
+}

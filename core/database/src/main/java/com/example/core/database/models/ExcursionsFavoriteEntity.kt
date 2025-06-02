@@ -1,0 +1,19 @@
+package com.example.core.database.models
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import com.example.core.models.Image
+
+@Entity
+data class ExcursionsFavoriteEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
+    @ColumnInfo val title: String,
+    @ColumnInfo val description: String,
+    @ColumnInfo val timestamp: Int,
+    @Ignore var images: List<Image>
+){
+    constructor(id: Int, title: String, description: String, timestamp: Int) : this(id, title, description, timestamp, listOf())
+}

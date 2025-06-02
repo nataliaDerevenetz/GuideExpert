@@ -12,7 +12,7 @@ class BookingExcursionUseCaseImpl @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val excursionsRepository: ExcursionsRepository
 ): BookingExcursionUseCase {
-    override suspend operator fun invoke(count: String, email: String, phone: String, comments:String, date: String,time:String, excursionId:Int): Flow<com.example.core.models.UIResources<com.example.core.models.MessageResponse>> {
+    override suspend operator fun invoke(count: String, email: String, phone: String, comments:String, date: String,time:String, excursionId:Int): Flow<UIResources<MessageResponse>> {
         val profile = profileRepository.profileFlow.value
         return excursionsRepository.bookingExcursion(count,email,phone,comments,date,time,excursionId,profile)
     }

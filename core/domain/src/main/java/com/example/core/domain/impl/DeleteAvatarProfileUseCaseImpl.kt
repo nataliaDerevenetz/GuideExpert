@@ -10,7 +10,7 @@ import javax.inject.Inject
 class DeleteAvatarProfileUseCaseImpl @Inject constructor(
     private val profileRepository: ProfileRepository
 ): DeleteAvatarProfileUseCase {
-    override suspend operator fun invoke(): Flow<com.example.core.models.UIResources<com.example.core.models.MessageResponse>> {
+    override suspend operator fun invoke(): Flow<UIResources<MessageResponse>> {
         return profileRepository.removeAvatarProfile()
     }
 }

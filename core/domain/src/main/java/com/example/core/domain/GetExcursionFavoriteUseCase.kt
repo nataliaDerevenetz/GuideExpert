@@ -1,8 +1,9 @@
 package com.example.core.domain
 
 import com.example.core.models.Excursion
+import com.example.core.models.UIResources
 import kotlinx.coroutines.flow.Flow
 
 interface GetExcursionFavoriteUseCase {
-    operator fun invoke(): Flow<List<com.example.core.models.Excursion>>
+    suspend operator fun invoke(): Flow<UIResources<List<Excursion>?>>
 }

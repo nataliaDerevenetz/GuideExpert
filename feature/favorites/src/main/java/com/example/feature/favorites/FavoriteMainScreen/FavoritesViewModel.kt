@@ -3,6 +3,12 @@ package com.example.feature.favorites.FavoriteMainScreen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.domain.DeleteFavoriteExcursionUseCase
+import com.example.core.domain.GetExcursionFavoriteUseCase
+import com.example.core.domain.RestoreFavoriteExcursionUseCase
+import com.example.core.domain.SetFavoriteExcursionUseCase
+import com.example.core.domain.repository.ExcursionsRepository
+import com.example.core.domain.repository.ProfileRepository
 import com.example.core.models.Excursion
 import com.example.core.models.SnackbarEffect
 import com.example.core.models.UIResources
@@ -91,12 +97,12 @@ sealed interface ExcursionsFavoriteUiEvent {
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    val loadExcursionFavoriteUseCase: com.example.core.domain.LoadExcursionFavoriteUseCase,
-    val getExcursionFavoriteUseCase: com.example.core.domain.GetExcursionFavoriteUseCase,
-    val setFavoriteExcursionUseCase: com.example.core.domain.SetFavoriteExcursionUseCase,
-    val deleteFavoriteExcursionUseCase: com.example.core.domain.DeleteFavoriteExcursionUseCase,
-    val restoreFavoriteExcursionUseCase: com.example.core.domain.RestoreFavoriteExcursionUseCase,
-    private val profileRepository: com.example.core.domain.repository.ProfileRepository,
+    val getExcursionFavoriteUseCase: GetExcursionFavoriteUseCase,
+    val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
+    val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase,
+    val restoreFavoriteExcursionUseCase: RestoreFavoriteExcursionUseCase,
+    private val profileRepository: ProfileRepository,
+    private val excursionsRepository: ExcursionsRepository,
     ) : ViewModel() {
 
     private val _excursions = MutableStateFlow(emptyList<Excursion>())
@@ -154,7 +160,7 @@ class FavoritesViewModel @Inject constructor(
         profileFlow.onEach { if (it == null || it.id ==0)  handleEvent(ExcursionsFavoriteUiEvent.OnLoadFavoritesUIStateSetIdle)}
             .filter { it != null && it.id !=0 }
             .flatMapLatest {
-                loadExcursionFavoriteUseCase()
+                getExcursionFavoriteUseCase()
             }.flowOn(Dispatchers.IO).collectLatest { resources ->
             when(resources) {
                 is UIResources.Success -> withContext(Dispatchers.Main){
@@ -277,7 +283,7 @@ class FavoritesViewModel @Inject constructor(
             profileFlow.filter { it != null && it.id !=0 }
                 .distinctUntilChanged()
                 .flatMapLatest {
-                    getExcursionFavoriteUseCase()
+                    excursionsRepository.getExcursionFavoriteFlow()
                 }.flowOn(Dispatchers.IO).collect { excursions: List<Excursion> ->
                 _excursions.update { excursions }
             }

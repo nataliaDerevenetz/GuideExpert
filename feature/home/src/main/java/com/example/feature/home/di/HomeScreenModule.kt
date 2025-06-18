@@ -11,8 +11,6 @@ import com.example.core.domain.GetFiltersCategoriesUseCase
 import com.example.core.domain.GetFiltersDurationUseCase
 import com.example.core.domain.GetFiltersGroupsUseCase
 import com.example.core.domain.GetFiltersSortUseCase
-import com.example.core.domain.GetImageExcursionUseCase
-import com.example.core.domain.GetImagesExcursionDataUseCase
 import com.example.core.domain.GetSortDefaultUseCase
 import com.example.core.domain.SetFavoriteExcursionUseCase
 import com.example.core.domain.impl.BookingExcursionUseCaseImpl
@@ -26,8 +24,6 @@ import com.example.core.domain.impl.GetFiltersCategoriesUseCaseImpl
 import com.example.core.domain.impl.GetFiltersDurationUseCaseImpl
 import com.example.core.domain.impl.GetFiltersGroupsUseCaseImpl
 import com.example.core.domain.impl.GetFiltersSortUseCaseImpl
-import com.example.core.domain.impl.GetImageExcursionUseCaseImpl
-import com.example.core.domain.impl.GetImagesExcursionDataUseCaseImpl
 import com.example.core.domain.impl.GetSortDefaultUseCaseImpl
 import com.example.core.domain.impl.SetFavoriteExcursionUseCaseImpl
 import dagger.Binds
@@ -96,17 +92,7 @@ abstract class HomeScreenModule {
     abstract fun bindGetConfigUseCase(
         getGetConfigUseCaseImpl: GetConfigUseCaseImpl
     ) : GetConfigUseCase
-
-    @Binds
-    abstract fun bindGetImagesExcursionDataUseCase(
-        getImagesExcursionDataUseCaseImpl: GetImagesExcursionDataUseCaseImpl
-    ) : GetImagesExcursionDataUseCase
-
-    @Binds
-    abstract fun bindGetImageExcursionUseCase(
-        getImageExcursionUseCaseImpl: GetImageExcursionUseCaseImpl
-    ) : GetImageExcursionUseCase
-
+    
 
     @ViewModelScoped
     @Binds

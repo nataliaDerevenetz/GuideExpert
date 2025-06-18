@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.domain.DeleteFavoriteExcursionUseCase
 import com.example.core.domain.GetExcursionDetailUseCase
 import com.example.core.domain.GetFiltersGroupsUseCase
-import com.example.core.domain.GetImagesExcursionDataUseCase
 import com.example.core.domain.SetFavoriteExcursionUseCase
 import com.example.core.domain.repository.ExcursionsRepository
 import com.example.core.domain.repository.ProfileRepository
@@ -60,7 +59,6 @@ sealed interface ExcursionDetailUiEvent {
 class ExcursionDetailViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getExcursionDetailUseCase: GetExcursionDetailUseCase,
-    getImagesExcursionDataUseCase: GetImagesExcursionDataUseCase,
     val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
     profileRepository: ProfileRepository,
     excursionsRepository: ExcursionsRepository,
@@ -78,7 +76,7 @@ class ExcursionDetailViewModel @Inject constructor(
 
     val excursion: Flow<ExcursionData?> = excursionsRepository.getExcursionData(excursionDetail.excursion.id)
 
-    val images: Flow<List<Image>> = getImagesExcursionDataUseCase(excursionDetail.excursion.id)
+    val images: Flow<List<Image>> = excursionsRepository.getImagesExcursion(excursionDetail.excursion.id)
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()

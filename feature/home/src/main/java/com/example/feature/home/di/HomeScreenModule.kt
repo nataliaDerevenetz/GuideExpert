@@ -5,7 +5,6 @@ import com.example.core.domain.DeleteFavoriteExcursionUseCase
 import com.example.core.domain.GetConfigUseCase
 import com.example.core.domain.GetExcursionByFiltersUseCase
 import com.example.core.domain.GetExcursionByQueryUseCase
-import com.example.core.domain.GetExcursionDataUseCase
 import com.example.core.domain.GetExcursionDetailUseCase
 import com.example.core.domain.GetFiltersBarUseCase
 import com.example.core.domain.GetFiltersCategoriesUseCase
@@ -21,7 +20,6 @@ import com.example.core.domain.impl.DeleteFavoriteExcursionUseCaseImpl
 import com.example.core.domain.impl.GetConfigUseCaseImpl
 import com.example.core.domain.impl.GetExcursionByFiltersUseCaseImpl
 import com.example.core.domain.impl.GetExcursionByQueryUseCaseImpl
-import com.example.core.domain.impl.GetExcursionDataUseCaseImpl
 import com.example.core.domain.impl.GetExcursionDetailUseCaseImpl
 import com.example.core.domain.impl.GetFiltersBarUseCaseImpl
 import com.example.core.domain.impl.GetFiltersCategoriesUseCaseImpl
@@ -98,11 +96,6 @@ abstract class HomeScreenModule {
     abstract fun bindGetConfigUseCase(
         getGetConfigUseCaseImpl: GetConfigUseCaseImpl
     ) : GetConfigUseCase
-
-    @Binds
-    abstract fun bindGetExcursionDataUseCase(
-        getExcursionDataUseCaseImpl: GetExcursionDataUseCaseImpl
-    ) : GetExcursionDataUseCase
 
     @Binds
     abstract fun bindGetImagesExcursionDataUseCase(

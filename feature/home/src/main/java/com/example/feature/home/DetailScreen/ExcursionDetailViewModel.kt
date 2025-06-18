@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.DeleteFavoriteExcursionUseCase
-import com.example.core.domain.GetExcursionDataUseCase
 import com.example.core.domain.GetExcursionDetailUseCase
 import com.example.core.domain.GetFiltersGroupsUseCase
 import com.example.core.domain.GetImagesExcursionDataUseCase
@@ -61,7 +60,6 @@ sealed interface ExcursionDetailUiEvent {
 class ExcursionDetailViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getExcursionDetailUseCase: GetExcursionDetailUseCase,
-    getExcursionDataUseCase: GetExcursionDataUseCase,
     getImagesExcursionDataUseCase: GetImagesExcursionDataUseCase,
     val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
     profileRepository: ProfileRepository,
@@ -78,7 +76,7 @@ class ExcursionDetailViewModel @Inject constructor(
     private val _stateView = MutableStateFlow<UIState>(UIState())
     val stateView: StateFlow<UIState> = _stateView.asStateFlow()
 
-    val excursion: Flow<ExcursionData?> = getExcursionDataUseCase(excursionDetail.excursion.id)
+    val excursion: Flow<ExcursionData?> = excursionsRepository.getExcursionData(excursionDetail.excursion.id)
 
     val images: Flow<List<Image>> = getImagesExcursionDataUseCase(excursionDetail.excursion.id)
 

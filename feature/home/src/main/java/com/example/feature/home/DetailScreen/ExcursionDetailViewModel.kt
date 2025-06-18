@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.DeleteFavoriteExcursionUseCase
 import com.example.core.domain.GetExcursionDetailUseCase
-import com.example.core.domain.GetFiltersGroupsUseCase
 import com.example.core.domain.SetFavoriteExcursionUseCase
+import com.example.core.domain.repository.DataProviderRepository
 import com.example.core.domain.repository.ExcursionsRepository
 import com.example.core.domain.repository.ProfileRepository
 import com.example.core.models.Excursion
@@ -59,9 +59,9 @@ sealed interface ExcursionDetailUiEvent {
 class ExcursionDetailViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getExcursionDetailUseCase: GetExcursionDetailUseCase,
-    val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
     profileRepository: ProfileRepository,
     excursionsRepository: ExcursionsRepository,
+    private val dataProviderRepository: DataProviderRepository,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
@@ -91,9 +91,11 @@ class ExcursionDetailViewModel @Inject constructor(
     )
     val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState> = _stateDeleteFavoriteExcursion.asStateFlow()
 
-    fun getFiltersGroups():List<Filter> {
-        return getFiltersGroupsUseCase()
-    }
+    val  getFiltersGroups:List<Filter>
+        get() {
+            return dataProviderRepository.getFiltersGroups()
+        }
+
 
     suspend fun sendEffectFlow(message: String, actionLabel: String? = null) {
         _effectChannel.send(SnackbarEffect.ShowSnackbar(message))

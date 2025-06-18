@@ -8,13 +8,8 @@ import androidx.paging.cachedIn
 import com.example.core.domain.DeleteFavoriteExcursionUseCase
 import com.example.core.domain.GetConfigUseCase
 import com.example.core.domain.GetExcursionByFiltersUseCase
-import com.example.core.domain.GetFiltersBarUseCase
-import com.example.core.domain.GetFiltersCategoriesUseCase
-import com.example.core.domain.GetFiltersDurationUseCase
-import com.example.core.domain.GetFiltersGroupsUseCase
-import com.example.core.domain.GetFiltersSortUseCase
-import com.example.core.domain.GetSortDefaultUseCase
 import com.example.core.domain.SetFavoriteExcursionUseCase
+import com.example.core.domain.repository.DataProviderRepository
 import com.example.core.domain.repository.ExcursionsRepository
 import com.example.core.domain.repository.ProfileRepository
 import com.example.core.models.Config
@@ -88,15 +83,10 @@ data class RestoreFavoriteExcursionUIState(
 class HomeViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     val getExcursionByFiltersUseCase: GetExcursionByFiltersUseCase,
-    val getFiltersBarUseCase: GetFiltersBarUseCase,
-    val getFiltersDurationUseCase: GetFiltersDurationUseCase,
-    val getFiltersSortUseCase: GetFiltersSortUseCase,
-    val getFiltersGroupsUseCase: GetFiltersGroupsUseCase,
-    val getFiltersCategoriesUseCase: GetFiltersCategoriesUseCase,
-    getSortDefaultUseCase: GetSortDefaultUseCase,
     val getConfigUseCase: GetConfigUseCase,
     profileRepository: ProfileRepository,
     excursionsRepository: ExcursionsRepository,
+    private val dataProviderRepository: DataProviderRepository,
     val setFavoriteExcursionUseCase: SetFavoriteExcursionUseCase,
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
@@ -107,7 +97,7 @@ class HomeViewModel @Inject constructor(
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
 
-    val sortDefault = getSortDefaultUseCase()
+    val sortDefault =  dataProviderRepository.getSortDefault()
     private val _sortState = MutableStateFlow(sortDefault)
     val sortState: StateFlow<Int> = _sortState
 
@@ -159,25 +149,30 @@ class HomeViewModel @Inject constructor(
         _stateSetFavoriteExcursion.update { it.copy(contentState = SetFavoriteExcursionState.Idle) }
     }
 
-    fun getFiltersBar():List<Filter> {
-        return getFiltersBarUseCase()
-    }
+    val getFiltersBar:List<Filter>
+        get() {
+            return dataProviderRepository.getFiltersBar()
+        }
 
-    fun getFiltersDuration():List<Filter> {
-        return getFiltersDurationUseCase()
-    }
+    val getFiltersDuration:List<Filter>
+        get() {
+            return dataProviderRepository.getFiltersDuration()
+        }
 
-    fun getFiltersSort():List<Filter> {
-        return getFiltersSortUseCase()
-    }
+    val getFiltersSort:List<Filter>
+        get() {
+            return dataProviderRepository.getFiltersSort()
+        }
 
-    fun getFiltersGroups():List<Filter> {
-        return getFiltersGroupsUseCase()
-    }
+    val getFiltersGroups:List<Filter>
+        get() {
+            return dataProviderRepository.getFiltersGroups()
+        }
 
-    fun getFiltersCategories():List<Filter> {
-        return getFiltersCategoriesUseCase()
-    }
+    val getFiltersCategories:List<Filter>
+        get() {
+            return dataProviderRepository.getFiltersCategories()
+        }
 
     private suspend fun loadConfig() {
        getConfigUseCase().flowOn(Dispatchers.IO).collectLatest { resource ->
@@ -192,44 +187,44 @@ class HomeViewModel @Inject constructor(
 
     private fun changedFilters() {
         val filters = Filters(sortState.value,
-            getFiltersCategories().filter { it.enabled.value}.map{it.id},
-            getFiltersDuration().filter { it.enabled.value}.map{it.id},
-            getFiltersGroups().filter { it.enabled.value}.map{it.id})
+            getFiltersCategories.filter { it.enabled.value}.map{it.id},
+            getFiltersDuration.filter { it.enabled.value}.map{it.id},
+            getFiltersGroups.filter { it.enabled.value}.map{it.id})
         _changeFilter.update {filters}
     }
 
 
     fun resetFilters() {
         _sortState.value = sortDefault
-        val filtersBar = getFiltersBar()
+        val filtersBar = getFiltersBar
         filtersBar.map { it.enabled.value = false }
 
-        val filtersCategories = getFiltersCategories()
+        val filtersCategories = getFiltersCategories
         filtersCategories.map { it.enabled.value = false }
 
-        val filtersGroups = getFiltersGroups()
+        val filtersGroups = getFiltersGroups
         filtersGroups.map { it.enabled.value = false }
 
-        val filtersDuration = getFiltersDuration()
+        val filtersDuration = getFiltersDuration
         filtersDuration.map { it.enabled.value = false }
 
-        val filtersSort = getFiltersSort()
+        val filtersSort = getFiltersSort
         filtersSort.map { it.enabled.value = false }
     }
 
     fun isChangedFilters(): Boolean {
         if (oldFilters.sort != sortState.value) return true
-        if (oldFilters.categories != getFiltersCategories().filter { it.enabled.value}.map{it.id}) return true
-        if (oldFilters.duration != getFiltersDuration().filter { it.enabled.value}.map{it.id}) return true
-        if (oldFilters.group != getFiltersGroups().filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.categories != getFiltersCategories.filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.duration != getFiltersDuration.filter { it.enabled.value}.map{it.id}) return true
+        if (oldFilters.group != getFiltersGroups.filter { it.enabled.value}.map{it.id}) return true
         return false
     }
 
     fun isChangedDefaultFilters(): Boolean {
         if (defaultFilters.sort != sortState.value) return true
-        if (defaultFilters.categories != getFiltersCategories().filter { it.enabled.value}.map{it.id}) return true
-        if (defaultFilters.duration != getFiltersDuration().filter { it.enabled.value}.map{it.id}) return true
-        if (defaultFilters.group != getFiltersGroups().filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.categories != getFiltersCategories.filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.duration != getFiltersDuration.filter { it.enabled.value}.map{it.id}) return true
+        if (defaultFilters.group != getFiltersGroups.filter { it.enabled.value}.map{it.id}) return true
         return false
     }
 

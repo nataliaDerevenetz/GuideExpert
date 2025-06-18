@@ -190,7 +190,7 @@ fun ExcursionDetailScreen(
         excursionData = viewModel.excursion,
         excursionImages = viewModel.images,
         onNavigateToBack = onNavigateToBack,
-        getFiltersGroups = viewModel.getFiltersGroups(),
+        getFiltersGroups = viewModel.getFiltersGroups,
         stateView = viewModel.stateView,
         navigateToAlbum = navigateToAlbum,
         navigateToImage = navigateToImage,

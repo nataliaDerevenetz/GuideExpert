@@ -10,6 +10,10 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
 
+
+   // id("com.android.application")
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -76,6 +80,12 @@ composeCompiler {
 
 dependencies {
 
+    implementation ("com.google.firebase:firebase-messaging-directboot:20.2.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics")
+
+
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
 
     implementation ("androidx.exifinterface:exifinterface:1.4.1")
@@ -91,6 +101,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-paging:$room_version")

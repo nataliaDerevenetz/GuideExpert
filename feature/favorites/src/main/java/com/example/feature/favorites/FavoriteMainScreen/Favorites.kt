@@ -19,6 +19,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -143,6 +145,18 @@ fun Favorites(snackbarHostState: SnackbarHostState,
         }
         is LoadFavoritesState.Loading -> { scopeState.FavoritesDataLoading(innerPadding) }
     }
+
+    LaunchedEffect(true) {
+   //     onF()
+    }
+    DisposableEffect(true) {
+        onDispose {
+           // onF()
+            //  lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+
 }
 
 @Composable

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "170653381562",
+    "project_id": "guide-expert-8b439",
+    "storage_bucket": "guide-expert-8b439.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170653381562:android:334404b3cecbc31acc6383",
+        "android_client_info": {
+          "package_name": "com.example.GuideExpert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAi1ocyQPk61ZwKgyXlMumALaFAIgzdyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

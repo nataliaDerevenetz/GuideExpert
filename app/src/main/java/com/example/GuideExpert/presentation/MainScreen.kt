@@ -1,6 +1,7 @@
 package com.example.GuideExpert.presentation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,8 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,9 +35,18 @@ private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun MainScreen(appState: AppState,viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(appState: AppState,time:String?,viewModel: MainViewModel = hiltViewModel()) {
 
     val currentDestination = appState.currentDestination
+//Log.d("III",currentDestination?.route.toString() )
+    if (viewModel.intentData.isEmpty() && currentDestination?.route != null && !time.isNullOrEmpty()) {
+
+        // if (currentDestination?.route != null && !appState.timeState.value.isNullOrEmpty()) {
+        LaunchedEffect(time) {
+            appState.navigateToTest()
+            viewModel.setNotificationData(time)
+        }
+    }
     val snackbarHostState = remember { SnackbarHostState() }
 
     NavigationSuiteScaffold(
@@ -72,6 +84,7 @@ fun MainScreen(appState: AppState,viewModel: MainViewModel = hiltViewModel()) {
             }
         }
     }
+
 }
 
 

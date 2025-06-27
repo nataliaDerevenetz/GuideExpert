@@ -5,11 +5,16 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.example.GuideExpert.presentation.AppState
+import com.example.feature.favorites.FavoritesBaseRoute
 import com.example.feature.home.homeScreen
 import com.example.feature.home.navigateToAlbum
 import com.example.feature.home.navigateToBooking
@@ -32,6 +37,11 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     val navController = appState.navController
+
+
+   // var f by remember { mutableStateOf(false) }
+   // val startDestination = if(f) HomeBaseRoute as Any else FavoritesBaseRoute
+
     NavHost(
         navController = navController,
         startDestination = HomeBaseRoute,
@@ -73,8 +83,11 @@ fun AppNavHost(
             onNavigateToYandex = navController::navigateToYandex,
             onNavigateToBack = {navController.navigateToHome(navOptions {
                 popUpTo(navController.graph.findStartDestination().id) {
+                   saveState = true
+               }
+               /* popUpTo(TopLevelDestination.HOME.route) {
                     saveState = true
-                }
+                }*/
                 launchSingleTop = true
                 restoreState = true
             })},

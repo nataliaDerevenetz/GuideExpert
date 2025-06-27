@@ -1,8 +1,12 @@
 package com.example.GuideExpert.presentation
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.example.core.domain.GetExcursionsFavoriteIdUseCase
 import com.example.core.domain.GetProfileUseCase
 import com.example.core.domain.repository.ProfileRepository
@@ -42,6 +46,18 @@ class MainViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val profileFlow = profileRepository.profileFlow
+
+
+    @OptIn(SavedStateHandleSaveableApi::class)
+    var intentData: String by savedStateHandle.saveable {
+        mutableStateOf("")
+    }
+
+    fun setNotificationData(query: String) {
+        Snapshot.withMutableSnapshot {
+            intentData = query
+        }
+    }
 
     private suspend fun getProfileInfo() {
         combine(

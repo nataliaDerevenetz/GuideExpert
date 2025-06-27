@@ -1,5 +1,7 @@
 package com.example.GuideExpert.presentation.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -16,6 +18,7 @@ import com.example.feature.home.HomeBaseRoute
 import com.example.feature.home.HomeRoute
 import kotlin.reflect.KClass
 
+@RequiresApi(Build.VERSION_CODES.P)
 enum class TopLevelDestination(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,

@@ -1,11 +1,15 @@
 package com.example.GuideExpert.presentation
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -19,14 +23,17 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun rememberAppState(
+  //  time: String?,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
 ): AppState {
     return remember(
+    //    time,
         navController,
         coroutineScope,
     ) {
         AppState(
+        //    time = time,
             navController = navController,
             coroutineScope = coroutineScope,
         )
@@ -34,6 +41,7 @@ fun rememberAppState(
 }
 @Stable
 class AppState(
+  //  var time:String?,
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
 ) {
@@ -47,6 +55,18 @@ class AppState(
 
     val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.entries
 
+    fun navigateToTest() {
+        navController.navigateToFavorites(navOptions {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        })
+        //timeState.value = null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
     fun navigateToTopLevelDestination(topLevelDestination: TopLevelDestination) {
         val topLevelNavOptions = navOptions {
             popUpTo(navController.graph.findStartDestination().id) {
@@ -61,6 +81,8 @@ class AppState(
             TopLevelDestination.PROFILE -> navController.navigateToProfile(topLevelNavOptions)
         }
     }
+
+  //  var timeState = mutableStateOf(time)
 
     val bottomBarState = mutableStateOf(true)
 

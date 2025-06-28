@@ -134,10 +134,8 @@ dependencies {
 
     val nav_version = "2.8.3"
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    //kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-   // ksp("com.google.dagger:hilt-android-compiler:2.51.1")
 
+    implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-compiler:2.51.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
@@ -176,5 +174,6 @@ dependencies {
     implementation(project(":core:utils"))
     implementation(project(":core:design"))
     implementation(project(":core:data"))
+    implementation(project(":core:notifications"))
 
 }

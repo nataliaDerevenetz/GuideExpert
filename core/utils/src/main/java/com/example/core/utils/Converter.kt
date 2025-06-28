@@ -1,8 +1,10 @@
 package com.example.core.utils
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.core.os.bundleOf
 import okhttp3.internal.UTC
 import java.time.LocalDate
 
@@ -18,3 +20,5 @@ fun convertLocalDateToTimestampUTC(localDate: LocalDate): Long {
     val instant = zonedDateTime.toInstant()
     return instant.toEpochMilli()
 }
+
+fun Map<String, Any?>.toBundle(): Bundle = bundleOf(*this.toList().toTypedArray())

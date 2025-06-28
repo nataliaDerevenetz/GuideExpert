@@ -21,14 +21,18 @@ import com.example.GuideExpert.presentation.AppState
 import com.example.GuideExpert.presentation.MainScreen
 import com.example.GuideExpert.presentation.rememberAppState
 import com.example.core.design.theme.GuideExpertTheme
+import com.example.notifications.Notifier
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var appState: AppState
 
+  //  @Inject
+  //  lateinit var notifier: Notifier
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,13 +54,17 @@ class MainActivity : ComponentActivity() {
         })
 
         val time: String? = intent?.extras?.getString("time")
+        intent?.extras?.let {
+            //notifier.createNotificationFromBundle(it)
+        }
+
       //  intent.extras?.clear()
         Log.d("PUSH", "on create time : $time")
         enableEdgeToEdge()
         setContent {
-            appState = rememberAppState()
+            appState = rememberAppState(time = time)
             GuideExpertTheme(isLightStatusBar = appState.isLightStatusBar.value) {
-                MainScreen(appState,time)
+                MainScreen(appState)
             }
 
             OnLifecycleEvent { owner, event ->

@@ -23,17 +23,17 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun rememberAppState(
-  //  time: String?,
+    time: String?,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
 ): AppState {
     return remember(
-    //    time,
+        time,
         navController,
         coroutineScope,
     ) {
         AppState(
-        //    time = time,
+            time = time,
             navController = navController,
             coroutineScope = coroutineScope,
         )
@@ -41,7 +41,7 @@ fun rememberAppState(
 }
 @Stable
 class AppState(
-  //  var time:String?,
+    var time:String?,
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
 ) {
@@ -63,7 +63,6 @@ class AppState(
             launchSingleTop = true
             restoreState = true
         })
-        //timeState.value = null
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -82,7 +81,7 @@ class AppState(
         }
     }
 
-  //  var timeState = mutableStateOf(time)
+    var timeState = mutableStateOf(time)
 
     val bottomBarState = mutableStateOf(true)
 

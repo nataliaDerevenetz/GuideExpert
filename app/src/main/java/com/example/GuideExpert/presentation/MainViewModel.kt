@@ -49,11 +49,11 @@ class MainViewModel @Inject constructor(
 
 
     @OptIn(SavedStateHandleSaveableApi::class)
-    var intentData: String by savedStateHandle.saveable {
-        mutableStateOf("")
+    var intentData: String? by savedStateHandle.saveable {
+        mutableStateOf(null)
     }
 
-    fun setNotificationData(query: String) {
+    fun setNotificationData(query: String?) {
         Snapshot.withMutableSnapshot {
             intentData = query
         }

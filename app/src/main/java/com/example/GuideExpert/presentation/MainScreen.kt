@@ -35,16 +35,15 @@ private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun MainScreen(appState: AppState,time:String?,viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(appState: AppState,viewModel: MainViewModel = hiltViewModel()) {
 
     val currentDestination = appState.currentDestination
 //Log.d("III",currentDestination?.route.toString() )
-    if (viewModel.intentData.isEmpty() && currentDestination?.route != null && !time.isNullOrEmpty()) {
-
-        // if (currentDestination?.route != null && !appState.timeState.value.isNullOrEmpty()) {
-        LaunchedEffect(time) {
+   // if (viewModel.intentData.isEmpty() && currentDestination?.route != null && !time.isNullOrEmpty()) {
+    if (viewModel.intentData.isNullOrEmpty() && currentDestination?.route != null && !appState.timeState.value.isNullOrEmpty()) {
+        LaunchedEffect(appState.timeState.value) {
             appState.navigateToTest()
-            viewModel.setNotificationData(time)
+            viewModel.setNotificationData(appState.timeState.value)
         }
     }
     val snackbarHostState = remember { SnackbarHostState() }

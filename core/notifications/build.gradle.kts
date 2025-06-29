@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 
     id("com.google.dagger.hilt.android") version "2.56.1" apply false
+    id ("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
 }
 
@@ -38,7 +39,13 @@ android {
 dependencies {
 
     implementation("com.google.dagger:hilt-android:2.56.1")
+    implementation(libs.work.runtime.ktx)
     ksp("com.google.dagger:hilt-compiler:2.56.1")
+
+    implementation ("com.google.firebase:firebase-messaging-directboot:20.2.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+    implementation("com.google.firebase:firebase-messaging")
+
 
 
     implementation(libs.androidx.core.ktx)

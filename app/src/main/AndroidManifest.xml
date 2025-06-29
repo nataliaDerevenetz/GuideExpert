@@ -47,7 +47,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name="com.example.notifications.MyFirebaseMessagingService"
             android:exported="false"
             android:directBootAware="true">
             <intent-filter>

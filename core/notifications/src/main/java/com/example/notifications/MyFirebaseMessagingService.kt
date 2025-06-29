@@ -1,5 +1,6 @@
-package com.example.GuideExpert
+package com.example.notifications
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -13,23 +14,33 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.example.core.utils.toBundle
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class MyFirebaseMessagingService : FirebaseMessagingService() {
+@AndroidEntryPoint
+//class MyFirebaseMessagingService @Inject constructor(
+//     private val notifier: Notifier,
+//) : FirebaseMessagingService() {
+
+class MyFirebaseMessagingService  : FirebaseMessagingService() {
+    @Inject
+    lateinit var notifier: Notifier
 
     // [START receive_message]
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: ${remoteMessage.from}")
+        Log.d(TAG, "From service: ${remoteMessage.from}")
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
+            notifier.postNotification(remoteMessage.data)
           //  val bundle =remoteMessage.data.toBundle()
             // Check if data needs to be processed by long running job
             if (needsToBeScheduled()) {
@@ -82,7 +93,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendNotification(messageBody: String) {
-        val intent = Intent(this, MainActivity::class.java)
+      /*  val intent = Intent(this, MainActivity::class.java)
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val requestCode = System.currentTimeMillis().toInt()//0
         val pendingIntent = PendingIntent.getActivity(
@@ -95,7 +107,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val channelId = "fcm_default_channel"
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+          //  .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("FCM Message")
             .setContentText(messageBody)
             .setAutoCancel(true)
@@ -117,6 +129,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         val notificationId = 0
         notificationManager.notify(notificationId, notificationBuilder.build())
+
+*/
     }
 
     companion object {

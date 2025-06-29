@@ -66,7 +66,6 @@ class MainActivity : ComponentActivity() {
             GuideExpertTheme(isLightStatusBar = appState.isLightStatusBar.value) {
                 MainScreen(appState)
             }
-
             OnLifecycleEvent { owner, event ->
                 when (event) {
                     Lifecycle.Event.ON_RESUME -> {

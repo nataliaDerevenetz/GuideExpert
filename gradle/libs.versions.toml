@@ -28,6 +28,7 @@ uiGraphicsAndroid = "1.8.2"
 material3Android = "1.3.2"
 firebaseMessagingKtx = "24.1.1"
 workRuntimeKtx = "2.10.1"
+workRuntimeKtxVersion = "2.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,6 +69,7 @@ androidx-ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graph
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
 
 
 [plugins]

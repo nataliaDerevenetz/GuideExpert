@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("com.google.dagger.hilt.android") version "2.51.1" apply false
+    id("com.google.dagger.hilt.android") version "2.56.1" apply false
     id("com.google.devtools.ksp")
 }
 
@@ -41,9 +41,9 @@ dependencies {
     val paging_version = "3.3.2"
     implementation("androidx.paging:paging-runtime:$paging_version")
 
-    implementation("com.google.dagger:hilt-android:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.56.1")
 
-    ksp("com.google.dagger:hilt-compiler:2.51.1")
+    ksp("com.google.dagger:hilt-compiler:2.56.1")
 
 
     implementation(libs.androidx.core.ktx)

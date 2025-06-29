@@ -31,8 +31,8 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     private lateinit var appState: AppState
 
-  //  @Inject
-  //  lateinit var notifier: Notifier
+    @Inject
+    lateinit var notifier: Notifier
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-
+      ///  navController.handleDeepLink(intent)
         Log.d("push notification ", " on new intent extras? : ${intent?.extras}")
 
         // notification coming when app in inactive/background, data included in intent extra

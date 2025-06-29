@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
 
-    id("com.google.dagger.hilt.android") version "2.51.1" apply false
+    id("com.google.dagger.hilt.android") version "2.56.1" apply false
     id("com.google.devtools.ksp")
 }
 
@@ -42,8 +42,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
 
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    ksp("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.56.1")
+    ksp("com.google.dagger:hilt-compiler:2.56.1")
 
 
     implementation(libs.androidx.core.ktx)

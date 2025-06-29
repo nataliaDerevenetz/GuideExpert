@@ -38,10 +38,6 @@ fun AppNavHost(
 ) {
     val navController = appState.navController
 
-
-   // var f by remember { mutableStateOf(false) }
-   // val startDestination = if(f) HomeBaseRoute as Any else FavoritesBaseRoute
-
     NavHost(
         navController = navController,
         startDestination = HomeBaseRoute,

@@ -21,9 +21,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-//class MyFirebaseMessagingService @Inject constructor(
-//     private val notifier: Notifier,
-//) : FirebaseMessagingService() {
 
 class MyFirebaseMessagingService  : FirebaseMessagingService() {
     @Inject

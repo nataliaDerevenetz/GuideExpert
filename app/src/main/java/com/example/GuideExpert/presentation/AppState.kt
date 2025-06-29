@@ -19,6 +19,8 @@ import com.example.feature.home.navigateToHome
 import com.example.feature.favorites.navigateToFavorites
 import com.example.feature.profile.navigateToProfile
 import com.example.GuideExpert.presentation.navigation.TopLevelDestination
+import com.example.core.models.Excursion
+import com.example.feature.home.navigateToExcursionDetail
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -56,13 +58,15 @@ class AppState(
     val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.entries
 
     fun navigateToTest() {
-        navController.navigateToFavorites(navOptions {
+      /*  navController.navigateToFavorites(navOptions {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
             }
             launchSingleTop = true
             restoreState = true
-        })
+        })*/
+
+        navController.navigateToExcursionDetail(Excursion(id=1, title = "", description = "", images = listOf()))
     }
 
     @RequiresApi(Build.VERSION_CODES.P)

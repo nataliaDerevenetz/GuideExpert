@@ -48,16 +48,32 @@ class MainActivity : ComponentActivity() {
             val token = task.result
 
             // Log and toast
-         //   val msg = getString("aaa", token)
+            //   val msg = getString("aaa", token)
             Log.d("TOKEN", token)
-            Toast.makeText(baseContext, "msg", Toast.LENGTH_SHORT).show()
+            //  Toast.makeText(baseContext, "msg", Toast.LENGTH_SHORT).show()
         })
 
         val time: String? = intent?.extras?.getString("time")
-        intent?.extras?.let {
-            //notifier.createNotificationFromBundle(it)
+      /*  intent?.extras?.let {
+            val notification = notifier.createNotificationFromBundle(it)
+            Log.d("NOTIFICATION",notification.type.toString() )
+        }*/
+
+        val notification = with(intent?.extras){
+            this?.let {
+                val notification = notifier.createNotificationFromBundle(this)
+                notification
+            }
         }
 
+        notification?.let {
+            Log.d("NOTIFICATION",it.type.toString() )
+        }
+        if (notification == null) {
+            Log.d("NOTIFICATION","NULL" )
+        }
+
+        //val not =
       //  intent.extras?.clear()
         Log.d("PUSH", "on create time : $time")
         enableEdgeToEdge()
@@ -65,15 +81,6 @@ class MainActivity : ComponentActivity() {
             appState = rememberAppState(time = time)
             GuideExpertTheme(isLightStatusBar = appState.isLightStatusBar.value) {
                 MainScreen(appState)
-            }
-            OnLifecycleEvent { owner, event ->
-                when (event) {
-                    Lifecycle.Event.ON_RESUME -> {
-                        Log.d("YYY","RESUME")
-                  //     appState.navigateToTest()
-                    }
-                    else -> { }
-                }
             }
         }
     }
@@ -94,23 +101,5 @@ class MainActivity : ComponentActivity() {
         }
 
 
-}
-
-@Composable
-fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit) {
-    val eventHandler = rememberUpdatedState(onEvent)
-    val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
-
-    DisposableEffect(lifecycleOwner.value) {
-        val lifecycle = lifecycleOwner.value.lifecycle
-        val observer = LifecycleEventObserver { owner, event ->
-            eventHandler.value(owner, event)
-        }
-
-        lifecycle.addObserver(observer)
-        onDispose {
-            lifecycle.removeObserver(observer)
-        }
-    }
 }
 

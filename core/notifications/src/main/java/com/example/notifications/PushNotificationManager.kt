@@ -18,9 +18,11 @@ import androidx.core.app.NotificationCompat
 @Singleton
 internal class PushNotificationManager @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val notificationFactory: NotificationFactory,
 ) : Notifier {
-    override fun createNotificationFromBundle(bundle: Bundle) {
+    override fun createNotificationFromBundle(bundle: Bundle):Notification {
         Log.d("RRR",bundle.getString("time")!!)
+        return notificationFactory.createNotification(bundle)
     }
 
     override fun postNotification(data: Map<String, String>) {
@@ -29,8 +31,7 @@ internal class PushNotificationManager @Inject constructor(
 
     private fun sendNotification(messageBody: String) = with(context) {
         //    val intent = Intent(this, MainActivity::class.java)
-        val intent = Intent(this, context::class.java)
-
+            val intent = Intent(this, context::class.java)
            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
            val requestCode = System.currentTimeMillis().toInt()//0
            val pendingIntent = PendingIntent.getActivity(

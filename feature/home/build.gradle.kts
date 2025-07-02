@@ -85,5 +85,6 @@ dependencies {
     implementation(project(":core:models"))
     implementation(project(":core:utils"))
     implementation(project(":core:design"))
+    implementation(project(":core:notifications"))
 
 }

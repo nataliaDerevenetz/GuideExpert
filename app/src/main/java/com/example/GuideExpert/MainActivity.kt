@@ -11,8 +11,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -73,10 +77,9 @@ class MainActivity : ComponentActivity() {
             Log.d("NOTIFICATION","NULL" )
         }
 
-        //val not =
-      //  intent.extras?.clear()
         Log.d("PUSH", "on create time : $time")
         enableEdgeToEdge()
+        val activity = this
         setContent {
             appState = rememberAppState(time = time)
             GuideExpertTheme(isLightStatusBar = appState.isLightStatusBar.value) {
@@ -88,13 +91,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-      ///  navController.handleDeepLink(intent)
+        appState.navController.handleDeepLink(intent)
         Log.d("push notification ", " on new intent extras? : ${intent?.extras}")
 
         // notification coming when app in inactive/background, data included in intent extra
         val time: String? = intent?.extras?.getString("time")
         time?.let {
-            appState.navigateToTest()
+           appState.navigateToTest()
             Log.d("push notification ", " on new intent count : $time")
         }
 

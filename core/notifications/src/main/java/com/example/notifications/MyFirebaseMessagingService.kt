@@ -33,7 +33,15 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From service: ${remoteMessage.from}")
 
-        // Check if message contains a data payload.
+        Log.d(TAG, "body: ${remoteMessage.notification?.body}")
+
+
+        // remoteMessage.notification?.body
+        if (remoteMessage.data.isEmpty()) {
+            Log.d(TAG, "Message empty")
+        }
+
+            // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 

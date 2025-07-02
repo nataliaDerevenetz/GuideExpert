@@ -2,12 +2,15 @@ package com.example.feature.home
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.example.core.models.Excursion
 import com.example.core.models.Image
@@ -20,6 +23,9 @@ import com.example.feature.home.DetailScreen.ExcursionDetailScreen
 import com.example.feature.home.ExcursionDetail.Companion.typeMap
 import com.example.feature.home.HomeScreen.HomeScreen
 import com.example.feature.home.ImageExcursion.Companion.typeMapImage
+import com.example.notifications.DEEP_LINK_BASE_PATH
+import com.example.notifications.DEEP_LINK_SCHEME_AND_HOST
+import com.example.notifications.DEEP_LINK_URI_PATTERN
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
@@ -82,10 +88,26 @@ fun NavGraphBuilder.homeScreen(
             HomeScreen(snackbarHostState = snackbarHostState,navigateToExcursion = onNavigateToExcursion,navigateToProfileInfo = onNavigateToProfileInfo,innerPadding = innerPadding)
         }
 
-        composable<ExcursionDetail>(typeMap = typeMap) {
+        composable<ExcursionDetail>(typeMap = typeMap,
+        //    deepLinks = listOf(
+        //        navDeepLink<ExcursionDetail>(basePath = "$DEEP_LINK_SCHEME_AND_HOST/excursion")
+        //    )
+
+        ) {
             onChangeVisibleBottomBar(false)
             onSetLightStatusBar(true)
             ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding,onNavigateToProfileInfo,onNavigateToBooking)
+        }
+
+        composable<TestRoute>(
+            deepLinks = listOf(
+                 navDeepLink {
+                    uriPattern = DEEP_LINK_URI_PATTERN
+                },
+            )
+
+        ) {
+            TestScreen()
         }
 
         composable<AlbumExcursion> {
@@ -136,4 +158,11 @@ fun NavController.navigateToImage(imageId: Int,excursionImages: List<Image>,inde
     navigate(route = ImageExcursion(imageId,excursionImages,indexImage)){
         launchSingleTop=true
     }
+}
+
+@Serializable data object TestRoute
+
+@Composable
+fun TestScreen() {
+    Text("Test")
 }

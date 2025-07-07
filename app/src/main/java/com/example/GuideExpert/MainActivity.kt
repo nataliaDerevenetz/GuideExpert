@@ -1,26 +1,14 @@
 package com.example.GuideExpert
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.GuideExpert.presentation.AppState
 import com.example.GuideExpert.presentation.MainScreen
 import com.example.GuideExpert.presentation.rememberAppState
@@ -63,6 +51,9 @@ class MainActivity : ComponentActivity() {
             Log.d("NOTIFICATION",notification.type.toString() )
         }*/
 
+
+        Log.d("intent ", "oncreate : ${intent.data}")
+
         val notification = with(intent?.extras){
             this?.let {
                 val notification = notifier.createNotificationFromBundle(this)
@@ -79,20 +70,28 @@ class MainActivity : ComponentActivity() {
 
         Log.d("PUSH", "on create time : $time")
         enableEdgeToEdge()
-        val activity = this
         setContent {
             appState = rememberAppState(time = time)
             GuideExpertTheme(isLightStatusBar = appState.isLightStatusBar.value) {
                 MainScreen(appState)
             }
         }
+
+        val data = intent.data
+        intent.data = null
+        handleDeepLink(data)
     }
 
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        appState.navController.handleDeepLink(intent)
-        Log.d("push notification ", " on new intent extras? : ${intent?.extras}")
+     //   appState.navController.handleDeepLink(intent)
+       // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+       // appState.navController.handleDeepLink(intent)
+      //  setIntent(intent)
+        Log.d("push notification ", "on onnewintent : ${intent?.extras}")
+
+        Log.d("intent ", " on new intent extras? : ${intent.data}")
 
         // notification coming when app in inactive/background, data included in intent extra
         val time: String? = intent?.extras?.getString("time")
@@ -101,7 +100,21 @@ class MainActivity : ComponentActivity() {
             Log.d("push notification ", " on new intent count : $time")
         }
 
+        val data = intent?.data
+        handleDeepLink(data)
+
+    }
+
+    private var deepLinkData: Uri? = null
+
+    private fun handleDeepLink(uri: Uri?) {
+        //TODO: there is an issue that will cause onNewIntent to be called twice when the activity is already present.
+        if (uri != null  && appState.navController.graph.hasDeepLink(uri)) {
+            //possible deep link for LoginFragment
+            deepLinkData = uri
+            appState.navController.navigate(uri)
         }
+    }
 
 
 }

@@ -90,7 +90,7 @@ internal class PushNotificationManager @Inject constructor(
 }
 
 
-private fun Context.createPendingIntent(requestCode: Int,bundle: Bundle?): PendingIntent? = PendingIntent.getActivity(
+fun Context.createPendingIntent(requestCode: Int,bundle: Bundle?): PendingIntent? = PendingIntent.getActivity(
     this,
     requestCode,
     Intent().apply {
@@ -99,10 +99,16 @@ private fun Context.createPendingIntent(requestCode: Int,bundle: Bundle?): Pendi
         component = ComponentName(
             packageName,
             TARGET_ACTIVITY_NAME,
-        )
-    } //.putExtras(bundle)
+        )}//.putExtras(bundle!!)
     ,
     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
 )
 
-private fun deepLinkUri() = "$DEEP_LINK_BASE_PATH/$ID".toUri()
+
+
+//private fun deepLinkUri() = "$DEEP_LINK_BASE_PATH/$ID".toUri()
+
+//private fun deepLinkUri() = "https://www.guide-expert.ru/test/1".toUri()
+private fun deepLinkUri() = "https://www.guide-expert.ru/test".toUri()
+
+

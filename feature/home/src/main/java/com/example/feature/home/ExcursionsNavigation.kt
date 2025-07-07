@@ -1,5 +1,6 @@
 package com.example.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -102,13 +103,24 @@ fun NavGraphBuilder.homeScreen(
         composable<TestRoute>(
             deepLinks = listOf(
                  navDeepLink {
-                    uriPattern = DEEP_LINK_URI_PATTERN
+                    uriPattern = "https://www.guide-expert.ru/test"
                 },
             )
 
         ) {
             TestScreen()
         }
+
+/*
+        composable<TestRoute>(
+            deepLinks = listOf(
+                navDeepLink<TestRoute>(basePath = "$DEEP_LINK_SCHEME_AND_HOST/test")
+            )
+        ) {
+            backStackEntry ->
+            TestScreen(id = backStackEntry.toRoute<TestRoute>().id)
+        }
+*/
 
         composable<AlbumExcursion> {
                 backStackEntry ->
@@ -160,9 +172,12 @@ fun NavController.navigateToImage(imageId: Int,excursionImages: List<Image>,inde
     }
 }
 
+
+//@Serializable data class TestRoute(val id: String)
 @Serializable data object TestRoute
 
 @Composable
-fun TestScreen() {
+fun TestScreen(id: String = "") {
+    Log.d("TEST", id.toString())
     Text("Test")
 }

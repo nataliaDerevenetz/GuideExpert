@@ -114,7 +114,7 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
+internal fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
                         onNavigateToProfile: () -> Unit,
                         innerPaddingMain: PaddingValues,
                         viewModel: EditorProfileViewModel = hiltViewModel(),
@@ -190,7 +190,7 @@ fun EditorProfileScreen(snackbarHostState: SnackbarHostState,
 }
 
 @Composable
-fun EditorProfileStateScope.ContentUpdateProfile(effectFlow: SnackbarEffect?) {
+private fun EditorProfileStateScope.ContentUpdateProfile(effectFlow: SnackbarEffect?) {
     val stateUpdateProfile by stateUpdateProfile.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
@@ -253,7 +253,7 @@ interface EditorProfileStateScope {
 }
 
 
-fun DefaultEditorProfileStateScope(
+private fun DefaultEditorProfileStateScope(
     profile: StateFlow<Profile?>,
     viewStateFlow: StateFlow<EditorViewState>,
     handleEvent : (EditorProfileUiEvent) -> Job,
@@ -287,7 +287,7 @@ fun DefaultEditorProfileStateScope(
 }
 
 @Composable
-fun rememberDefaultEditorProfileStateScope(
+private fun rememberDefaultEditorProfileStateScope(
     profile: StateFlow<Profile?>,
     viewStateFlow: StateFlow<EditorViewState>,
     handleEvent: (EditorProfileUiEvent) -> Job,
@@ -304,7 +304,7 @@ fun rememberDefaultEditorProfileStateScope(
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
+private fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
 {
     val profile by profile.collectAsStateWithLifecycle()
     val isEditeProfile by isEditeProfile.collectAsStateWithLifecycle()
@@ -548,7 +548,7 @@ fun EditorProfileStateScope.EditorProfileContent(innerPadding: PaddingValues, )
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit) {
+private fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit) {
     val viewState: EditorViewState by viewStateFlow.collectAsState()
     val profile by profile.collectAsStateWithLifecycle()
 
@@ -626,7 +626,7 @@ fun EditorProfileStateScope.LoadAvatar(onChangeShowBottomSheet:(Boolean) -> Unit
 
 
 @Composable
-fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
+private fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
     val profile by profile.collectAsStateWithLifecycle()
 
     val sex = rememberSaveable{mutableStateOf(profile?.sex)}
@@ -680,7 +680,7 @@ fun EditorProfileStateScope.SelectSexToModal(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun EditorProfileStateScope.CommonDialog(
+private fun EditorProfileStateScope.CommonDialog(
     title: String?,
     state: MutableState<Boolean>,
     content: @Composable (() -> Unit)? = null
@@ -753,7 +753,7 @@ fun EditorProfileStateScope.SingleChoiceView(sex: MutableState<String?>) {
 
 
 @Composable
-fun EditorProfileStateScope.DatePickerFieldToModal(selectedDate: MutableState<Long?>) {
+private fun EditorProfileStateScope.DatePickerFieldToModal(selectedDate: MutableState<Long?>) {
    // val profile by profile.collectAsStateWithLifecycle()
 
   //  var selectedDate by rememberSaveable  { mutableStateOf(profile?.birthday?.time) }

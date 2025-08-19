@@ -84,7 +84,7 @@ interface ProfileStateScope {
     val logout : () -> Unit
 }
 
-fun DefaultProfileStateScope(
+private fun DefaultProfileStateScope(
     profile: StateFlow<Profile?>,
     profileStateFlow: StateFlow<ProfileResources>,
     effectFlow: Flow<SnackbarEffect>,
@@ -118,7 +118,7 @@ fun DefaultProfileStateScope(
 }
 
 @Composable
-fun rememberDefaultProfileStateScope(
+private fun rememberDefaultProfileStateScope(
     profile: StateFlow<Profile?>,
     profileStateFlow: StateFlow<ProfileResources>,
     effectFlow: Flow<SnackbarEffect>,
@@ -134,7 +134,7 @@ fun rememberDefaultProfileStateScope(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileInfo(snackbarHostState: SnackbarHostState,
+internal fun ProfileInfo(snackbarHostState: SnackbarHostState,
                 onNavigateToYandex: () -> Unit,
                 onNavigateToEditorProfile: () -> Unit,
                 onNavigateToBack: () -> Unit,
@@ -215,7 +215,7 @@ fun ProfileInfo(snackbarHostState: SnackbarHostState,
 }
 
 @Composable
-fun ProfileStateScope.ProfileEnter(innerPadding: PaddingValues) {
+private fun ProfileStateScope.ProfileEnter(innerPadding: PaddingValues) {
     Column (modifier = Modifier.padding(innerPadding).fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally ){
@@ -230,7 +230,7 @@ fun ProfileStateScope.ProfileEnter(innerPadding: PaddingValues) {
 }
 
 @Composable
-fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
+private fun ProfileStateScope.ProfileContent(innerPadding: PaddingValues) {
 
     val profile by profile.collectAsStateWithLifecycle()
 

@@ -28,7 +28,7 @@ import com.google.accompanist.pager.rememberPagerState
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ImageExcursionScreen(
+internal fun ImageExcursionScreen(
     imageExcursion: ImageExcursion,
 ) {
     var scale by remember { mutableStateOf(1f) }

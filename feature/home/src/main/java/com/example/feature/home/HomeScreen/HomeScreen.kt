@@ -42,7 +42,7 @@ import kotlin.math.roundToInt
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun HomeScreen(
+internal fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     navigateToExcursion: (Excursion) -> Unit,
     navigateToProfileInfo: () -> Unit,

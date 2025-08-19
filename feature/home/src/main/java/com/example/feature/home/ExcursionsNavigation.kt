@@ -177,7 +177,7 @@ fun NavController.navigateToImage(imageId: Int,excursionImages: List<Image>,inde
 @Serializable data object TestRoute
 
 @Composable
-fun TestScreen(id: String = "") {
+internal fun TestScreen(id: String = "") {
     Log.d("TEST", id.toString())
     Text("Test")
 }

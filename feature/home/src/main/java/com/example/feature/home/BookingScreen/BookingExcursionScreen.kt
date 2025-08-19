@@ -83,7 +83,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookingExcursionScreen(
+internal fun BookingExcursionScreen(
     excursionId: Int,
     innerPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
@@ -124,7 +124,7 @@ fun BookingExcursionScreen(
 
 
 @Composable
-fun BookingExcursionContent(
+private fun BookingExcursionContent(
     excursionId: Int,
     innerPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
@@ -337,7 +337,7 @@ fun BookingExcursionContent(
 
 
 @Composable
-fun DatePickerBookingToModal(
+private fun DatePickerBookingToModal(
     selectedDate: MutableState<Long?>,
     handleEvent: (BookingExcursionUiEvent) -> Job
 ) {
@@ -397,7 +397,7 @@ fun DatePickerBookingToModal(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerBookingModal(
+private fun DatePickerBookingModal(
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -449,7 +449,7 @@ class FutureSelectableDates: SelectableDates {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdvancedTimePicker(
+private fun AdvancedTimePicker(
     selectedTime: MutableState<String>,
     handleEvent: (BookingExcursionUiEvent) -> Job
 ) {
@@ -513,7 +513,7 @@ fun AdvancedTimePicker(
 }
 
 @Composable
-fun AdvancedTimePickerDialog(
+private fun AdvancedTimePickerDialog(
     title: String = "Select Time",
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,

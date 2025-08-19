@@ -95,7 +95,7 @@ interface ExcursionDetailScope {
     val profile: StateFlow<Profile?>
 }
 
-fun DefaultExcursionDetailScope(
+private fun DefaultExcursionDetailScope(
     excursionData: Flow<ExcursionData?>,
     excursionImages: Flow<List<Image>>,
     onNavigateToBack: () -> Unit,
@@ -153,7 +153,7 @@ fun DefaultExcursionDetailScope(
 }
 
 @Composable
-fun rememberDefaultExcursionDetailScope(
+private fun rememberDefaultExcursionDetailScope(
     excursionData: Flow<ExcursionData?>,
     excursionImages: Flow<List<Image>>,
     onNavigateToBack: () -> Unit,
@@ -177,7 +177,7 @@ fun rememberDefaultExcursionDetailScope(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExcursionDetailScreen(
+internal fun ExcursionDetailScreen(
     navigateToAlbum: (Int) -> Unit,
     navigateToImage: (Int,List<Image>,Int) -> Unit,
     onNavigateToBack:() -> Unit,
@@ -273,7 +273,7 @@ fun ExcursionDetailScreen(
 }
 
 @Composable
-fun ExcursionDetailScope.ExcursionDataError(innerPadding: PaddingValues) {
+private fun ExcursionDetailScope.ExcursionDataError(innerPadding: PaddingValues) {
     Column (Modifier.padding(innerPadding).fillMaxSize()){
         Row(
             Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
@@ -293,7 +293,7 @@ fun ExcursionDetailScope.ExcursionDataError(innerPadding: PaddingValues) {
 
 
 @Composable
-fun ExcursionDetailScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
+private fun ExcursionDetailScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
     val stateSetFavoriteExcursion by stateSetFavoriteExcursion.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
@@ -319,7 +319,7 @@ fun ExcursionDetailScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) 
 }
 
 @Composable
-fun ExcursionDetailScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
+private fun ExcursionDetailScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
     val stateDeleteFavoriteExcursion by stateDeleteFavoriteExcursion.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
@@ -348,7 +348,7 @@ fun ExcursionDetailScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
+private fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
     val excursionData by excursionData.collectAsStateWithLifecycle(null)
     val excursionImages by excursionImages.collectAsStateWithLifecycle(null)
     val profile by profile.collectAsStateWithLifecycle(null)
@@ -451,7 +451,7 @@ fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
 }
 
 @Composable
-fun NetworkImageCarousel(url: String, contentDescription: String?, width: Int, height: Int,
+internal fun NetworkImageCarousel(url: String, contentDescription: String?, width: Int, height: Int,
                          navigateToImage: (Int,List<Image>,Int) -> Unit, imageId:Int,
                          excursionImages: List<Image>,
                          indexImage:Int) {

@@ -19,7 +19,7 @@ import com.example.feature.home.DetailScreen.NetworkImageCarousel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun AlbumExcursionScreen(
+internal fun AlbumExcursionScreen(
     excursionId: Int,
     navigateToImage: (Int, List<Image>, Int) -> Unit,
     viewModel: AlbumExcursionViewModel = hiltViewModel(),

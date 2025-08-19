@@ -59,7 +59,7 @@ interface FavoritesScope {
     val profile: StateFlow<Profile?>
 }
 
-fun DefaultFavoritesScope(
+private fun DefaultFavoritesScope(
     handleEvent : (ExcursionsFavoriteUiEvent) -> Unit,
     stateLoadFavorites:  StateFlow<LoadFavoritesUIState>,
     effectFlow: Flow<SnackbarEffect>,
@@ -96,7 +96,7 @@ fun DefaultFavoritesScope(
 }
 
 @Composable
-fun rememberDefaultFavoritesScope(
+private fun rememberDefaultFavoritesScope(
     handleEvent : (ExcursionsFavoriteUiEvent) -> Unit,
     stateLoadFavorites:  StateFlow<LoadFavoritesUIState>,
     effectFlow: Flow<SnackbarEffect>,
@@ -113,7 +113,7 @@ fun rememberDefaultFavoritesScope(
 
 
 @Composable
-fun Favorites(snackbarHostState: SnackbarHostState,
+internal fun Favorites(snackbarHostState: SnackbarHostState,
               navigateToExcursion: (Excursion) -> Unit,
               innerPadding: PaddingValues,
               viewModel: FavoritesViewModel = hiltViewModel(),
@@ -160,7 +160,7 @@ fun Favorites(snackbarHostState: SnackbarHostState,
 }
 
 @Composable
-fun FavoritesScope.FavoritesDataError(innerPadding: PaddingValues, effectFlow: SnackbarEffect?) {
+private fun FavoritesScope.FavoritesDataError(innerPadding: PaddingValues, effectFlow: SnackbarEffect?) {
 
     Column (Modifier.padding(innerPadding).fillMaxSize()){
         Row(
@@ -183,7 +183,7 @@ fun FavoritesScope.FavoritesDataError(innerPadding: PaddingValues, effectFlow: S
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScope.FavoritesDataContent(innerPadding: PaddingValues, effectFlow: SnackbarEffect?) {
+private fun FavoritesScope.FavoritesDataContent(innerPadding: PaddingValues, effectFlow: SnackbarEffect?) {
     val excursions by excursions.collectAsStateWithLifecycle(null)
     val scope = rememberCoroutineScope()
 
@@ -225,7 +225,7 @@ fun FavoritesScope.FavoritesDataContent(innerPadding: PaddingValues, effectFlow:
 }
 
 @Composable
-fun FavoritesScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
+private fun FavoritesScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
     val stateDeleteFavoriteExcursion by stateDeleteFavoriteExcursion.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     when(stateDeleteFavoriteExcursion.contentState){
@@ -249,7 +249,7 @@ fun FavoritesScope.ContentDeleteFavoriteContent(effectFlow: SnackbarEffect?) {
 }
 
 @Composable
-fun FavoritesScope.FavoritesDataLoading(innerPadding: PaddingValues) {
+private fun FavoritesScope.FavoritesDataLoading(innerPadding: PaddingValues) {
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize(),
     ) {
         LoadingExcursionListShimmer()
@@ -257,7 +257,7 @@ fun FavoritesScope.FavoritesDataLoading(innerPadding: PaddingValues) {
 }
 
 @Composable
-fun FavoritesScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
+private fun FavoritesScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
     val stateSetFavoriteExcursion by stateSetFavoriteExcursion.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -282,7 +282,7 @@ fun FavoritesScope.ContentSetFavoriteContent(effectFlow: SnackbarEffect?) {
 }
 
 @Composable
-fun FavoritesScope.ContentRestoreFavoriteContent(effectFlow: SnackbarEffect?) {
+private fun FavoritesScope.ContentRestoreFavoriteContent(effectFlow: SnackbarEffect?) {
     val stateRestoreFavoriteExcursion by stateRestoreFavoriteExcursion.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 

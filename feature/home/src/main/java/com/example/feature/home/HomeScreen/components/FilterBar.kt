@@ -123,7 +123,7 @@ fun rememberFilterChipState(
         getFiltersSort,getFiltersGroups,getFiltersCategories,sortDefault)
 }
 
-context(SharedTransitionScope)
+context(sh:SharedTransitionScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterBar(
@@ -138,26 +138,28 @@ fun FilterBar(
         contentPadding = PaddingValues(start = 12.dp, end = 8.dp),
         modifier = Modifier.heightIn(min = 56.dp)
     ) {
-        item {
-            AnimatedVisibility(visible = !filterScreenVisible) {
-                IconButton(
-                    onClick = onShowFilters,
-                    modifier = Modifier
-                        .sharedBounds(
-                            rememberSharedContentState(FilterSharedElementKey),
-                            animatedVisibilityScope = this@AnimatedVisibility,
-                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+        with(sh) {
+            item {
+                AnimatedVisibility(visible = !filterScreenVisible) {
+                    IconButton(
+                        onClick = onShowFilters,
+                        modifier = Modifier
+                            .sharedBounds(
+                                rememberSharedContentState(FilterSharedElementKey),
+                                animatedVisibilityScope = this@AnimatedVisibility,
+                                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.FilterList,
+                            tint = Shadow1,
+                            contentDescription = "",
+                            modifier = Modifier.diagonalGradientBorder(
+                                colors = listOf(Shadow1, Shadow2),
+                                shape = CircleShape
+                            )
                         )
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.FilterList,
-                        tint = Shadow1,
-                        contentDescription = "",
-                        modifier = Modifier.diagonalGradientBorder(
-                            colors = listOf(Shadow1, Shadow2),
-                            shape = CircleShape
-                        )
-                    )
+                    }
                 }
             }
         }

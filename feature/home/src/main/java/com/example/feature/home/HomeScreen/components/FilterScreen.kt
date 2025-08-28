@@ -95,7 +95,7 @@ fun rememberFilterState(
         getFiltersGroups,getFiltersCategories)
 }
 
-context(SharedTransitionScope, AnimatedVisibilityScope)
+context(sh:SharedTransitionScope, av:AnimatedVisibilityScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterScreen(
@@ -154,98 +154,111 @@ fun FilterScreen(
                 }
         )
 
-        Column(
-            Modifier
-                .padding(16.dp)
-                .align(Alignment.Center)
-                .clip(MaterialTheme.shapes.medium)
-                .sharedBounds(
-                    rememberSharedContentState(FilterSharedElementKey),
-                    animatedVisibilityScope = this@AnimatedVisibilityScope,
-                    resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                    clipInOverlayDuringTransition = OverlayClip(MaterialTheme.shapes.medium)
-                )
-                .wrapContentSize()
-                .heightIn(max = 450.dp)
-                .verticalScroll(rememberScrollState())
-                /*.clickable(
+        with(sh) {
+            Column(
+                Modifier
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+                    .clip(MaterialTheme.shapes.medium)
+                    .sharedBounds(
+                        rememberSharedContentState(FilterSharedElementKey),
+                        animatedVisibilityScope = av,
+                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                        clipInOverlayDuringTransition = OverlayClip(MaterialTheme.shapes.medium)
+                    )
+                    .wrapContentSize()
+                    .heightIn(max = 450.dp)
+                    .verticalScroll(rememberScrollState())
+                    /*.clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) { }*/
-                .background(MaterialTheme.colorScheme.onSecondary)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-                .skipToLookaheadSize(),
-        ) {
-            Row(modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton(onClick = { if(state.isChangedFilters()) state.handleEvent(
-                    ExcursionsUiEvent.OnChangeFilters)
-                    onDismiss()}) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = ""
-                    )
-                }
-                Text(
-                    text = stringResource(id = R.string.label_filters),
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(top = 8.dp, end = 48.dp),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                val resetEnabled = state.isChangedDefaultFilters()
-
-                IconButton(
-                    onClick = { state.resetFilters() },
-                    enabled = resetEnabled
+                    .background(MaterialTheme.colorScheme.onSecondary)
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
+                    .skipToLookaheadSize(),
+            ) {
+                Row(
+                    modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "",
-                        tint = Shadow1.copy(alpha = if (!resetEnabled) 0.38f else 1f)
+                    IconButton(onClick = {
+                        if (state.isChangedFilters()) state.handleEvent(
+                            ExcursionsUiEvent.OnChangeFilters
+                        )
+                        onDismiss()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = ""
+                        )
+                    }
+                    Text(
+                        text = stringResource(id = R.string.label_filters),
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(top = 8.dp, end = 48.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge
                     )
+
+                    val resetEnabled = state.isChangedDefaultFilters()
+
+                    IconButton(
+                        onClick = { state.resetFilters() },
+                        enabled = resetEnabled
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "",
+                            tint = Shadow1.copy(alpha = if (!resetEnabled) 0.38f else 1f)
+                        )
+
+                    }
 
                 }
 
-            }
+                with(state) {
+                    SortFiltersSection(
+                        sortState = sortState.value,
+                        onFilterChange = { filter ->
+                            state.setSortState(filter.id)
+                        }
+                    )
+                }
 
-            with(state) {
-                SortFiltersSection(
-                    sortState = sortState.value,
-                    onFilterChange = { filter ->
-                        state.setSortState(filter.id)
-                    }
+                FilterChipSection(
+                    title = stringResource(id = R.string.categories),
+                    filters = state.getFiltersCategories()
+                )
+
+                FilterChipSection(
+                    title = stringResource(id = R.string.groups),
+                    filters = state.getFiltersGroups()
+                )
+
+                FilterChipSection(
+                    title = stringResource(id = R.string.duration),
+                    filters = state.getFiltersDuration()
                 )
             }
 
-            FilterChipSection(
-                title = stringResource(id = R.string.categories),
-                filters = state.getFiltersCategories()
-            )
-
-            FilterChipSection(
-                title = stringResource(id = R.string.groups),
-                filters = state.getFiltersGroups()
-            )
-
-            FilterChipSection(
-                title = stringResource(id = R.string.duration),
-                filters = state.getFiltersDuration()
-            )
         }
+
+
     }
 }
 
-context(FilterState)
+context(fs:FilterState)
 @Composable
 fun SortFiltersSection(sortState: Int, onFilterChange: (Filter) -> Unit) {
-    FilterTitle(text = stringResource(id = R.string.sort))
-    Column(Modifier.padding(bottom = 24.dp)) {
-        SortFilters(
-            sortState = sortState,
-            onChanged = onFilterChange
-        )
+    with(fs) {
+        FilterTitle(text = stringResource(id = R.string.sort))
+        Column(Modifier.padding(bottom = 24.dp)) {
+            SortFilters(
+                sortState = sortState,
+                onChanged = onFilterChange
+            )
+        }
     }
 }
 
@@ -259,24 +272,25 @@ fun FilterTitle(text: String) {
     )
 }
 
-context(FilterState)
+context(fs:FilterState)
 @Composable
 fun SortFilters(
     sortState: Int,
     onChanged: (Filter) -> Unit
 ) {
+    with(fs) {
+        getFiltersBar().filter{  it.type == FilterType.Sort }.map{ it.enabled.value = false }
 
-    getFiltersBar().filter{  it.type == FilterType.Sort }.map{ it.enabled.value = false }
-
-    getFiltersSort().forEach { filter ->
-        SortOption(
-            text = filter.name,
-            icon = filter.icon,
-            selected = sortState == filter.id,
-            onClickOption = {
-                onChanged(filter)
-            }
-        )
+        getFiltersSort().forEach { filter ->
+            SortOption(
+                text = filter.name,
+                icon = filter.icon,
+                selected = sortState == filter.id,
+                onClickOption = {
+                    onChanged(filter)
+                }
+            )
+        }
     }
 }
 

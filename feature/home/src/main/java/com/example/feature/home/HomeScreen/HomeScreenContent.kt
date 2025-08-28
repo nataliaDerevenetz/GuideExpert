@@ -102,7 +102,7 @@ fun rememberHomeScreenContentState(
     HomeScreenContentState(filterListState,effectFlow,snackbarHostState,onEvent,sendEffectFlow,navigateToExcursion,getFiltersBar,profileFavoriteExcursionIdFlow,stateSetFavoriteExcursion,stateDeleteFavoriteExcursion,navigateToProfileInfo,profile)
 }
 
-context(SharedTransitionScope)
+context(sh:SharedTransitionScope)
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(

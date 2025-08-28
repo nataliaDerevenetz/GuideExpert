@@ -2,9 +2,12 @@ package com.example.feature.home
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -69,6 +72,7 @@ class ExcursionDetail(val excursion : Excursion) {
 
 fun NavController.navigateToHome(navOptions: NavOptions) = navigate(route = HomeRoute, navOptions)
 
+val uri = "https://www.guide-expert.ru"
 
 fun NavGraphBuilder.homeScreen(
     innerPadding: PaddingValues,
@@ -101,14 +105,18 @@ fun NavGraphBuilder.homeScreen(
         }
 
         composable<TestRoute>(
-            deepLinks = listOf(
+           /* deepLinks = listOf(
                  navDeepLink {
                     uriPattern = "https://www.guide-expert.ru/test"
                 },
+            )*/
+            deepLinks = listOf(
+                navDeepLink<TestRoute>(basePath = "$uri/testroute")
             )
 
         ) {
-            TestScreen()
+                backStackEntry ->
+            TestScreen(id = backStackEntry.toRoute<TestRoute>().id)
         }
 
 /*
@@ -173,11 +181,11 @@ fun NavController.navigateToImage(imageId: Int,excursionImages: List<Image>,inde
 }
 
 
-//@Serializable data class TestRoute(val id: String)
-@Serializable data object TestRoute
+@Serializable data class TestRoute(val id: String)
+//@Serializable data object TestRoute
 
 @Composable
 internal fun TestScreen(id: String = "") {
     Log.d("TEST", id.toString())
-    Text("Test")
+    Text("Test " + id, modifier = Modifier.padding(top=30.dp))
 }

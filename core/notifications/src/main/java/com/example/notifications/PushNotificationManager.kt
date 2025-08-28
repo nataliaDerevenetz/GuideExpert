@@ -108,7 +108,7 @@ fun Context.createPendingIntent(requestCode: Int,bundle: Bundle?): PendingIntent
 
 //private fun deepLinkUri() = "$DEEP_LINK_BASE_PATH/$ID".toUri()
 
-//private fun deepLinkUri() = "https://www.guide-expert.ru/test/1".toUri()
-private fun deepLinkUri() = "https://www.guide-expert.ru/test".toUri()
+private fun deepLinkUri() = "https://www.guide-expert.ru/testroute/555".toUri()
+//private fun deepLinkUri() = "https://www.guide-expert.ru/test".toUri()
 
 

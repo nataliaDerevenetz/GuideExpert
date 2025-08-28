@@ -109,7 +109,10 @@ class MainActivity : ComponentActivity() {
 
     private fun handleDeepLink(uri: Uri?) {
         //TODO: there is an issue that will cause onNewIntent to be called twice when the activity is already present.
+        Log.d("DEEPLINK","handleDeepLink")
+     //   Log.d("DEEPLINK",uri.toString())
         if (uri != null  && appState.navController.graph.hasDeepLink(uri)) {
+            Log.d("DEEPLINK","4444")
             //possible deep link for LoginFragment
             deepLinkData = uri
             appState.navController.navigate(uri)

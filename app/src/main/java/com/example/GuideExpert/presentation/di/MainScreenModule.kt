@@ -2,8 +2,10 @@ package com.example.GuideExpert.presentation.di
 
 import com.example.core.domain.GetExcursionsFavoriteIdUseCase
 import com.example.core.domain.GetProfileUseCase
+import com.example.core.domain.SetTokenDeviceOnServerUseCase
 import com.example.core.domain.impl.GetExcursionsFavoriteIdUseCaseImpl
 import com.example.core.domain.impl.GetProfileUseCaseImpl
+import com.example.core.domain.impl.SetTokenDeviceOnServerUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,5 +28,11 @@ abstract class MainScreenModule {
     abstract fun bindGetExcursionsFavoriteIdUseCase(
         getExcursionsFavoriteIdUseCaseImpl: GetExcursionsFavoriteIdUseCaseImpl
     ) : GetExcursionsFavoriteIdUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindSetTokenDeviceOnServerUseCase(
+        setTokenDeviceOnServerUseCaseImpl: SetTokenDeviceOnServerUseCaseImpl
+    ) : SetTokenDeviceOnServerUseCase
 
 }

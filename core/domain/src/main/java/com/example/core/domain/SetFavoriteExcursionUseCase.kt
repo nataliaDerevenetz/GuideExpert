@@ -6,5 +6,5 @@ import com.example.core.models.UIResources
 import kotlinx.coroutines.flow.Flow
 
 interface SetFavoriteExcursionUseCase {
-    suspend operator fun invoke(excursion: com.example.core.models.Excursion) : Flow<com.example.core.models.UIResources<com.example.core.models.SetFavoriteExcursionResponse>>
+    suspend operator fun invoke(excursion: Excursion) : Flow<UIResources<SetFavoriteExcursionResponse>>
 }

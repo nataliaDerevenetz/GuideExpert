@@ -9,11 +9,7 @@ plugins {
     id ("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
-
-
-   // id("com.android.application")
     id("com.google.gms.google-services")
-
 }
 
 android {
@@ -50,7 +46,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs = freeCompilerArgs + "-Xcontext-parameters"
     }
     buildFeatures {
         compose = true
@@ -73,63 +68,16 @@ android {
     }
 }
 
-composeCompiler {
-    enableStrongSkippingMode = true
-}
-
-
 dependencies {
-
-    implementation ("com.google.firebase:firebase-messaging-directboot:20.2.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
-    implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-analytics")
-
-
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
-
-    implementation ("androidx.exifinterface:exifinterface:1.4.1")
-    implementation ("androidx.datastore:datastore-preferences:1.1.0")
-
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-
-    implementation("androidx.compose.animation:animation:1.8.0")
-
-    implementation("com.google.accompanist:accompanist-pager:0.28.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.media3.common.ktx)
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.androidx.work.runtime.ktx)
-    val room_version = "2.6.1"
-
-    implementation("androidx.room:room-paging:$room_version")
-
-    val paging_version = "3.3.2"
-    implementation("androidx.paging:paging-runtime:$paging_version")
-    implementation("androidx.paging:paging-compose:3.3.6")
-
-
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation("androidx.compose.material3:material3:1.3.2")
-
-
-
-    implementation("androidx.room:room-runtime:$room_version")
-
-    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
-    // See Add the KSP plugin to your project
-    ksp("androidx.room:room-compiler:$room_version")
-
-
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
 
 
     val nav_version = "2.8.3"

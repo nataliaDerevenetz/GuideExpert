@@ -1,6 +1,7 @@
 package com.example.core.network.services
 
 import com.example.core.network.pojo.ProfilePOJO
+import com.example.core.network.pojo.RegisterTokenDeviceResponsePOJO
 import com.example.core.network.pojo.RemoveAvatarProfileResponsePOJO
 import com.example.core.network.pojo.UpdateAvatarProfileResponsePOJO
 import com.example.core.network.pojo.UpdateProfileResponsePOJO
@@ -34,4 +35,9 @@ interface ProfileService {
                               @Query("last_name") lastName:String, @Query("sex") sex:String?,
                               @Query("email") email:String, @Query("birthday") birthday: Date
                               ): Response<UpdateProfileResponsePOJO>
+
+    @GET("registertokendevice.php")
+    suspend fun registerTokenDevice(@Query("profile_id") profileId:Int, @Query("token_device") tokenDevice:String,
+                              @Query("token_device_old") tokenDeviceOld:String? = null
+    ): Response<RegisterTokenDeviceResponsePOJO>
 }

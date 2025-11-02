@@ -1,16 +1,19 @@
 package com.example.core.data.repository
 
+import android.util.Log
 import com.example.core.data.models.toAvatar
 import com.example.core.data.models.toProfile
 import com.example.core.data.models.toRemoveAvatarProfileResponse
 import com.example.core.data.models.toUpdateProfileResponse
 import com.example.core.data.local.DBStorage
+import com.example.core.data.models.toSetTokenDeviceResponse
 import com.example.core.domain.repository.ProfileRepository
 import com.example.core.domain.repository.SessionManager
 import com.example.core.models.Avatar
 import com.example.core.models.MessageResponse
 import com.example.core.models.Profile
 import com.example.core.models.ProfileResources
+import com.example.core.models.SetTokenDeviceResponse
 import com.example.core.models.UIResources
 import com.example.core.network.services.ProfileService
 import kotlinx.coroutines.flow.Flow
@@ -138,6 +141,37 @@ class ProfileRepositoryImpl @Inject constructor(
                 emit(UIResources.Error("Error update profile"))
             }
 
+        } catch (e: Exception) {
+            emit(UIResources.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun registerTokenDevice(token: String): Flow<UIResources<SetTokenDeviceResponse>> = flow {
+        try {
+            emit(UIResources.Loading)
+            Log.d("TOKEN", token)
+            profileFlow.value?.let {
+                val result = profileService.registerTokenDevice(it.id,token)
+                if (result.code() == 403) {
+                    removeProfile()
+                }
+
+                if (result.isSuccessful) {
+                    val response = result.body()?.toSetTokenDeviceResponse() ?: SetTokenDeviceResponse()
+                    if (response.success) {
+                        profileFlow.value?.let {
+                            sessionManager.setDeviceToken(token)
+                            sessionManager.setTimeTimestampDeviceToken(response.timestamp!!)
+                        }
+                        emit(UIResources.Success(response))
+                    } else {
+                        emit(UIResources.Error("Error :: ${response.message}"))
+                    }
+                }
+            }
+            if (profileFlow.value == null) {
+                emit(UIResources.Error("Error saved token device"))
+            }
         } catch (e: Exception) {
             emit(UIResources.Error(e.message.toString()))
         }

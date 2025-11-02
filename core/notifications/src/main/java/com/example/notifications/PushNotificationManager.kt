@@ -33,7 +33,8 @@ internal class PushNotificationManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val notificationFactory: NotificationFactory,
 ) : Notifier {
-    override fun createNotificationFromBundle(bundle: Bundle):Notification {
+    override fun createNotificationFromBundle(bundle: Bundle?): Notification? {
+        if (bundle == null) return null
         Log.d("RRR",bundle.getString("time")!!)
         return notificationFactory.createNotification(bundle)
     }

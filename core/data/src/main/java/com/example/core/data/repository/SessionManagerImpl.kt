@@ -31,17 +31,24 @@ class SessionManagerImpl @Inject constructor(
 
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")
     override suspend fun setAuthToken(value: String) = save(AUTH_TOKEN, value)
-
     override fun getAuthToken(): Flow<String> = read(AUTH_TOKEN, "")
 
 
     private val PROFILE_ID = stringPreferencesKey("profile_id")
     override suspend fun setProfileId(value: String) = save(PROFILE_ID, value)
-
     override fun getProfileId(): Flow<String> = read(PROFILE_ID, "")
 
     private val PROFILE_TIME = intPreferencesKey("profile_time")
     override suspend fun setProfileTime(value: Int) = save(PROFILE_TIME, value)
-
     fun getProfileTime(): Flow<Int> = read(PROFILE_TIME, 0)
+
+    private val DEVICE_TOKEN = stringPreferencesKey("device_token")
+    override suspend fun setDeviceToken(value: String) = save(DEVICE_TOKEN, value)
+    override fun getDeviceToken(): Flow<String> = read(DEVICE_TOKEN, "")
+
+    private val TIMESTAMP_DEVICE_TOKEN = intPreferencesKey("timestamp_device_token")
+    override suspend fun setTimeTimestampDeviceToken(value: Int) = save(TIMESTAMP_DEVICE_TOKEN, value)
+    fun getTimestampDeviceToken(): Flow<Int> = read(TIMESTAMP_DEVICE_TOKEN, 0)
+
+
 }

@@ -60,13 +60,13 @@ class MainViewModel @Inject constructor(
 
 
     @OptIn(SavedStateHandleSaveableApi::class)
-    var intentData: String? by savedStateHandle.saveable {
-        mutableStateOf(null)
+    var isOpenFromNotification: Boolean by savedStateHandle.saveable {
+        mutableStateOf(false)
     }
 
-    fun setNotificationData(query: String?) {
+    fun onNotificationOpened() {
         Snapshot.withMutableSnapshot {
-            intentData = query
+            isOpenFromNotification = true
         }
     }
 

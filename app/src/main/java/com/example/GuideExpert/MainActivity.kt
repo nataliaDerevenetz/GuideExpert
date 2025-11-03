@@ -42,23 +42,11 @@ class MainActivity : ComponentActivity() {
         requestNotificationPermission()
         retrieveFCMToken()
 
-        val time: String? = intent?.extras?.getString("time")
-
-        Log.d("intent ", "oncreate : ${intent.data}")
-
         val notification = notifier.createNotificationFromBundle(intent?.extras)
 
-        notification?.let {
-            Log.d("NOTIFICATION",it.type.toString() )
-        }
-        if (notification == null) {
-            Log.d("NOTIFICATION","NULL" )
-        }
-
-        Log.d("PUSH", "on create time : $time")
         enableEdgeToEdge()
         setContent {
-            appState = rememberAppState(time = time)
+            appState = rememberAppState(notification=notification)
             GuideExpertTheme(isLightStatusBar = appState.isLightStatusBar.value) {
                 MainScreen(appState = appState, viewModel = mainViewModel)
             }
@@ -72,33 +60,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-     //   appState.navController.handleDeepLink(intent)
-       // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-       // appState.navController.handleDeepLink(intent)
-      //  setIntent(intent)
-        Log.d("push notification ", "on new intent : ${intent.extras}")
-
-        Log.d("intent ", "  intent deep link : ${intent.data}")
-
         // notification coming when app in inactive/background, data included in intent extra
-        val time: String? = intent.extras?.getString("time")
-        time?.let {
-           appState.navigateToTest()
-            Log.d("push notification ", " on new intent count : $time")
+        val notification = notifier.createNotificationFromBundle(intent.extras)
+        notification?.let {
+            appState.navigateToScreenFromNotification(notification)
         }
-
-        val data = intent.data
-        handleDeepLink(data)
+        handleDeepLink(intent.data)
 
     }
 
     private var deepLinkData: Uri? = null
 
     private fun handleDeepLink(uri: Uri?) {
-        //TODO: there is an issue that will cause onNewIntent to be called twice when the activity is already present.
-        Log.d("DEEPLINK","handleDeepLink")
         if (uri != null  && appState.navController.graph.hasDeepLink(uri)) {
-            Log.d("DEEPLINK","4444")
             //possible deep link for navigation
             deepLinkData = uri
             appState.navController.navigate(uri)

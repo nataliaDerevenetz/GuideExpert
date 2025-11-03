@@ -38,14 +38,14 @@ private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
 fun MainScreen(appState: AppState,viewModel: MainViewModel = hiltViewModel()) {
 
     val currentDestination = appState.currentDestination
-//Log.d("III",currentDestination?.route.toString() )
-   // if (viewModel.intentData.isEmpty() && currentDestination?.route != null && !time.isNullOrEmpty()) {
-    if (viewModel.intentData.isNullOrEmpty() && currentDestination?.route != null && !appState.timeState.value.isNullOrEmpty()) {
-        LaunchedEffect(appState.timeState.value) {
-            appState.navigateToTest()
-            viewModel.setNotificationData(appState.timeState.value)
+
+    if (!viewModel.isOpenFromNotification && currentDestination?.route != null && appState.notificationState.value != null ) {
+        LaunchedEffect(appState.notificationState.value) {
+            appState.navigateToScreenFromNotification(appState.notificationState.value!!)
+            viewModel.onNotificationOpened()
         }
     }
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     NavigationSuiteScaffold(

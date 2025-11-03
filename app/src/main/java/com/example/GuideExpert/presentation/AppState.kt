@@ -21,21 +21,24 @@ import com.example.feature.profile.navigateToProfile
 import com.example.GuideExpert.presentation.navigation.TopLevelDestination
 import com.example.core.models.Excursion
 import com.example.feature.home.navigateToExcursionDetail
+import com.example.notifications.BookingConfirmation
+import com.example.notifications.BookingExcursion
+import com.example.notifications.Notification
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun rememberAppState(
-    time: String?,
+    notification: Notification?,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
 ): AppState {
     return remember(
-        time,
+        notification,
         navController,
         coroutineScope,
     ) {
         AppState(
-            time = time,
+            notification = notification,
             navController = navController,
             coroutineScope = coroutineScope,
         )
@@ -43,7 +46,7 @@ fun rememberAppState(
 }
 @Stable
 class AppState(
-    var time:String?,
+    val notification: Notification?,
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
 ) {
@@ -57,16 +60,13 @@ class AppState(
 
     val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.entries
 
-    fun navigateToTest() {
-      /*  navController.navigateToFavorites(navOptions {
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
+    fun navigateToScreenFromNotification(notification: Notification) {
+        when(notification) {
+            is BookingExcursion -> {
+                navController.navigateToExcursionDetail(Excursion(id=notification.excursionId!!))
             }
-            launchSingleTop = true
-            restoreState = true
-        })*/
-
-        navController.navigateToExcursionDetail(Excursion(id=1, title = "", description = "", images = listOf()))
+            is BookingConfirmation -> {}
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -85,7 +85,7 @@ class AppState(
         }
     }
 
-    var timeState = mutableStateOf(time)
+    var notificationState = mutableStateOf(notification)
 
     val bottomBarState = mutableStateOf(true)
 

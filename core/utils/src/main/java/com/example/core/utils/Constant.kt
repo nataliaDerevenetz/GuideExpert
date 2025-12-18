@@ -6,4 +6,5 @@ object Constant {
     const val REMOTE_KEY_FILTER_ID = "excursion_filter"
     const val PAGE_SIZE = 5
     const val STATUSBAR_HEIGHT = 24
+    const val URI = "https://www.guide-expert.ru"
 }

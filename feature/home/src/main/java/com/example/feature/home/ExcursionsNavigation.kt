@@ -1,14 +1,7 @@
 package com.example.feature.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -16,9 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.example.core.models.Excursion
 import com.example.core.models.Image
-import com.example.core.utils.serializableType
+import com.example.core.utils.Constant
 import com.example.core.utils.serializableTypeArray
 import com.example.feature.home.AlbumScreen.AlbumExcursionScreen
 import com.example.feature.home.AlbumScreen.ImageExcursionScreen
@@ -63,8 +55,6 @@ class ExcursionDetail(
 
 fun NavController.navigateToHome(navOptions: NavOptions) = navigate(route = HomeRoute, navOptions)
 
-val uri = "https://www.guide-expert.ru"
-
 fun NavGraphBuilder.homeScreen(
     innerPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
@@ -86,39 +76,13 @@ fun NavGraphBuilder.homeScreen(
 
         composable<ExcursionDetail>(
             deepLinks = listOf(
-                navDeepLink<ExcursionDetail>(basePath = "$uri/excursiondetail")
+                navDeepLink<ExcursionDetail>(basePath = "${Constant.URI}/excursiondetail")
             )
         ) {
             onChangeVisibleBottomBar(false)
             onSetLightStatusBar(true)
             ExcursionDetailScreen(onNavigateToAlbum,onNavigateToImage,onNavigateToBack,snackbarHostState,innerPadding,onNavigateToProfileInfo,onNavigateToBooking)
         }
-
-        composable<TestRoute>(
-           /* deepLinks = listOf(
-                 navDeepLink {
-                    uriPattern = "https://www.guide-expert.ru/test"
-                },
-            )*/
-            deepLinks = listOf(
-                navDeepLink<TestRoute>(basePath = "$uri/testroute")
-            )
-
-        ) {
-                backStackEntry ->
-            TestScreen(id = backStackEntry.toRoute<TestRoute>().id)
-        }
-
-/*
-        composable<TestRoute>(
-            deepLinks = listOf(
-                navDeepLink<TestRoute>(basePath = "$DEEP_LINK_SCHEME_AND_HOST/test")
-            )
-        ) {
-            backStackEntry ->
-            TestScreen(id = backStackEntry.toRoute<TestRoute>().id)
-        }
-*/
 
         composable<AlbumExcursion> {
                 backStackEntry ->
@@ -168,14 +132,4 @@ fun NavController.navigateToImage(imageId: Int,excursionImages: List<Image>,inde
     navigate(route = ImageExcursion(imageId,excursionImages,indexImage)){
         launchSingleTop=true
     }
-}
-
-
-@Serializable data class TestRoute(val id: String)
-//@Serializable data object TestRoute
-
-@Composable
-internal fun TestScreen(id: String = "") {
-    Log.d("TEST", id.toString())
-    Text("Test " + id, modifier = Modifier.padding(top=30.dp))
 }

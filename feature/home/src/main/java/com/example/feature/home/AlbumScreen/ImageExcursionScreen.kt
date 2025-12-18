@@ -98,7 +98,7 @@ internal fun ImageExcursionScreen(
                         translationY = offsetY,
                     )
             ) { page ->
-                com.example.core.design.components.NetworkImage(
+                NetworkImage(
                     contentDescription = "",
                     url = imageExcursion.excursionImages[page].url,
                     width = 350,

@@ -44,7 +44,7 @@ import kotlin.math.roundToInt
 @Composable
 internal fun HomeScreen(
     snackbarHostState: SnackbarHostState,
-    navigateToExcursion: (Excursion) -> Unit,
+    navigateToExcursion: (Int) -> Unit,
     navigateToProfileInfo: () -> Unit,
     innerPadding: PaddingValues
     //  viewModel: ExcursionsViewModel = hiltViewModel()

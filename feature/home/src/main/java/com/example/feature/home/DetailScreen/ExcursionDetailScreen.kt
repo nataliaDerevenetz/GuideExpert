@@ -69,6 +69,7 @@ import com.example.feature.home.HomeScreen.SetFavoriteExcursionState
 import com.example.feature.home.HomeScreen.SetFavoriteExcursionUIState
 import com.example.core.design.components.shimmerEffect
 import com.example.feature.home.R
+import com.example.feature.home.utils.toExcursion
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -232,13 +233,13 @@ internal fun ExcursionDetailScreen(
                                 if (!isFavorite) {
                                     scopeState.handleEvent(
                                         ExcursionDetailUiEvent.OnSetFavoriteExcursion(
-                                            scopeState.excursionDetail.excursion
+                                            excursionData!!.toExcursion()
                                         )
                                     )
                                 } else {
                                     scopeState.handleEvent(
                                         ExcursionDetailUiEvent.OnDeleteFavoriteExcursion(
-                                            scopeState.excursionDetail.excursion
+                                            excursionData!!.toExcursion()
                                         )
                                     )
                                 }

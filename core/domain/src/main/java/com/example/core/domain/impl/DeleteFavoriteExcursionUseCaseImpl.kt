@@ -13,7 +13,7 @@ class DeleteFavoriteExcursionUseCaseImpl @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val excursionsRepository: ExcursionsRepository
 ): DeleteFavoriteExcursionUseCase {
-    override suspend operator fun invoke(excursion: com.example.core.models.Excursion): Flow<com.example.core.models.UIResources<com.example.core.models.DeleteFavoriteExcursionResponse>> {
+    override suspend operator fun invoke(excursion: Excursion): Flow<UIResources<DeleteFavoriteExcursionResponse>> {
         val profile = profileRepository.profileFlow.value
         return excursionsRepository.removeFavoriteExcursion(excursion,profile)
     }

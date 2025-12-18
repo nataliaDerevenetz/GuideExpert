@@ -52,7 +52,7 @@ interface FavoritesScope {
     val effectFlow: Flow<SnackbarEffect>
     val snackbarHostState: SnackbarHostState
     val excursions: Flow<List<Excursion>>
-    val navigateToExcursion: (Excursion) -> Unit
+    val navigateToExcursion: (Int) -> Unit
     val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
     val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
     val stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>
@@ -65,7 +65,7 @@ private fun DefaultFavoritesScope(
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
     excursions: Flow<List<Excursion>>,
-    navigateToExcursion: (Excursion) -> Unit,
+    navigateToExcursion: (Int) -> Unit,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
     stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>,
@@ -82,7 +82,7 @@ private fun DefaultFavoritesScope(
             get() = snackbarHostState
         override val excursions:Flow<List<Excursion>>
             get() = excursions
-        override val navigateToExcursion:(Excursion) -> Unit
+        override val navigateToExcursion:(Int) -> Unit
             get() = navigateToExcursion
         override val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
             get() = stateSetFavoriteExcursion
@@ -102,7 +102,7 @@ private fun rememberDefaultFavoritesScope(
     effectFlow: Flow<SnackbarEffect>,
     snackbarHostState: SnackbarHostState,
     excursions: Flow<List<Excursion>>,
-    navigateToExcursion: (Excursion) -> Unit,
+    navigateToExcursion: (Int) -> Unit,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
     stateRestoreFavoriteExcursion: StateFlow<RestoreFavoriteExcursionUIState>,
@@ -114,7 +114,7 @@ private fun rememberDefaultFavoritesScope(
 
 @Composable
 internal fun Favorites(snackbarHostState: SnackbarHostState,
-              navigateToExcursion: (Excursion) -> Unit,
+              navigateToExcursion: (Int) -> Unit,
               innerPadding: PaddingValues,
               viewModel: FavoritesViewModel = hiltViewModel(),
               scopeState: FavoritesScope = rememberDefaultFavoritesScope(

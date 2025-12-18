@@ -150,7 +150,7 @@ fun FavoritesScope.ExcursionFavoriteCard(
         shape = RoundedCornerShape(15.dp),
     ){
         Row( modifier = Modifier.clickable{
-            navigateToExcursion(excursion)
+            navigateToExcursion(excursion.id)
         }){
             Column ( modifier = Modifier
                 .padding(8.dp)

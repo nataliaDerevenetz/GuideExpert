@@ -37,7 +37,6 @@ class AppFirebaseMessagingService  : FirebaseMessagingService() {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
             notifier.postNotification(remoteMessage.data)
-          //  val bundle =remoteMessage.data.toBundle()
             // Check if data needs to be processed by long running job
             if (needsToBeScheduled()) {
                 // For long-running tasks (10 seconds or more) use WorkManager.
@@ -49,11 +48,11 @@ class AppFirebaseMessagingService  : FirebaseMessagingService() {
         }
 
         // Check if message contains a notification payload.
-        remoteMessage.notification?.let {
+       /* remoteMessage.notification?.let {
             Log.d(TAG, "Message Notification Body: ${it.body}")
             sendNotification(it.body.toString())
         }
-
+        */
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
 

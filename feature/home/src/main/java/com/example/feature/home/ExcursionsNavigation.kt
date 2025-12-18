@@ -24,12 +24,8 @@ import com.example.feature.home.AlbumScreen.AlbumExcursionScreen
 import com.example.feature.home.AlbumScreen.ImageExcursionScreen
 import com.example.feature.home.BookingScreen.BookingExcursionScreen
 import com.example.feature.home.DetailScreen.ExcursionDetailScreen
-import com.example.feature.home.ExcursionDetail.Companion.typeMap
 import com.example.feature.home.HomeScreen.HomeScreen
 import com.example.feature.home.ImageExcursion.Companion.typeMapImage
-import com.example.notifications.DEEP_LINK_BASE_PATH
-import com.example.notifications.DEEP_LINK_SCHEME_AND_HOST
-import com.example.notifications.DEEP_LINK_URI_PATTERN
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
@@ -61,14 +57,9 @@ data class ImageExcursion(
 }
 
 @Serializable
-class ExcursionDetail(val excursion : Excursion) {
-    companion object {
-        val typeMap = mapOf(typeOf<Excursion>() to serializableType<Excursion>())
-
-        fun from(savedStateHandle: SavedStateHandle) =
-            savedStateHandle.toRoute<ExcursionDetail>(typeMap)
-    }
-}
+class ExcursionDetail(
+    val excursionId:Int
+)
 
 fun NavController.navigateToHome(navOptions: NavOptions) = navigate(route = HomeRoute, navOptions)
 
@@ -77,7 +68,7 @@ val uri = "https://www.guide-expert.ru"
 fun NavGraphBuilder.homeScreen(
     innerPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
-    onNavigateToExcursion: (Excursion) -> Unit,
+    onNavigateToExcursion: (Int) -> Unit,
     onNavigateToAlbum: (Int) -> Unit,
     onNavigateToImage: (Int, List<Image>, Int) -> Unit,
     onNavigateToBack:() -> Unit,
@@ -93,11 +84,10 @@ fun NavGraphBuilder.homeScreen(
             HomeScreen(snackbarHostState = snackbarHostState,navigateToExcursion = onNavigateToExcursion,navigateToProfileInfo = onNavigateToProfileInfo,innerPadding = innerPadding)
         }
 
-        composable<ExcursionDetail>(typeMap = typeMap,
-        //    deepLinks = listOf(
-        //        navDeepLink<ExcursionDetail>(basePath = "$DEEP_LINK_SCHEME_AND_HOST/excursion")
-        //    )
-
+        composable<ExcursionDetail>(
+            deepLinks = listOf(
+                navDeepLink<ExcursionDetail>(basePath = "$uri/excursiondetail")
+            )
         ) {
             onChangeVisibleBottomBar(false)
             onSetLightStatusBar(true)
@@ -156,8 +146,8 @@ fun NavGraphBuilder.homeScreen(
     }
 }
 
-fun NavController.navigateToExcursionDetail(excursion: Excursion) {
-    navigate(route = ExcursionDetail(excursion)){
+fun NavController.navigateToExcursionDetail(excursionId: Int) {
+    navigate(route = ExcursionDetail(excursionId)){
         launchSingleTop=true
     }
 }

@@ -28,8 +28,3 @@ fun ExcursionDataPOJO.toExcursionData() = ExcursionData(
     title = title, owner = owner, text = text, description = description,
     group = group, images = images.map { it.toImage() })
 
-fun ExcursionData.toExcursion() =
-    Excursion(
-        id = excursionId, title = title, description = description,
-        images = images
-    )

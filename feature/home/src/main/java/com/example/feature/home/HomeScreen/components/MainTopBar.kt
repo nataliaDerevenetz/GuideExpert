@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
 @Composable
 fun MainTopBar(modifier: Modifier = Modifier,
                snackbarHostState: SnackbarHostState,
-               navigateToExcursion: (Excursion) -> Unit,
+               navigateToExcursion: (Int) -> Unit,
                toolbarHeightDp: Int,
                toolbarOffsetHeightPx: Float,
                scrollingOn:()->Unit,

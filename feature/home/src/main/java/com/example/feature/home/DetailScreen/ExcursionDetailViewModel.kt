@@ -3,6 +3,7 @@ package com.example.feature.home.DetailScreen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.core.domain.DeleteFavoriteExcursionUseCase
 import com.example.core.domain.GetExcursionDetailUseCase
 import com.example.core.domain.SetFavoriteExcursionUseCase
@@ -66,7 +67,7 @@ class ExcursionDetailViewModel @Inject constructor(
     val deleteFavoriteExcursionUseCase: DeleteFavoriteExcursionUseCase
 ) : ViewModel() {
 
-    val excursionDetail = ExcursionDetail.from(savedStateHandle)
+    val excursionDetail = savedStateHandle.toRoute<ExcursionDetail>()
 
     val profileFavoriteExcursionIdFlow = excursionsRepository.profileFavoriteExcursionIdFlow
     val profileFlow = profileRepository.profileFlow
@@ -74,9 +75,9 @@ class ExcursionDetailViewModel @Inject constructor(
     private val _stateView = MutableStateFlow<UIState>(UIState())
     val stateView: StateFlow<UIState> = _stateView.asStateFlow()
 
-    val excursion: Flow<ExcursionData?> = excursionsRepository.getExcursionData(excursionDetail.excursion.id)
+    val excursion: Flow<ExcursionData?> = excursionsRepository.getExcursionData(excursionDetail.excursionId)
 
-    val images: Flow<List<Image>> = excursionsRepository.getImagesExcursion(excursionDetail.excursion.id)
+    val images: Flow<List<Image>> = excursionsRepository.getImagesExcursion(excursionDetail.excursionId)
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()
@@ -114,7 +115,7 @@ class ExcursionDetailViewModel @Inject constructor(
     }
 
     private suspend fun loadInfo() {
-        getExcursionDetailUseCase(excursionDetail.excursion.id).flowOn(Dispatchers.IO).collectLatest { resource ->
+        getExcursionDetailUseCase(excursionDetail.excursionId).flowOn(Dispatchers.IO).collectLatest { resource ->
             when(resource) {
                 is UIResources.Error -> {
                     _stateView.update { it.copy(contentState = ExcursionInfoUIState.Error(resource.message)) } }
@@ -127,7 +128,7 @@ class ExcursionDetailViewModel @Inject constructor(
         }
     }
 
-    private fun setFavoriteExcursion(excursion :Excursion) {
+    private fun setFavoriteExcursion(excursion : Excursion) {
         viewModelScope.launch(Dispatchers.IO) {
             setFavoriteExcursionUseCase(excursion).collectLatest { resources ->
                 when (resources) {

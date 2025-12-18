@@ -63,7 +63,7 @@ class AppState(
     fun navigateToScreenFromNotification(notification: Notification) {
         when(notification) {
             is BookingExcursion -> {
-                navController.navigateToExcursionDetail(Excursion(id=notification.excursionId!!))
+                navController.navigateToExcursionDetail(notification.excursionId!!)
             }
             is BookingConfirmation -> {}
         }

@@ -13,7 +13,7 @@ class SetFavoriteExcursionUseCaseImpl @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val excursionsRepository: ExcursionsRepository
 ): SetFavoriteExcursionUseCase {
-    override suspend operator fun invoke(excursion: com.example.core.models.Excursion): Flow<com.example.core.models.UIResources<com.example.core.models.SetFavoriteExcursionResponse>> {
+    override suspend operator fun invoke(excursion: Excursion): Flow<UIResources<SetFavoriteExcursionResponse>> {
         val profile = profileRepository.profileFlow.value
         return excursionsRepository.setFavoriteExcursion(excursion,profile)
     }

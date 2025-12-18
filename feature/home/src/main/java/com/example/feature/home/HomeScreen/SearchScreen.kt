@@ -81,7 +81,7 @@ interface SearchStateScope {
     val snackbarHostState: SnackbarHostState
     val onEvent : (SearchEvent) -> Unit
     val sendEffectFlow : KSuspendFunction2<String, String?, Unit>
-    val navigateToExcursion : (Excursion) -> Unit
+    val navigateToExcursion : (Int) -> Unit
     val profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>
     val stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>
     val stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>
@@ -96,7 +96,7 @@ fun DefaultSearchStateScope(
     snackbarHostState: SnackbarHostState,
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
-    navigateToExcursion : (Excursion) -> Unit,
+    navigateToExcursion : (Int) -> Unit,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
@@ -116,7 +116,7 @@ fun DefaultSearchStateScope(
             get() = onEvent
         override val sendEffectFlow: KSuspendFunction2<String, String?, Unit>
             get() = sendEffectFlow
-        override val navigateToExcursion: (Excursion) -> Unit
+        override val navigateToExcursion: (Int) -> Unit
             get() = navigateToExcursion
         override val profileFavoriteExcursionIdFlow: StateFlow<List<ExcursionFavorite>>
             get() = profileFavoriteExcursionIdFlow
@@ -140,7 +140,7 @@ fun rememberDefaultSearchStateScope(
     snackbarHostState: SnackbarHostState,
     onEvent: (SearchEvent) -> Unit,
     sendEffectFlow: KSuspendFunction2<String, String?, Unit>,
-    navigateToExcursion : (Excursion) -> Unit,
+    navigateToExcursion : (Int) -> Unit,
     profileFavoriteExcursionIdFlow:  StateFlow<List<ExcursionFavorite>>,
     stateSetFavoriteExcursion: StateFlow<SetFavoriteExcursionUIState>,
     stateDeleteFavoriteExcursion: StateFlow<DeleteFavoriteExcursionUIState>,
@@ -155,7 +155,7 @@ fun rememberDefaultSearchStateScope(
 fun SearchScreen(modifier: Modifier = Modifier,
                  snackbarHostState: SnackbarHostState,
                  viewModel: SearchViewModel = hiltViewModel(),
-                 navigateToExcursion: (Excursion) -> Unit,
+                 navigateToExcursion: (Int) -> Unit,
                  scrollingOn:()->Unit,
                  scrollingOff:()->Unit,
                  onActiveChanged: (Boolean) -> Unit,

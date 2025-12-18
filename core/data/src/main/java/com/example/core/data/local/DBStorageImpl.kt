@@ -95,6 +95,7 @@ class DBStorageImpl @Inject constructor(
     override suspend fun insertExcursionFavorite(excursion: ExcursionFavorite, excursionUpdate: Excursion) {
         excursionsRoomDatabase.withTransaction {
             favoriteDao.insert(excursion.toExcursionsFavoriteEntity())
+            // excursionId timestamp
             excursionsFavoriteDao.insertExcursion(excursionUpdate.toExcursionsFavoriteWithData())
         }
     }
@@ -115,6 +116,13 @@ class DBStorageImpl @Inject constructor(
            favorite -> favorite.map {  it.toExcursion() }
         }
     }
+
+    override fun getExcursionFavoriteById(excursionId: Int): Flow<Excursion>{
+        return excursionsFavoriteDao.getExcursionById(excursionId).map{
+                 it.toExcursion()
+        }
+    }
+
 
     override suspend fun clearAll() {
         excursionsFavoriteDao.clearAll()

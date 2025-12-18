@@ -23,7 +23,7 @@ fun NavGraphBuilder.favoritesScreen(
     innerPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onChangeVisibleBottomBar: (Boolean) -> Unit,
-    onNavigateToExcursion: (Excursion) -> Unit,
+    onNavigateToExcursion: (Int) -> Unit,
 ) {
     navigation<FavoritesBaseRoute>(startDestination = FavoritesRoute) {
         composable<FavoritesRoute> {

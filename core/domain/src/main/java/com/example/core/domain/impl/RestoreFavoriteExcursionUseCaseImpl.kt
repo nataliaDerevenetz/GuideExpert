@@ -13,7 +13,7 @@ class RestoreFavoriteExcursionUseCaseImpl @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val excursionsRepository: ExcursionsRepository
 ): RestoreFavoriteExcursionUseCase {
-    override suspend operator fun invoke(excursion: com.example.core.models.Excursion): Flow<com.example.core.models.UIResources<com.example.core.models.RestoreFavoriteExcursionResponse>> {
+    override suspend operator fun invoke(excursion: Excursion): Flow<UIResources<RestoreFavoriteExcursionResponse>> {
         val profile = profileRepository.profileFlow.value
         return excursionsRepository.restoreFavoriteExcursion(excursion,profile)
     }

@@ -32,7 +32,7 @@ import com.example.core.design.components.NetworkImage
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImageSlider(modifier: Modifier = Modifier,
-                navigateToExcursion: (Excursion) -> Unit,
+                navigateToExcursion: (Int) -> Unit,
                 viewModel: HomeViewModel = hiltViewModel(),
 ){
 
@@ -84,9 +84,7 @@ fun ImageSlider(modifier: Modifier = Modifier,
                         )
                     }
                     .clickable {
-                        navigateToExcursion(Excursion(id =configApp.value.banners[page].id,title = "",
-                            description = "", images = listOf(), idSort = 0
-                        ))
+                        navigateToExcursion(configApp.value.banners[page].id)
                     }
             ) {
                 com.example.core.design.components.NetworkImage(

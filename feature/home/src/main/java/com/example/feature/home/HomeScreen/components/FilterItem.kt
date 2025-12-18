@@ -53,7 +53,7 @@ fun HomeScreenContentState.FilterItem(
          ),
         shape = RoundedCornerShape(15.dp),
     ){
-        Row( modifier = Modifier.clickable{ navigateToExcursion(excursion) }){
+        Row( modifier = Modifier.clickable{ navigateToExcursion(excursion.id) }){
             Column ( modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()

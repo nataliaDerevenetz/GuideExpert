@@ -43,7 +43,7 @@ import com.google.accompanist.pager.rememberPagerState
 fun SearchStateScope.SearchItem(
     excursion: Excursion,
     onEvent: (SearchEvent) -> Unit,
-    navigateToExcursion: (Excursion) -> Unit,
+    navigateToExcursion: (Int) -> Unit,
     )
 {
     val favoriteExcursions by profileFavoriteExcursionIdFlow.collectAsStateWithLifecycle()
@@ -56,7 +56,7 @@ fun SearchStateScope.SearchItem(
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ){
-        Row( modifier = Modifier.clickable{ navigateToExcursion(excursion) }) {
+        Row( modifier = Modifier.clickable{ navigateToExcursion(excursion.id) }) {
             Column ( modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()

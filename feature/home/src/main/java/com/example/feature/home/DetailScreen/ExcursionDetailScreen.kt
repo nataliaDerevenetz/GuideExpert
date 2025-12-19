@@ -77,8 +77,8 @@ import kotlin.reflect.KFunction1
 
 @Stable
 interface ExcursionDetailScope {
-    val excursionData: Flow<ExcursionData?>
-    val excursionImages: Flow<List<Image>>
+    val excursionData: StateFlow<ExcursionData?>
+    val excursionImages: StateFlow<List<Image>?>
     val onNavigateToBack: () -> Unit
     val getFiltersGroups: List<Filter>
     val stateView: StateFlow<UIState>
@@ -97,8 +97,8 @@ interface ExcursionDetailScope {
 }
 
 private fun DefaultExcursionDetailScope(
-    excursionData: Flow<ExcursionData?>,
-    excursionImages: Flow<List<Image>>,
+    excursionData: StateFlow<ExcursionData?>,
+    excursionImages: StateFlow<List<Image>?>,
     onNavigateToBack: () -> Unit,
     getFiltersGroups: List<Filter>,
     stateView: StateFlow<UIState>,
@@ -116,9 +116,9 @@ private fun DefaultExcursionDetailScope(
     profile: StateFlow<Profile?>
 ): ExcursionDetailScope {
     return object : ExcursionDetailScope {
-        override val excursionData: Flow<ExcursionData?>
+        override val excursionData: StateFlow<ExcursionData?>
             get() = excursionData
-        override val excursionImages: Flow<List<Image>>
+        override val excursionImages: StateFlow<List<Image>?>
             get() = excursionImages
         override val onNavigateToBack: () -> Unit
             get() = onNavigateToBack
@@ -155,8 +155,8 @@ private fun DefaultExcursionDetailScope(
 
 @Composable
 private fun rememberDefaultExcursionDetailScope(
-    excursionData: Flow<ExcursionData?>,
-    excursionImages: Flow<List<Image>>,
+    excursionData: StateFlow<ExcursionData?>,
+    excursionImages: StateFlow<List<Image>?>,
     onNavigateToBack: () -> Unit,
     getFiltersGroups: List<Filter>,
     stateView: StateFlow<UIState>,
@@ -350,9 +350,9 @@ private fun ExcursionDetailScope.ContentDeleteFavoriteContent(effectFlow: Snackb
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValues) {
-    val excursionData by excursionData.collectAsStateWithLifecycle(null)
-    val excursionImages by excursionImages.collectAsStateWithLifecycle(null)
-    val profile by profile.collectAsStateWithLifecycle(null)
+    val excursionData by excursionData.collectAsStateWithLifecycle()
+    val excursionImages by excursionImages.collectAsStateWithLifecycle()
+    val profile by profile.collectAsStateWithLifecycle()
 
     val scrollState = rememberScrollState()
 
@@ -423,29 +423,28 @@ private fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValue
                             fontSize = 16.sp
                         )
                     }
+
+                    Button(
+                        onClick = {
+
+                            if (profile!= null && profile?.id !=0) {
+                                navigateToBooking(it.excursionId) 
+                            } else {
+                                navigateToProfileInfo()
+                            }
+
+
+                        },
+                        modifier = Modifier
+                            .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+                            .height(50.dp)
+                            .fillMaxWidth()
+
+                    ) {
+                        Text(stringResource(id = R.string.booking))
+                    }
                 }
             }
-
-            Button(
-                onClick = {
-
-                    if (profile!= null && profile?.id !=0) {
-                        excursionData?.let { navigateToBooking(it.excursionId) }
-                    } else {
-                        navigateToProfileInfo()
-                    }
-
-
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp)
-                    .height(50.dp)
-                    .fillMaxWidth()
-
-            ) {
-                Text(stringResource(id = R.string.booking))
-            }
-
         }
 
     }

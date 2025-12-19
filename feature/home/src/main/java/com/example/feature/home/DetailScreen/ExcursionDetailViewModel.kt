@@ -26,11 +26,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,9 +77,17 @@ class ExcursionDetailViewModel @Inject constructor(
     private val _stateView = MutableStateFlow<UIState>(UIState())
     val stateView: StateFlow<UIState> = _stateView.asStateFlow()
 
-    val excursion: Flow<ExcursionData?> = excursionsRepository.getExcursionData(excursionDetail.excursionId)
+    val excursion  = excursionsRepository.getExcursionData(excursionDetail.excursionId).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
-    val images: Flow<List<Image>> = excursionsRepository.getImagesExcursion(excursionDetail.excursionId)
+    val images = excursionsRepository.getImagesExcursion(excursionDetail.excursionId).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     private val _effectChannel = Channel<SnackbarEffect>()
     val effectFlow: Flow<SnackbarEffect> = _effectChannel.receiveAsFlow()

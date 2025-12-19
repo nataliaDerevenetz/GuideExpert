@@ -18,6 +18,7 @@ interface ExcursionsFavoriteDao {
     @Query("SELECT * FROM excursionsFavoriteEntity ORDER BY timestamp DESC")
     fun getAll() : Flow<List<ExcursionsFavoriteWithData>>
 
+    @Transaction
     @Query("SELECT * FROM excursionsFavoriteEntity WHERE  id = :excursionId")
     fun getExcursionById(excursionId: Int) : Flow<ExcursionsFavoriteWithData>
 

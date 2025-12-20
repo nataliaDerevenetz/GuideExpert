@@ -145,18 +145,6 @@ internal fun Favorites(snackbarHostState: SnackbarHostState,
         }
         is LoadFavoritesState.Loading -> { scopeState.FavoritesDataLoading(innerPadding) }
     }
-
-    LaunchedEffect(true) {
-   //     onF()
-    }
-    DisposableEffect(true) {
-        onDispose {
-           // onF()
-            //  lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-
 }
 
 @Composable

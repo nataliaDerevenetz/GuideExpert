@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object FavoritesBaseRoute
 
 fun NavController.navigateToFavorites(navOptions: NavOptions? = null) =
-    navigate(route = FavoritesRoute, navOptions)
+    navigate(route = FavoritesBaseRoute, navOptions)
 
 fun NavGraphBuilder.favoritesScreen(
     innerPadding: PaddingValues,

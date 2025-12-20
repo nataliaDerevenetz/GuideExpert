@@ -428,7 +428,7 @@ private fun ExcursionDetailScope.ExcursionDataContent(innerPadding: PaddingValue
                         onClick = {
 
                             if (profile!= null && profile?.id !=0) {
-                                navigateToBooking(it.excursionId) 
+                                navigateToBooking(it.excursionId)
                             } else {
                                 navigateToProfileInfo()
                             }

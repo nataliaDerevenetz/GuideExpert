@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable object EditorProfile
 
 
-fun NavController.navigateToProfile(navOptions: NavOptions? = null) = navigate(route = com.example.feature.profile.ProfileRoute, navOptions)
+fun NavController.navigateToProfile(navOptions: NavOptions? = null) = navigate(route = ProfileBaseRoute, navOptions)
 
 @RequiresApi(Build.VERSION_CODES.P)
 fun NavGraphBuilder.profileScreen(
@@ -33,7 +33,7 @@ fun NavGraphBuilder.profileScreen(
     onNavigateToBack: () -> Unit,
     onNavigateToProfile: () -> Unit,
 ) {
-    navigation<ProfileBaseRoute>(startDestination = com.example.feature.profile.ProfileRoute) {
+    navigation<ProfileBaseRoute>(startDestination = ProfileRoute) {
         composable<ProfileRoute> {
             onChangeVisibleBottomBar(true)
             ProfileInfo(
@@ -52,7 +52,7 @@ fun NavGraphBuilder.profileScreen(
 }
 
 fun NavController.navigateToEditorProfile() {
-    navigate(route = com.example.feature.profile.EditorProfile){
+    navigate(route = EditorProfile){
         launchSingleTop=true
     }
 }
